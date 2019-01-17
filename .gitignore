@@ -1,0 +1,12 @@
+!.gitignore
+!.gitattributes
+*.DS_Store
+*.idea
+*.svn
+*.git
+/runtime
+/log
+/vendor
+/static/upload
+!composer.json
+/composer.lock

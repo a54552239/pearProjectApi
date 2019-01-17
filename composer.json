@@ -1,0 +1,41 @@
+{
+  "type": "pearProject",
+  "name": "pearProject",
+  "description": "pearProject",
+  "homepage": "https://beta.vilson.xyz",
+  "keywords": [
+    "project",
+    "plan"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "vilson",
+      "email": "545522390@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "qiniu/php-sdk": "^7.2",
+    "endroid/qr-code": "^1.9",
+    "topthink/framework": "5.1.*",
+    "aliyuncs/oss-sdk-php": "^2.2",
+    "zoujingli/ip2region": "dev-master",
+    "topthink/think-image": "^1.0",
+    "workerman/gateway-worker-for-win" : ">=3.0.0",
+    "workerman/gateway-worker" : ">=3.0.0",
+    "overtrue/easy-sms": "^1.1",
+    "phpoffice/phpspreadsheet": "^1.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "app\\": "application"
+    }
+  },
+  "extra": {
+    "think-path": "thinkphp"
+  },
+  "config": {
+    "preferred-install": "dist"
+  }
+}

@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+namespace think;
+
+// 加载基础文件
+require __DIR__ . '/thinkphp/base.php';
+
+// 执行应用
+Container::get('app', [__DIR__ . '/application/'])->initialize();
+Console::init();

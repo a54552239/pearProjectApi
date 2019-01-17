@@ -1,0 +1,208 @@
+<?php
+
+namespace app\project\controller;
+
+use app\common\Model\Member;
+use app\common\Model\SystemConfig;
+use controller\BasicApi;
+use service\FileService;
+use service\NodeService;
+use think\facade\Request;
+use think\File;
+
+/**
+ * Class Account
+ * @package app\project\controller
+ */
+class Account extends BasicApi
+{
+
+    public function __construct()
+    {
+        parent::__construct();
+        if (!$this->model) {
+            $this->model = new \app\common\Model\MemberAccount();
+        }
+    }
+
+    /**
+     * 账户列表
+     * @return array|string
+     * @throws \think\exception\DbException
+     */
+    public function index()
+    {
+        $currentOrganizationCode = getCurrentOrganizationCode();
+        $where = [['organization_code', '=', $currentOrganizationCode]];
+//        $where = [['organization_code', '=', $currentOrganizationCode], ['is_owner', '=', 0]];
+        $params = Request::only('account,mobile,email,searchType,keyword');
+        $departmentCode = Request::param('departmentCode');
+        if (isset($params['keyword']) && $params['keyword']) {
+            $where[] = ['name', 'like', "%{$params['keyword']}%"];
+        }
+        if (isset($params['searchType'])) {
+            $searchType = $params['searchType'];
+            switch ($searchType) {
+                case 1:
+                    $where[] = ['status', '=', 1];
+                    break;
+                case 2:
+                    $where[] = ['department_code', '=', ''];
+                    break;
+                case 3:
+                    $where[] = ['status', '=', 0];
+                    break;
+                case 4:
+                    $where[] = ['status', '=', 1];
+                    $where[] = ['department_code', 'like', "%{$departmentCode}%"];
+                    break;
+                default:
+                    $where[] = ['status', '=', 1];
+
+            }
+        }
+        foreach (['account', 'mobile', 'email'] as $key) {
+            (isset($params[$key]) && $params[$key] !== '') && $where[] = [$key, 'like', "%{$params[$key]}%"];
+        }
+        if (isset($params['date']) && $params['date'] !== '') {
+            list($start, $end) = explode('~', $params['date']);
+            $where[] = ['last_login_time', 'between', ["{$start} 00:00:00", "{$end} 23:59:59"]];
+        }
+        $list = $this->model->_list($where,'id asc');
+        if ($list['list']) {
+            foreach ($list['list'] as &$item) {
+                $memberInfo = Member::where(['code' => $item['member_code']])->field('id', true)->find();
+                if ($memberInfo) {
+                    $item['avatar'] = $memberInfo['avatar'];
+                }
+                $departments = '';
+                $departmentCodes = $item['department_code'];
+                if ($departmentCodes) {
+                    $departmentCodes = explode(',', $departmentCodes);
+                    foreach ($departmentCodes as $departmentCode) {
+                        $department = \app\common\Model\Department::where(['code' => $departmentCode])->field('name')->find();
+                        $departments .= "{$department['name']} ";
+                    }
+                }
+                $item['departments'] = $departments;
+            }
+            unset($item);
+        }
+        $list['authList'] = \app\common\Model\ProjectAuth::where(['status' => '1', 'organization_code' => $currentOrganizationCode])->select();
+        $this->success('', $list);
+    }
+
+    /**
+     * 授权管理
+     * @return array|string
+     */
+    public function auth()
+    {
+        $params = Request::only('id,auth');
+        $data = ['id' => $params['id']];
+        if ($params['auth']) {
+            //        //支持同时设置多个角色，默认关闭
+            $data['authorize'] = intval($params['auth']);
+//            $data['authorize'] = implode(',', json_decode($params['auth']));
+        } else {
+            $data['authorize'] = '';
+        }
+        $result = $this->model->_edit($data);
+        if ($result) {
+            $this->success('');
+        }
+        $this->error("操作失败，请稍候再试！");
+    }
+
+    /**
+     * 账户添加
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function add()
+    {
+        //todo 权限判断
+
+        $params = Request::only('account,mail,mobile,desc,password,realname,name');
+        if ($params['password']) {
+            $params['password'] = md5($params['password']);
+        } else {
+            unset($params['password']);
+        }
+        $params['create_time'] = nowTime();
+        $params['member_code'] = session('member.code');
+        $params['organization_code'] = session('currentOrganizationCode');
+        $user = $this->model->where(['account' => $params['account'], 'member_code' => session('member.code'), 'organization_code' => session('currentOrganizationCode')])->find();
+        $user && $this->error("该账号已存在！");
+        $result = $this->model->_add($params);
+        if ($result) {
+            $this->success('', $result);
+        }
+        $this->error("操作失败，请稍候再试！");
+    }
+
+    /**
+     * 账户编辑
+     * @return array|string
+     */
+    public function edit()
+    {
+        //todo 权限判断
+
+        $params = Request::only('mobile,email,desc,name,id,description');
+        $result = $this->model->_edit($params, ['id' => $params['id']]);
+        if ($result) {
+            $this->success('');
+        }
+        $this->error("操作失败，请稍候再试！");
+    }
+
+    /**
+     * 删除账户
+     */
+    public function del()
+    {
+        try {
+            $result = $this->model->del(Request::post('accountCode'));
+        } catch (\Exception $e) {
+            $this->error($e->getMessage(), $e->getCode());;
+        }
+        if ($result) {
+            $this->success('', $result);
+        }
+        $this->error("账户删除失败，请稍候再试！");
+    }
+
+    /**
+     * 账户禁用
+     */
+    public function forbid()
+    {
+        //todo 权限判断
+
+        $params = Request::only('status,accountCode');
+        $result = $this->model->_edit(['status' => $params['status']], ['code' => $params['accountCode']]);
+        if ($result) {
+            $this->success('');
+        }
+        $this->error("账户禁用失败，请稍候再试！");
+    }
+
+    /**
+     * 账户恢复
+     */
+    public function resume()
+    {
+        //todo 权限判断
+
+        $params = Request::only('status,accountCode');
+        $result = $this->model->_edit(['status' => $params['status']], ['code' => $params['accountCode']]);
+        if ($result) {
+            $this->success('');
+        }
+        $this->error("账户启用失败，请稍候再试！");
+    }
+
+}
