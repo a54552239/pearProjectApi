@@ -103,6 +103,27 @@ class ProjectMember extends BasicApi
     /**
      * 邀请成员
      */
+    public function _joinProject()
+    {
+        $inviteCode = Request::param('inviteCode');
+        $project = $this->model->where(['invite_code' => $inviteCode])->find();
+        if (!$project) {
+            $this->error('该项目已失效');
+        }
+        if (nowTime() >= $project['invite_over_time']) {
+            $this->error('该链接已失效');
+        }
+        try {
+            $this->model->inviteMember($data['memberCode'], $data['projectCode']);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage(), $e->getCode());;
+        }
+        $this->success('');
+    }
+
+    /**
+     * 邀请成员
+     */
     public function inviteMember()
     {
         $data = Request::only('memberCode,projectCode');
