@@ -3,6 +3,24 @@
 namespace app\index\controller;
 
 use app\common\Model\Areas;
+use app\common\Model\Collection;
+use app\common\Model\Department;
+use app\common\Model\DepartmentMember;
+use app\common\Model\File;
+use app\common\Model\Member;
+use app\common\Model\MemberAccount;
+use app\common\Model\Organization;
+use app\common\Model\Project;
+use app\common\Model\ProjectAuth;
+use app\common\Model\ProjectAuthNode;
+use app\common\Model\ProjectCollection;
+use app\common\Model\ProjectLog;
+use app\common\Model\ProjectMember;
+use app\common\Model\SourceLink;
+use app\common\Model\Task;
+use app\common\Model\TaskLike;
+use app\common\Model\TaskMember;
+use app\common\Model\TaskStages;
 use controller\BasicApi;
 use Exception;
 use PDO;
@@ -61,6 +79,7 @@ class Index extends BasicApi
             $this->error($err);
         }
 
+        $initData = isset($_POST['initData']) ? $_POST['initData'] : false;
         $mysqlHostname = isset($_POST['mysqlHost']) ? $_POST['mysqlHost'] : '127.0.0.1';
         $mysqlHostport = isset($_POST['mysqlHostport']) ? $_POST['mysqlHostport'] : 3306;
         $hostArr = explode(':', $mysqlHostname);
@@ -122,6 +141,9 @@ class Index extends BasicApi
             if (!$result) {
                 throw new Exception("无法写入安装锁定到data/install.lock文件，请检查是否有写权限");
             }
+            if ($initData) {
+                $this->initData();
+            }
             $this->success('安装成功，请登录');
         } catch (PDOException $e) {
             $err = $e->getMessage();
@@ -144,6 +166,33 @@ class Index extends BasicApi
             $this->error('', 201);
         }
         $this->success();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function initData()
+    {
+//        $member = Member::where("account = 123456")->find();
+//        $memberCode = $member['code'];
+        Member::where("account <> '123456'")->delete();
+        MemberAccount::where("id > 21")->delete();
+        Collection::where("id > 0")->delete();
+        Department::where("id > 0")->delete();
+        DepartmentMember::where("id > 0")->delete();
+        File::where("id > 0")->delete();
+        Organization::where("id > 1")->delete();
+        Project::where("id > 0")->delete();
+        ProjectAuth::where("id > 4")->delete();
+        ProjectAuthNode::where("auth not in (1,2,3,4)")->delete();
+        ProjectCollection::where("id > 0")->delete();
+        ProjectLog::where("id > 0")->delete();
+        ProjectMember::where("id > 0")->delete();
+        SourceLink::where("id > 0")->delete();
+        Task::where("id > 0")->delete();
+        TaskLike::where("id > 0")->delete();
+        TaskMember::where("id > 0")->delete();
+        TaskStages::where("id > 0")->delete();
     }
 
     /**

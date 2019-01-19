@@ -85,7 +85,7 @@ class Login extends BasicApi
         $organizationList = [];
         if ($list) {
             foreach ($list as $item) {
-                $organization = Organization::where(['code' => $item['organization_code']])->find()->toArray();
+                $organization = Organization::where(['code' => $item['organization_code']])->find();
                 if ($organization) {
                     $organizationList[] = $organization;
                 }
