@@ -356,8 +356,9 @@ class Task extends CommonModel
         }
         $data = [
             'member_code' => getCurrentMember()['code'],
-            'task_code' => $taskCode,
-            'code' => createUniqueCode('taskLog'),
+            'source_code' => $taskCode,
+            'action_type' => 'task',
+            'code' => createUniqueCode('projectLog'),
             'create_time' => nowTime(),
             'is_comment' => 1,
             'content' => $comment,
