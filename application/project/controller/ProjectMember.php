@@ -2,6 +2,7 @@
 
 namespace app\project\controller;
 
+use app\common\Model\InviteLink;
 use app\common\Model\Member;
 use app\common\Model\MemberAccount;
 use controller\BasicApi;
@@ -101,22 +102,25 @@ class ProjectMember extends BasicApi
     }
 
     /**
-     * 邀请成员
+     * 通过邀请连接邀请成员
      */
-    public function _joinProject()
+    public function _joinByInviteLink()
     {
         $inviteCode = Request::param('inviteCode');
-        $project = $this->model->where(['invite_code' => $inviteCode])->find();
-        if (!$project) {
-            $this->error('该项目已失效');
-        }
-        if (nowTime() >= $project['invite_over_time']) {
+        $inviteLink = InviteLink::where(['code' => $inviteCode])->find();
+        if (!$inviteLink || nowTime() >= $inviteLink['over_time']) {
             $this->error('该链接已失效');
         }
-        try {
-            $this->model->inviteMember($data['memberCode'], $data['projectCode']);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage(), $e->getCode());;
+        if ($inviteLink['invite_type'] == 'project') {
+            $project = \app\common\Model\Project::where(['code' => $inviteLink['source_code']])->find();
+            if (!$project) {
+                $this->error('该项目已失效');
+            }
+            try {
+                $this->model->inviteMember(getCurrentMember()['code'], $project['code']);
+            } catch (\Exception $e) {
+                $this->error($e->getMessage(), $e->getCode());
+            }
         }
         $this->success('');
     }
