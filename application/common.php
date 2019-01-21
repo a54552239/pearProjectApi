@@ -7,19 +7,6 @@ use think\Db;
 use think\facade\Cache;
 use think\facade\Request;
 
-/**
- * 获取默认分页信息
- * @return int
- */
-function defaultRows()
-{
-    $rows = intval(Request::param('rows', cookie('page-rows')));
-    if (!$rows) {
-        $rows = 20;
-    }
-    cookie('page-rows', $rows);
-    return $rows;
-}
 
 function isDebug()
 {
@@ -51,7 +38,7 @@ function auth($node, $moduleApp = 'project')
 }
 
 /**
- * 生产表唯一标记
+ * 生成表唯一标记
  * @param string $tableName 表名
  * @param string $fieldName 字段名
  * @param int $len 长度
@@ -92,6 +79,34 @@ function sysconf($name, $value = null)
 }
 
 /**
+ * 错误消息，一般用于向上抛出逻辑错误
+ * @param $errno
+ * @param string $message
+ * @return array
+ */
+function error($errno, $message = '')
+{
+    return [
+        'errno' => $errno,
+        'message' => $message,
+    ];
+}
+
+/**
+ * 判断是否含有错误消息
+ * @param $data
+ * @return bool
+ */
+function isError($data)
+{
+    if (empty($data) || !is_array($data) || !array_key_exists('errno', $data) || (array_key_exists('errno', $data) && $data['errno'] == 0)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+/**
  * 日期格式标准输出
  * @param string $datetime 输入日期
  * @param string $format 输出格式
@@ -102,6 +117,10 @@ function format_datetime($datetime, $format = 'Y年m月d日 H:i:s')
     return date($format, strtotime($datetime));
 }
 
+/**
+ * 当前时间
+ * @return false|string
+ */
 function nowTime()
 {
     return date('Y-m-d H:i:s', time());
