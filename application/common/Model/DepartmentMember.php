@@ -14,9 +14,9 @@ class DepartmentMember extends CommonModel
 
     /**
      * @param $accountCode
-     * @param string $departmentCode
-     * @param int $isOwner
-     * @param int $isPrincipal
+     * @param string $departmentCode 部门code
+     * @param int $isOwner 是否拥有者
+     * @param int $isPrincipal 是否负责人
      * @return DepartmentMember|MemberAccount
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -51,33 +51,12 @@ class DepartmentMember extends CommonModel
             }
             return $result;
         } else {
-            $hasJoined = MemberAccount::where(['member_code' => $accountCode, 'organization_code' => $orgCode])->find();
-            if ($hasJoined) {
-                throw new \Exception('已加入该组织', 3);
+            try {
+                $result = MemberAccount::inviteMember($accountCode, $orgCode);
+            } catch (\Exception $e) {
+                throw new \Exception($e->getMessage(), 3);
             }
-            $memberDate = Member::where(['code' => $accountCode])->find();
-            if (!$memberDate) {
-                throw new \Exception('该用户不存在', 4);
-            }
-            $auth = ProjectAuth::where(['organization_code' => $orgCode, 'is_default' => 1])->field('id')->find();
-            $authId = '';
-            if ($auth) {
-                $authId = $auth['id'];//权限id
-            }
-            $data = [
-                'position' => '资深工程师',
-                'department' => '某某公司－某某某事业群－某某平台部－某某技术部',
-                'code' => createUniqueCode('memberAccount'),
-                'member_code' => $accountCode,
-                'organization_code' => $orgCode,
-                'is_owner' => 0,
-                'authorize' => $authId,
-                'status' => 1,
-                'create_time' => nowTime(),
-                'name' => $memberDate['name'],
-                'email' => $memberDate['email'],
-            ];
-            return MemberAccount::create($data);
+            return $result;
         }
     }
 

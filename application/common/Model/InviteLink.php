@@ -36,19 +36,26 @@ class InviteLink extends CommonModel
         switch ($inviteType) {
             case 'project':
                 $source = Project::where(['code' => $sourceCode])->find();
+                break;
+            case 'organization':
+                $source = Organization::where(['code' => $sourceCode])->find();
         }
         if (!$source) {
             throw new \Exception('该资源不存在', 1);
         }
-        $fileData = [
-            'code' => createUniqueCode('inviteLink'),
-            'create_by' => $memberCode,
-            'invite_type' => $inviteType,
-            'source_code' => $sourceCode,
-            'create_time' => nowTime(),
-            'over_time' => Date('Y-m-d H:i:s', strtotime(nowTime()) + 3600 * 24),
-        ];
-        $result = self::create($fileData);
+        if (!$inviteLink) {
+            $fileData = [
+                'code' => createUniqueCode('inviteLink'),
+                'create_by' => $memberCode,
+                'invite_type' => $inviteType,
+                'source_code' => $sourceCode,
+                'create_time' => nowTime(),
+                'over_time' => Date('Y-m-d H:i:s', strtotime(nowTime()) + 3600 * 24),
+            ];
+            $result = self::create($fileData);
+        }else{
+            $result = $inviteLink;
+        }
         return $result;
     }
 
@@ -60,6 +67,13 @@ class InviteLink extends CommonModel
             case 'project':
                 $link['name'] = '';
                 $linkDetail = Project::where(['code' => $link['source_code']])->field('id', true)->find();
+                if ($linkDetail) {
+                    $link['name'] = $linkDetail['name'];
+                }
+                break;
+            case 'organization':
+                $link['name'] = '';
+                $linkDetail = Organization::where(['code' => $link['source_code']])->field('id', true)->find();
                 if ($linkDetail) {
                     $link['name'] = $linkDetail['name'];
                 }

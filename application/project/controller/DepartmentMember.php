@@ -106,6 +106,7 @@ class DepartmentMember extends BasicApi
         $this->success('', array_values($tempList));//数组下标重置
     }
 
+
     /**
      * 邀请成员
      */

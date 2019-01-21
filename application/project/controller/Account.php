@@ -3,6 +3,7 @@
 namespace app\project\controller;
 
 use app\common\Model\Member;
+use app\common\Model\MemberAccount;
 use app\common\Model\SystemConfig;
 use controller\BasicApi;
 use service\FileService;
@@ -21,7 +22,7 @@ class Account extends BasicApi
     {
         parent::__construct();
         if (!$this->model) {
-            $this->model = new \app\common\Model\MemberAccount();
+            $this->model = new MemberAccount();
         }
     }
 
@@ -68,7 +69,7 @@ class Account extends BasicApi
             list($start, $end) = explode('~', $params['date']);
             $where[] = ['last_login_time', 'between', ["{$start} 00:00:00", "{$end} 23:59:59"]];
         }
-        $list = $this->model->_list($where,'id asc');
+        $list = $this->model->_list($where, 'id asc');
         if ($list['list']) {
             foreach ($list['list'] as &$item) {
                 $memberInfo = Member::where(['code' => $item['member_code']])->field('id', true)->find();
@@ -112,6 +113,30 @@ class Account extends BasicApi
             $this->success('');
         }
         $this->error("操作失败，请稍候再试！");
+    }
+
+    /**
+     * 通过邀请连接邀请成员
+     */
+    public function _joinByInviteLink()
+    {
+        $inviteCode = Request::param('inviteCode');
+        $inviteLink = \app\common\Model\InviteLink::where(['code' => $inviteCode])->find();
+        if (!$inviteLink || nowTime() >= $inviteLink['over_time']) {
+            $this->error('该链接已失效');
+        }
+        if ($inviteLink['invite_type'] == 'organization') {
+            $organization = \app\common\Model\Organization::where(['code' => $inviteLink['source_code']])->find();
+            if (!$organization) {
+                $this->error('该组织不存在');
+            }
+            try {
+                MemberAccount::inviteMember(getCurrentMember()['code'], $organization['code']);
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+            }
+        }
+        $this->success('');
     }
 
     /**
