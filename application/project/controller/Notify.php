@@ -27,15 +27,15 @@ class Notify extends BasicApi
     public function index()
     {
         $where = [];
-        $where[] = ['to', '=', $this->model->gecurrentOrganizationCode()];
-        $where[] = ['terminal', '=', 'organization'];
+        $where[] = ['to', '=', getCurrentMember()['code']];
+        $where[] = ['terminal', '=', 'project'];
         $params = Request::post();
         foreach (['title'] as $key) {
             (isset($params[$key]) && $params[$key] !== '') && $where[] = [$key, 'like', "%{$params[$key]}%"];
         }
-        foreach (['type'] as $key) {
-            (isset($params[$key]) && $params[$key] !== '') && $where[] = [$key, '=', $params['type']];
-        }
+//        foreach (['type'] as $key) {
+//            (isset($params[$key]) && $params[$key] !== '') && $where[] = [$key, '=', $params['type']];
+//        }
         if (isset($params['date']) && $params['date'] !== '') {
             list($start, $end) = explode('~', $params['date']);
             $where[] = ['create_time', 'between', ["{$start} 00:00:00", "{$end} 23:59:59"]];
@@ -53,8 +53,7 @@ class Notify extends BasicApi
      */
     public function noReads()
     {
-        $organization_code = $this->model->gecurrentOrganizationCode();
-        $list = $this->model->listTypeFormat(['is_read' => 0, 'to' => $organization_code, 'terminal' => 'organization'], 5);
+        $list = $this->model->listTypeFormat(['is_read' => 0, 'to' => getCurrentMember()['code'], 'terminal' => 'project'], 5);
         $this->success('', $list);
     }
 

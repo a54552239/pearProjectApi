@@ -12,6 +12,7 @@ namespace app\project\behavior;
 use app\common\Model\CommonModel;
 use app\common\Model\Member;
 use app\common\Model\ProjectLog;
+use app\common\Model\TaskMember;
 use app\common\Model\TaskStages;
 use service\MessageService;
 use think\facade\Log;
@@ -38,9 +39,9 @@ class Task
         $notifyData = [
             'title' => '',
             'content' => '',
-            'type' => '',
-            'action' => '',
-            'terminal' => '',
+            'type' => 'message',
+            'action' => 'task',
+            'terminal' => 'project',
         ];
         $remark = '';
         $content = '';
@@ -49,8 +50,6 @@ class Task
                 $icon = 'plus';
                 $remark = '创建了任务 ';
                 $content = $task['name'];
-                $notifyData['title'] = "";
-                $notifyData['action'] = "";
                 break;
             case 'name':
                 $icon = 'edit';
@@ -155,14 +154,26 @@ class Task
             $logData['content'] = $content;
         }
         ProjectLog::create($logData);
-        if (false) {
+        //触发推送的事件
+        $notifyActions = ['done', 'redo', 'assign'];
+        if (in_array($data['type'], $notifyActions)) {
             //todo 短信,消息推送
             $notifyModel = new \app\common\Model\Notify();
-            $notifyData['content'] = "";
-            $result = $notifyModel->add($notifyData['title'], $notifyData['content'], $notifyData['type'], 0, 0, $notifyData['action'], json_encode($task), $notifyData['terminal']);
-            $organizationCode = getCurrentOrganizationCode();
-            $messageService = new MessageService();
-            $messageService->sendToAll(['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => $organizationCode], 'notify' => $result], $notifyData['action']);
+            $member = Member::where(['code' => $data['memberCode']])->find();
+            $notifyData['title'] = $member['name'] . ' ' . $remark;
+            $notifyData['content'] = $task['name'];
+            $notifyData['avatar'] = $member['avatar'];
+            $taskMembers = TaskMember::where(['task_code' => $task['code']])->select()->toArray();
+            if ($taskMembers) {
+                $messageService = new MessageService();
+                foreach ($taskMembers as $taskMember) {
+                    if ($taskMember['member_code'] == $data['memberCode']) {
+                        continue;//跳过产生者
+                    }
+                    $result = $notifyModel->add($notifyData['title'], $notifyData['content'], $notifyData['type'], $data['memberCode'], $taskMember['member_code'], $notifyData['action'], json_encode($task), $notifyData['terminal'], $notifyData['avatar']);
+                    $messageService->sendToUid($taskMember['member_code'], ['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => getCurrentOrganizationCode()], 'notify' => $result], $notifyData['action']);
+                }
+            }
         }
     }
 }

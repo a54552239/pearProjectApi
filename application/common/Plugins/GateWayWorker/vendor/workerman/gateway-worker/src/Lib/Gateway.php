@@ -52,8 +52,8 @@ class Gateway
      * 与Gateway是否是长链接
      * @var bool
      */
-    public static $persistentConnection = true;
-    
+    public static $persistentConnection = false;
+
     /**
      * 向所有客户端连接(或者 client_id_array 指定的客户端连接)广播消息
      *
@@ -167,7 +167,7 @@ class Gateway
     {
         return (int)static::getClientIdByUid($uid);
     }
-    
+
     /**
      * 判断client_id对应的连接是否在线
      *
@@ -664,7 +664,7 @@ class Gateway
 
     /**
      * 生成验证包，用于验证此客户端的合法性
-     * 
+     *
      * @return string
      */
     protected static function generateAuthBuffer()
@@ -1050,7 +1050,7 @@ class Gateway
         }
         static::setSocketSession($client_id, Context::sessionEncode($session));
     }
-    
+
     /**
      * 更新 session，实际上是与老的session合并
      *
@@ -1067,12 +1067,12 @@ class Gateway
         }
         static::sendCmdAndMessageToClient($client_id, GatewayProtocol::CMD_UPDATE_SESSION, '', Context::sessionEncode($session));
     }
-    
+
     /**
      * 获取某个client_id的session
      *
      * @param int   $client_id
-     * @return mixed false表示出错、null表示用户不存在、array表示具体的session信息 
+     * @return mixed false表示出错、null表示用户不存在、array表示具体的session信息
      */
     public static function getSession($client_id)
     {

@@ -7,6 +7,7 @@ use app\common\Model\MemberAccount;
 use app\common\Model\SystemConfig;
 use controller\BasicApi;
 use service\FileService;
+use service\MessageService;
 use service\NodeService;
 use think\facade\Request;
 use think\File;

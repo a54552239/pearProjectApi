@@ -2,10 +2,6 @@
 
 namespace app\common\Model;
 
-use service\FileService;
-use think\Exception;
-use think\File;
-
 class Notify extends CommonModel
 {
 
@@ -30,7 +26,7 @@ class Notify extends CommonModel
                 foreach ($types as $type) {
                     !isset($formatList[$type]) and $formatList[$type] = [];
                     !isset($totalSum[$type]) and $totalSum[$type] = 0;
-                    $sum = $this->where($where)->where(['type'=>$type])->count('id');
+                    $sum = $this->where($where)->where(['type' => $type])->count('id');
                     $totalSum[$type] = $sum;
                     if ($size and count($formatList[$type]) >= $size) {
                         continue;
@@ -64,14 +60,12 @@ class Notify extends CommonModel
             return false;
         }
         switch ($fromType) {
-            case 'admin':
-                return SystemUser::find($from);
             case 'project': //消息
                 return MemberAccount::find($from);
         }
     }
 
-    public function add($title, $content, $type, $from, $to, $action, $send_data, $terminal,$fromType = 'system')
+    public function add($title, $content, $type, $from, $to, $action, $send_data, $terminal, $avatar = '', $fromType = 'system')
     {
         $data = [
             'title' => $title,
@@ -82,6 +76,7 @@ class Notify extends CommonModel
             'action' => $action,
             'send_data' => $send_data,
             'terminal' => $terminal,
+            'avatar' => $avatar,
             'from_type' => $fromType,
             'create_time' => nowTime(),
         ];

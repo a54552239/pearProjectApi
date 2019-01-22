@@ -11,11 +11,10 @@
  * @link http://www.workerman.net/
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 use Workerman\Worker;
-use Workerman\WebServer;
 use GatewayWorker\Gateway;
-use GatewayWorker\BusinessWorker;
-use Workerman\Autoloader;
+
 require_once __DIR__ . '/vendor/autoload.php';
 
 $ssl = false;
@@ -27,7 +26,7 @@ if ($ssl) {
         'ssl' => array(
             // 请使用绝对路径
             'local_cert' => '/www/wwwroot/pms/server.pem', // 也可以是crt文件
-            'local_pk' =>  '/www/wwwroot/pms/server.key',
+            'local_pk' => '/www/wwwroot/pms/server.key',
             'verify_peer' => false,
             'allow_self_signed' => true, //如果是自签名证书需要开启此选项
         )
@@ -55,9 +54,10 @@ $gateway->startPort = 2900;
 $gateway->registerAddress = '192.168.0.159:2346';
 
 // 心跳间隔
-//$gateway->pingInterval = 10;
+$gateway->pingInterval = 10;
 // 心跳数据
-//$gateway->pingData = '{"type":"ping"}';
+$data = ['action' => 'ping'];
+$gateway->pingData = json_encode($data);
 
 /*
 // 当客户端连接上来时，设置连接的onWebSocketConnect，即在websocket握手时的回调
@@ -78,8 +78,7 @@ $gateway->onConnect = function($connection)
 */
 
 // 如果不是在根目录启动，则运行runAll方法
-if(!defined('GLOBAL_START'))
-{
+if (!defined('GLOBAL_START')) {
     Worker::runAll();
 }
 

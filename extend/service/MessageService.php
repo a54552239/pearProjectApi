@@ -1,12 +1,10 @@
 <?php
 
-
-
 namespace service;
 
+require_once env('app_path') . 'common/Plugins/GateWayWorker/vendor/autoload.php';
+
 use GatewayWorker\Lib\Gateway;
-use think\Db;
-use think\db\Query;
 
 /**
  * 消息推送服务
@@ -15,6 +13,9 @@ use think\db\Query;
  */
 class MessageService
 {
+    /**
+     * MessageService constructor.
+     */
     public function __construct()
     {
         /**
