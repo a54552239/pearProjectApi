@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : localhost
+ Source Server         : 本地
  Source Server Type    : MySQL
- Source Server Version : 50640
- Source Host           : localhost:3306
+ Source Server Version : 50642
+ Source Host           : 127.0.0.1:3306
  Source Schema         : pearproject
 
  Target Server Type    : MySQL
- Target Server Version : 50640
+ Target Server Version : 50642
  File Encoding         : 65001
 
- Date: 20/01/2019 13:10:11
+ Date: 22/01/2019 16:38:56
 */
 
 SET NAMES utf8mb4;
@@ -159,21 +159,6 @@ INSERT INTO `pear_file` VALUES (42, '7ru54lhm6i198stqkdcy3ap2', 'static/upload/f
 INSERT INTO `pear_file` VALUES (43, 'tfydkno68i4b7ha0q1x2uwcs', 'static/upload/file/default/bh5mdpzy7wg46kiqx9uclns2/6v7be19pwman2fird04gqu53/20190113/20190113122337-avatar.png', 'avatar', 'png', 51574, '', 'bh5mdpzy7wg46kiqx9uclns2', NULL, 'mo4uqwfb06dxv8ez2spkl3rg', '6v7be19pwman2fird04gqu53', '2019-01-13 12:23:37', 0, '', 0, 'http://easyproject.net/static/upload/file/default/bh5mdpzy7wg46kiqx9uclns2/6v7be19pwman2fird04gqu53/20190113/20190113122337-avatar.png', 'image/png', '');
 
 -- ----------------------------
--- Table structure for pear_invite_link
--- ----------------------------
-DROP TABLE IF EXISTS `pear_invite_link`;
-CREATE TABLE `pear_invite_link`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邀请码',
-  `create_by` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邀请人',
-  `invite_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '链接类型',
-  `source_code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '资源编码',
-  `create_time` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建时间',
-  `over_time` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '过期时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '邀请链接表' ROW_FORMAT = Compact;
-
--- ----------------------------
 -- Table structure for pear_lock
 -- ----------------------------
 DROP TABLE IF EXISTS `pear_lock`;
@@ -241,7 +226,7 @@ CREATE TABLE `pear_member`  (
 -- ----------------------------
 INSERT INTO `pear_member` VALUES (586, 'Alians', 'e10adc3949ba59abbe56e057f20f883e', 'Alians', '18377893857', 'vilson', NULL, 1, '2019-01-04 21:23:23', '', 'https://gw.alipayobjects.com/zos/rmsportal/zOsKZmFRdUtvpqCImOVY.png', NULL, 0, 0, 0, NULL, NULL, 'vilson@qq.com', 'kqdcn2w40p58r31zyo6efjib');
 INSERT INTO `pear_member` VALUES (582, '123456', 'e10adc3949ba59abbe56e057f20f883e', 'vilson', '18681140825', 'juli', NULL, 1, '2019-01-16 14:32:39', '', 'https://static.vilson.xyz/cover.png', '', 0, 0, 0, NULL, NULL, '545522390@qq.com', '6v7be19pwman2fird04gqu53');
-INSERT INTO `pear_member` VALUES (587, 'Chihiro', 'e10adc3949ba59abbe56e057f20f883e', 'Chihiro', '18278881051', 'Chihiro', NULL, 1, '2019-01-04 21:28:53', '', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', NULL, 0, 0, 0, NULL, NULL, '741648282@qq.com', 'y680trgedcavbhnz24u7i5m3');
+INSERT INTO `pear_member` VALUES (587, 'Chihiro', 'e10adc3949ba59abbe56e057f20f883e', 'Chihiro', '18278881051', 'Chihiro', NULL, 1, '2019-01-22 09:59:52', '', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', NULL, 0, 0, 0, NULL, NULL, '741648282@qq.com', 'y680trgedcavbhnz24u7i5m3');
 INSERT INTO `pear_member` VALUES (588, 'Json', 'f9f02f39d6d2048d760d8add98265ba1', 'Json', '18681140821', 'Json', '2019-01-05 21:57:01', 1, '2019-01-06 08:21:42', '', 'https://static.vilson.xyz/cover.png', NULL, 0, 0, 0, NULL, NULL, '123456@qq.com', 'vys8gd32cfui6brtwzj4pqho');
 
 -- ----------------------------
@@ -289,20 +274,33 @@ CREATE TABLE `pear_notify`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '标题',
   `content` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '内容',
-  `type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '通知类型。通知：notice，消息：message，待办：task',
-  `from` int(11) NULL DEFAULT 0 COMMENT '发送人id',
-  `to` int(11) NULL DEFAULT 0 COMMENT '送达用户id',
+  `type` enum('notice','message','task') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '通知类型。通知：notice，消息：message，待办：task',
+  `from` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '发送人id',
+  `to` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '送达用户id',
   `create_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '生成时间',
   `is_read` tinyint(1) NULL DEFAULT 0 COMMENT '是否已读',
   `read_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '阅读时间',
   `send_data` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '关联数据',
   `finally_send_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '最终发送时间',
   `send_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '发送时间',
-  `action` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'none' COMMENT '场景',
-  `terminal` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '推送终端。管理端：admin，移动端：wap',
-  `from_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '\'landord\',\'admin\',\'system\'',
+  `action` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'none' COMMENT '场景：task，project',
+  `terminal` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '推送终端。pc端：project，移动端：wap',
+  `from_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '\'project\',\'system\'',
+  `avatar` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '头像/图片',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 4244 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '动态通知表' ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 4298 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '动态通知表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of pear_notify
+-- ----------------------------
+INSERT INTO `pear_notify` VALUES (4297, 'vilson 指派给了 Chihiro', '修复了 Divider 与浮动元素一起使用时的样式问题', 'message', '6v7be19pwman2fird04gqu53', 'y680trgedcavbhnz24u7i5m3', '2019-01-22 15:33:47', 0, NULL, '{\"id\":12311,\"code\":\"g15scwqm9zxroy7p8bvjt632\",\"project_code\":\"mo4uqwfb06dxv8ez2spkl3rg\",\"name\":\"\\u4fee\\u590d\\u4e86 Divider \\u4e0e\\u6d6e\\u52a8\\u5143\\u7d20\\u4e00\\u8d77\\u4f7f\\u7528\\u65f6\\u7684\\u6837\\u5f0f\\u95ee\\u9898\",\"pri\":0,\"execute_status\":\"wait\",\"description\":null,\"create_by\":\"6v7be19pwman2fird04gqu53\",\"create_time\":\"2019-01-03 22:28:21\",\"assign_to\":\"y680trgedcavbhnz24u7i5m3\",\"deleted\":0,\"stage_code\":\"7z8tgb6xevy2aj9nui5fk0w1\",\"task_tag\":null,\"done\":0,\"begin_time\":null,\"end_time\":null,\"remind_time\":null,\"pcode\":\"\",\"sort\":0,\"like\":0,\"star\":0,\"deleted_time\":null,\"private\":1,\"id_num\":22,\"priText\":\"\\u666e\\u901a\",\"liked\":0,\"stared\":0,\"childCount\":[0,0],\"hasComment\":0,\"hasSource\":2,\"canRead\":true}', NULL, NULL, 'task', 'project', 'system', 'https://static.vilson.xyz/cover.png');
+INSERT INTO `pear_notify` VALUES (4296, 'vilson 指派给了 Chihiro', '增加 less 变量 @font-variant-base 定制 font-variant 样式', 'message', '6v7be19pwman2fird04gqu53', 'y680trgedcavbhnz24u7i5m3', '2019-01-22 11:17:25', 0, NULL, '{\"id\":12301,\"code\":\"xkic58d20srnu9jm7ohqw14f\",\"project_code\":\"mo4uqwfb06dxv8ez2spkl3rg\",\"name\":\"\\u589e\\u52a0 less \\u53d8\\u91cf @font-variant-base \\u5b9a\\u5236 font-variant \\u6837\\u5f0f\",\"pri\":0,\"execute_status\":\"wait\",\"description\":null,\"create_by\":\"6v7be19pwman2fird04gqu53\",\"create_time\":\"2019-01-03 22:25:53\",\"assign_to\":\"y680trgedcavbhnz24u7i5m3\",\"deleted\":0,\"stage_code\":\"jvyswuxz34qk2cpt9o7ldb60\",\"task_tag\":null,\"done\":0,\"begin_time\":null,\"end_time\":null,\"remind_time\":null,\"pcode\":\"\",\"sort\":0,\"like\":0,\"star\":0,\"deleted_time\":null,\"private\":0,\"id_num\":12,\"priText\":\"\\u666e\\u901a\",\"liked\":0,\"stared\":0,\"childCount\":[0,0],\"hasComment\":0,\"hasSource\":0}', NULL, NULL, 'task', 'project', 'system', 'https://static.vilson.xyz/cover.png');
+INSERT INTO `pear_notify` VALUES (4295, 'vilson 指派给了 Chihiro', '增加 less 变量 @font-variant-base 定制 font-variant 样式', 'message', '6v7be19pwman2fird04gqu53', 'kqdcn2w40p58r31zyo6efjib', '2019-01-22 11:17:25', 0, NULL, '{\"id\":12301,\"code\":\"xkic58d20srnu9jm7ohqw14f\",\"project_code\":\"mo4uqwfb06dxv8ez2spkl3rg\",\"name\":\"\\u589e\\u52a0 less \\u53d8\\u91cf @font-variant-base \\u5b9a\\u5236 font-variant \\u6837\\u5f0f\",\"pri\":0,\"execute_status\":\"wait\",\"description\":null,\"create_by\":\"6v7be19pwman2fird04gqu53\",\"create_time\":\"2019-01-03 22:25:53\",\"assign_to\":\"y680trgedcavbhnz24u7i5m3\",\"deleted\":0,\"stage_code\":\"jvyswuxz34qk2cpt9o7ldb60\",\"task_tag\":null,\"done\":0,\"begin_time\":null,\"end_time\":null,\"remind_time\":null,\"pcode\":\"\",\"sort\":0,\"like\":0,\"star\":0,\"deleted_time\":null,\"private\":0,\"id_num\":12,\"priText\":\"\\u666e\\u901a\",\"liked\":0,\"stared\":0,\"childCount\":[0,0],\"hasComment\":0,\"hasSource\":0}', NULL, NULL, 'task', 'project', 'system', 'https://static.vilson.xyz/cover.png');
+INSERT INTO `pear_notify` VALUES (4293, 'Chihiro 完成了任务 ', '微调 Card 头部和加载中的样式细节', 'message', 'y680trgedcavbhnz24u7i5m3', '6v7be19pwman2fird04gqu53', '2019-01-22 11:00:51', 0, '2019-01-22 11:13:27', '{\"id\":12305,\"code\":\"uwq87z2f0hnvrl6o9gtcb3iy\",\"project_code\":\"mo4uqwfb06dxv8ez2spkl3rg\",\"name\":\"\\u5fae\\u8c03 Card \\u5934\\u90e8\\u548c\\u52a0\\u8f7d\\u4e2d\\u7684\\u6837\\u5f0f\\u7ec6\\u8282\",\"pri\":0,\"execute_status\":\"wait\",\"description\":null,\"create_by\":\"6v7be19pwman2fird04gqu53\",\"create_time\":\"2019-01-03 22:26:21\",\"assign_to\":\"y680trgedcavbhnz24u7i5m3\",\"deleted\":0,\"stage_code\":\"p56enm7zck4id2rb0tx9lguh\",\"task_tag\":null,\"done\":1,\"begin_time\":null,\"end_time\":null,\"remind_time\":null,\"pcode\":\"\",\"sort\":0,\"like\":0,\"star\":2,\"deleted_time\":null,\"private\":0,\"id_num\":16,\"priText\":\"\\u666e\\u901a\",\"liked\":0,\"stared\":0,\"childCount\":[0,0],\"hasComment\":0,\"hasSource\":0}', NULL, NULL, 'task', 'project', 'system', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png');
+INSERT INTO `pear_notify` VALUES (4292, 'Chihiro 完成了任务 ', '优化 Spin 样式并略微提升了切换状态的性能', 'message', 'y680trgedcavbhnz24u7i5m3', '6v7be19pwman2fird04gqu53', '2019-01-22 11:00:34', 0, '2019-01-22 11:13:27', '{\"id\":12304,\"code\":\"gjmotpbrwva079ukde4izn38\",\"project_code\":\"mo4uqwfb06dxv8ez2spkl3rg\",\"name\":\"\\u4f18\\u5316 Spin \\u6837\\u5f0f\\u5e76\\u7565\\u5fae\\u63d0\\u5347\\u4e86\\u5207\\u6362\\u72b6\\u6001\\u7684\\u6027\\u80fd\",\"pri\":0,\"execute_status\":\"wait\",\"description\":null,\"create_by\":\"6v7be19pwman2fird04gqu53\",\"create_time\":\"2019-01-03 22:26:16\",\"assign_to\":\"6v7be19pwman2fird04gqu53\",\"deleted\":0,\"stage_code\":\"p56enm7zck4id2rb0tx9lguh\",\"task_tag\":null,\"done\":1,\"begin_time\":null,\"end_time\":null,\"remind_time\":null,\"pcode\":\"\",\"sort\":0,\"like\":0,\"star\":0,\"deleted_time\":null,\"private\":0,\"id_num\":15,\"priText\":\"\\u666e\\u901a\",\"liked\":0,\"stared\":0,\"childCount\":[0,0],\"hasComment\":0,\"hasSource\":0}', NULL, NULL, 'task', 'project', 'system', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png');
+INSERT INTO `pear_notify` VALUES (4291, 'vilson 重做了任务 ', '微调 Card 头部和加载中的样式细节', 'message', '6v7be19pwman2fird04gqu53', 'y680trgedcavbhnz24u7i5m3', '2019-01-22 11:00:24', 0, NULL, '{\"id\":12305,\"code\":\"uwq87z2f0hnvrl6o9gtcb3iy\",\"project_code\":\"mo4uqwfb06dxv8ez2spkl3rg\",\"name\":\"\\u5fae\\u8c03 Card \\u5934\\u90e8\\u548c\\u52a0\\u8f7d\\u4e2d\\u7684\\u6837\\u5f0f\\u7ec6\\u8282\",\"pri\":0,\"execute_status\":\"wait\",\"description\":null,\"create_by\":\"6v7be19pwman2fird04gqu53\",\"create_time\":\"2019-01-03 22:26:21\",\"assign_to\":\"y680trgedcavbhnz24u7i5m3\",\"deleted\":0,\"stage_code\":\"p56enm7zck4id2rb0tx9lguh\",\"task_tag\":null,\"done\":0,\"begin_time\":null,\"end_time\":null,\"remind_time\":null,\"pcode\":\"\",\"sort\":0,\"like\":0,\"star\":2,\"deleted_time\":null,\"private\":0,\"id_num\":16,\"priText\":\"\\u666e\\u901a\",\"liked\":0,\"stared\":0,\"childCount\":[0,0],\"hasComment\":0,\"hasSource\":0}', NULL, NULL, 'task', 'project', 'system', 'https://static.vilson.xyz/cover.png');
+INSERT INTO `pear_notify` VALUES (4290, 'vilson 完成了任务 ', '微调 Card 头部和加载中的样式细节', 'message', '6v7be19pwman2fird04gqu53', 'y680trgedcavbhnz24u7i5m3', '2019-01-22 11:00:01', 0, NULL, '{\"id\":12305,\"code\":\"uwq87z2f0hnvrl6o9gtcb3iy\",\"project_code\":\"mo4uqwfb06dxv8ez2spkl3rg\",\"name\":\"\\u5fae\\u8c03 Card \\u5934\\u90e8\\u548c\\u52a0\\u8f7d\\u4e2d\\u7684\\u6837\\u5f0f\\u7ec6\\u8282\",\"pri\":0,\"execute_status\":\"wait\",\"description\":null,\"create_by\":\"6v7be19pwman2fird04gqu53\",\"create_time\":\"2019-01-03 22:26:21\",\"assign_to\":\"y680trgedcavbhnz24u7i5m3\",\"deleted\":0,\"stage_code\":\"p56enm7zck4id2rb0tx9lguh\",\"task_tag\":null,\"done\":1,\"begin_time\":null,\"end_time\":null,\"remind_time\":null,\"pcode\":\"\",\"sort\":0,\"like\":0,\"star\":2,\"deleted_time\":null,\"private\":0,\"id_num\":16,\"priText\":\"\\u666e\\u901a\",\"liked\":0,\"stared\":0,\"childCount\":[0,0],\"hasComment\":0,\"hasSource\":0}', NULL, NULL, 'task', 'project', 'system', 'https://static.vilson.xyz/cover.png');
+INSERT INTO `pear_notify` VALUES (4294, 'vilson 重做了任务 ', '微调 Card 头部和加载中的样式细节', 'message', '6v7be19pwman2fird04gqu53', 'y680trgedcavbhnz24u7i5m3', '2019-01-22 11:17:09', 0, NULL, '{\"id\":12305,\"code\":\"uwq87z2f0hnvrl6o9gtcb3iy\",\"project_code\":\"mo4uqwfb06dxv8ez2spkl3rg\",\"name\":\"\\u5fae\\u8c03 Card \\u5934\\u90e8\\u548c\\u52a0\\u8f7d\\u4e2d\\u7684\\u6837\\u5f0f\\u7ec6\\u8282\",\"pri\":0,\"execute_status\":\"wait\",\"description\":null,\"create_by\":\"6v7be19pwman2fird04gqu53\",\"create_time\":\"2019-01-03 22:26:21\",\"assign_to\":\"y680trgedcavbhnz24u7i5m3\",\"deleted\":0,\"stage_code\":\"p56enm7zck4id2rb0tx9lguh\",\"task_tag\":null,\"done\":0,\"begin_time\":null,\"end_time\":null,\"remind_time\":null,\"pcode\":\"\",\"sort\":0,\"like\":0,\"star\":2,\"deleted_time\":null,\"private\":0,\"id_num\":16,\"priText\":\"\\u666e\\u901a\",\"liked\":0,\"stared\":0,\"childCount\":[0,0],\"hasComment\":0,\"hasSource\":0}', NULL, NULL, 'task', 'project', 'system', 'https://static.vilson.xyz/cover.png');
 
 -- ----------------------------
 -- Table structure for pear_organization
@@ -357,8 +355,6 @@ CREATE TABLE `pear_project`  (
   `open_prefix` tinyint(1) NULL DEFAULT 0 COMMENT '是否开启项目前缀',
   `archive` tinyint(1) NULL DEFAULT 0 COMMENT '是否归档',
   `archive_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '归档时间',
-  `invite_code` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '邀请码',
-  `invite_over_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '邀请码过期时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `project`(`order`) USING BTREE
 ) ENGINE = MyISAM AUTO_INCREMENT = 13043 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目表' ROW_FORMAT = Dynamic;
@@ -366,17 +362,17 @@ CREATE TABLE `pear_project`  (
 -- ----------------------------
 -- Records of pear_project
 -- ----------------------------
-INSERT INTO `pear_project` VALUES (1, 'https://beta.vilson.xyz/static/upload//20190103/f9ad4e304ea0be7609e3236188f7547d.png', 'iView', 'a8mpr6tvbndk10hj2lwcqzuo', '那是一种内在的东西， 他们到达不了，也无法触及的', 'private', NULL, NULL, 0, '10', 39.00, '2018-04-30 22:29:18', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, '', '');
-INSERT INTO `pear_project` VALUES (2, 'https://beta.vilson.xyz/static/upload//20190103/aaacec0e2001580b44dffbb967804349.png', 'Alipay', '8rlqyh56smzpoc1wef7390t2', '城镇中有那么多的酒馆，她却偏偏走进了我的酒馆', 'open', NULL, NULL, 0, '10', 75.00, '2018-05-01 09:28:36', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, '', '');
-INSERT INTO `pear_project` VALUES (3, 'https://beta.vilson.xyz/static/upload//20190103/9ba2134d72cc3cec58f61024b89eb798.png', 'Vue', 'nkp4gulsb6oxqyi80fhead39', '生命就像一盒巧克力，结果往往出人意料', 'open', NULL, NULL, 0, '10', 63.00, '2018-05-01 09:33:43', '6v7be19pwman2fird04gqu53', '2019-01-03 22:20:10', 1, '', 0, 0, NULL, '', '');
-INSERT INTO `pear_project` VALUES (4, 'https://beta.vilson.xyz/static/upload//20190103/6fc14133651ee1c6ee1abaafcea76d01.png', 'Angular', 'sbklfvyouc0qpmwhitn47j5z', '希望是一个好东西，也许是最好的，好东西是不会消亡的', 'private', NULL, NULL, 0, '13', 100.00, '2018-05-01 09:36:05', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, '', '');
-INSERT INTO `pear_project` VALUES (5, 'https://beta.vilson.xyz/static/upload//20190103/5d2a6e2d2cb235bb6888b884331bb516.png', 'EasyUI', 'n5opgqevrz1l03h48uwx67d2', '那时候我只会想自己想要什么，从不想自己拥有什么', 'open', NULL, NULL, 1, '0', 0.00, '2018-12-22 10:52:25', '6v7be19pwman2fird04gqu53', '2019-01-03 22:19:50', 1, '', 0, 0, NULL, '', '');
-INSERT INTO `pear_project` VALUES (1304, 'https://beta.vilson.xyz/static/upload//20190103/f5187655ceab8b52a335443664dffb3c.png', 'Vant', 'tnxpbov8kez6m4wl2hfjucd9', '现在的魏无羡，离开了蓝忘机就不行', 'open', NULL, 0, 0, '0', 50.00, '2018-12-23 08:31:53', '6v7be19pwman2fird04gqu53', '2019-01-04 11:33:02', 1, '', 0, 1, '2019-01-13 13:53:42', '', '');
-INSERT INTO `pear_project` VALUES (1303, 'https://beta.vilson.xyz/static/upload//20190103/30bdd62b610f5a4e3f788ec37e6c4a5b.png', 'Material UI', 'elqa703jyvfhpt1dsxkzi8on', '这个项目你不是项目成员，将不能进行操作（只读）', 'open', NULL, 0, 0, '0', 35.00, '2018-12-23 09:33:46', '6v7be19pwman2fird04gqu53', NULL, 0, '', 0, 0, NULL, '', '');
-INSERT INTO `pear_project` VALUES (1302, 'https://beta.vilson.xyz/static/upload//20190103/271ec382566f0d2ca187740330b19a17.png', 'Ant Motion', 'ibag9hw3o1tusd5qlpxrk782', '如果我真的存在，也是因为你需要我', 'open', NULL, 0, 1, '0', 50.00, '2018-12-23 09:53:25', '6v7be19pwman2fird04gqu53', '2019-01-04 21:48:33', 0, '', 0, 0, '2019-01-02 21:01:12', '', '');
-INSERT INTO `pear_project` VALUES (1305, 'https://beta.vilson.xyz/static/upload//20190103/d86b104c0e1131b2fbd06dce615470df.png', 'Ant Design', 'mo4uqwfb06dxv8ez2spkl3rg', '那时候我只会想自己想要什么，从不想自己拥有什么', 'open', NULL, 0, 0, '0', 24.00, '2018-12-25 07:20:36', '6v7be19pwman2fird04gqu53', '2019-01-02 22:06:02', 1, 'EP', 0, 0, '2019-01-02 20:59:09', '', '');
-INSERT INTO `pear_project` VALUES (1307, 'https://beta.vilson.xyz/static/upload//20190103/271ec382566f0d2ca187740330b19a17.png', '测试', '8ulzfth64cd0k1x5peivowm2', '测试11', 'open', NULL, 0, 1, '', 0.00, '2019-01-03 09:15:11', '6v7be19pwman2fird04gqu53', '2019-01-03 22:18:30', 1, '', 0, 0, '2019-01-03 10:52:54', '', '');
-INSERT INTO `pear_project` VALUES (13042, 'http://easyproject.net/static/image/default/project-cover.png', 'OKR 管理', 'gbim9jpevkh7qr6ufa1t3wl4', 'OKR 管理', 'open', NULL, 0, 1, '', 0.00, '2019-01-05 21:57:31', '4ni58wts2egcybvodfh1kmaj', '2019-01-06 08:21:49', 1, NULL, 0, 0, NULL, '', '');
+INSERT INTO `pear_project` VALUES (1, 'https://beta.vilson.xyz/static/upload//20190103/f9ad4e304ea0be7609e3236188f7547d.png', 'iView', 'a8mpr6tvbndk10hj2lwcqzuo', '那是一种内在的东西， 他们到达不了，也无法触及的', 'private', NULL, NULL, 0, '10', 39.00, '2018-04-30 22:29:18', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL);
+INSERT INTO `pear_project` VALUES (2, 'https://beta.vilson.xyz/static/upload//20190103/aaacec0e2001580b44dffbb967804349.png', 'Alipay', '8rlqyh56smzpoc1wef7390t2', '城镇中有那么多的酒馆，她却偏偏走进了我的酒馆', 'open', NULL, NULL, 0, '10', 75.00, '2018-05-01 09:28:36', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL);
+INSERT INTO `pear_project` VALUES (3, 'https://beta.vilson.xyz/static/upload//20190103/9ba2134d72cc3cec58f61024b89eb798.png', 'Vue', 'nkp4gulsb6oxqyi80fhead39', '生命就像一盒巧克力，结果往往出人意料', 'open', NULL, NULL, 0, '10', 63.00, '2018-05-01 09:33:43', '6v7be19pwman2fird04gqu53', '2019-01-03 22:20:10', 1, '', 0, 0, NULL);
+INSERT INTO `pear_project` VALUES (4, 'https://beta.vilson.xyz/static/upload//20190103/6fc14133651ee1c6ee1abaafcea76d01.png', 'Angular', 'sbklfvyouc0qpmwhitn47j5z', '希望是一个好东西，也许是最好的，好东西是不会消亡的', 'private', NULL, NULL, 0, '13', 100.00, '2018-05-01 09:36:05', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL);
+INSERT INTO `pear_project` VALUES (5, 'https://beta.vilson.xyz/static/upload//20190103/5d2a6e2d2cb235bb6888b884331bb516.png', 'EasyUI', 'n5opgqevrz1l03h48uwx67d2', '那时候我只会想自己想要什么，从不想自己拥有什么', 'open', NULL, NULL, 1, '0', 0.00, '2018-12-22 10:52:25', '6v7be19pwman2fird04gqu53', '2019-01-03 22:19:50', 1, '', 0, 0, NULL);
+INSERT INTO `pear_project` VALUES (1304, 'https://beta.vilson.xyz/static/upload//20190103/f5187655ceab8b52a335443664dffb3c.png', 'Vant', 'tnxpbov8kez6m4wl2hfjucd9', '现在的魏无羡，离开了蓝忘机就不行', 'open', NULL, 0, 0, '0', 50.00, '2018-12-23 08:31:53', '6v7be19pwman2fird04gqu53', '2019-01-04 11:33:02', 1, '', 0, 1, '2019-01-13 13:53:42');
+INSERT INTO `pear_project` VALUES (1303, 'https://beta.vilson.xyz/static/upload//20190103/30bdd62b610f5a4e3f788ec37e6c4a5b.png', 'Material UI', 'elqa703jyvfhpt1dsxkzi8on', '这个项目你不是项目成员，将不能进行操作（只读）', 'open', NULL, 0, 0, '0', 35.00, '2018-12-23 09:33:46', '6v7be19pwman2fird04gqu53', NULL, 0, '', 0, 0, NULL);
+INSERT INTO `pear_project` VALUES (1302, 'https://beta.vilson.xyz/static/upload//20190103/271ec382566f0d2ca187740330b19a17.png', 'Ant Motion', 'ibag9hw3o1tusd5qlpxrk782', '如果我真的存在，也是因为你需要我', 'open', NULL, 0, 1, '0', 50.00, '2018-12-23 09:53:25', '6v7be19pwman2fird04gqu53', '2019-01-04 21:48:33', 0, '', 0, 0, '2019-01-02 21:01:12');
+INSERT INTO `pear_project` VALUES (1305, 'https://beta.vilson.xyz/static/upload//20190103/d86b104c0e1131b2fbd06dce615470df.png', 'Ant Design', 'mo4uqwfb06dxv8ez2spkl3rg', '那时候我只会想自己想要什么，从不想自己拥有什么', 'open', NULL, 0, 0, '0', 24.00, '2018-12-25 07:20:36', '6v7be19pwman2fird04gqu53', '2019-01-02 22:06:02', 1, 'EP', 0, 0, '2019-01-02 20:59:09');
+INSERT INTO `pear_project` VALUES (1307, 'https://beta.vilson.xyz/static/upload//20190103/271ec382566f0d2ca187740330b19a17.png', '测试', '8ulzfth64cd0k1x5peivowm2', '测试11', 'open', NULL, 0, 1, '', 0.00, '2019-01-03 09:15:11', '6v7be19pwman2fird04gqu53', '2019-01-03 22:18:30', 1, '', 0, 0, '2019-01-03 10:52:54');
+INSERT INTO `pear_project` VALUES (13042, 'http://easyproject.net/static/image/default/project-cover.png', 'OKR 管理', 'gbim9jpevkh7qr6ufa1t3wl4', 'OKR 管理', 'open', NULL, 0, 1, '', 0.00, '2019-01-05 21:57:31', '4ni58wts2egcybvodfh1kmaj', '2019-01-06 08:21:49', 1, NULL, 0, 0, NULL);
 
 -- ----------------------------
 -- Table structure for pear_project_auth
@@ -1210,7 +1206,7 @@ CREATE TABLE `pear_project_log`  (
   `project_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `icon` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4334 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目日志表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 4386 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目日志表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pear_project_log
@@ -1672,6 +1668,58 @@ INSERT INTO `pear_project_log` VALUES (4330, 'm6847e9oj20tagqb5uclfyir', '6v7be1
 INSERT INTO `pear_project_log` VALUES (4331, 'cguhle3aypqw05fz6iv4rmjn', '6v7be19pwman2fird04gqu53', '', '取消关联文件 <a target=\"_blank\" class=\"muted\" href=\"http://easyproject.net/static/upload/file/default/6v7be19pwman2fird04gqu53/6v7be19pwman2fird04gqu53/20190111/20190111104607-cover.png \">cover.png</a>', 'unlinkFile', '2019-01-11 11:19:16', 'g15scwqm9zxroy7p8bvjt632', 'task', '', 0, NULL, 'disconnect');
 INSERT INTO `pear_project_log` VALUES (4332, 'ibq97pevg4w6tfna3hukydjr', '6v7be19pwman2fird04gqu53', '', '把任务移到了回收站 ', 'recycle', '2019-01-12 22:27:56', 'owrs04m3e2klj8uqac6tiy17', 'task', '', 0, NULL, 'delete');
 INSERT INTO `pear_project_log` VALUES (4333, 'te280dxhycfkjzvqwi9bam63', '6v7be19pwman2fird04gqu53', '', '恢复了任务 ', 'recovery', '2019-01-13 20:46:29', 'owrs04m3e2klj8uqac6tiy17', 'task', '', 0, NULL, 'undo');
+INSERT INTO `pear_project_log` VALUES (4334, '640evh2r593opsj78lbaknqd', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 09:26:28', 'p1aujdigrlxky76h8cs3z4w0', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4335, 'pxj6rs9a3gzmv4tce5dlfiok', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 09:27:21', 'xkic58d20srnu9jm7ohqw14f', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4336, 'pt5kr32fbyjcladn4sweqmo0', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 09:27:27', '2bn918l6ejyzousa73dkpgci', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4337, 'znqcf283ixw0g7b9sa5hvryj', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 09:27:40', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4338, 'd1eirc78j596ut3qfyx0swbg', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 09:27:44', 'gjmotpbrwva079ukde4izn38', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4339, 'mujeyl30g4rpx51htofv27sd', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 09:28:37', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4340, '869lgdwb3piavo1ec4tf2kuq', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 09:28:44', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4341, 'af4ozmystrqincju75dxpwv0', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 09:28:49', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4342, 'krsxhc15bd6wtnpuq94gilz2', '6v7be19pwman2fird04gqu53', '', '添加了参与者 Alians', 'inviteMember', '2019-01-22 09:29:26', '6hj43ueim2bk187sqzcoy59v', 'task', 'kqdcn2w40p58r31zyo6efjib', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'user-add');
+INSERT INTO `pear_project_log` VALUES (4343, '0rq5hmjwgeonxb9ztslku8ac', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 09:29:39', '6hj43ueim2bk187sqzcoy59v', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4344, 'd6t7n3oxyv4fehr9ka2p1sj8', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 09:29:49', '6hj43ueim2bk187sqzcoy59v', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4345, '189uhp2abf5grx3zeljnvtyi', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 09:31:23', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4346, 'kgzi1bltahenq3d879xpjcmo', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 09:49:31', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4347, 'suqp9no7zbdmijk5vr13xael', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 09:56:16', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4348, 'khpzxr8wbteaqf2vgj346soy', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 09:57:35', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4349, 'fnhkexwao5d2j0c9iqts1mgr', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 09:57:54', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4350, '37wt1f5kiqburjmndclxeo8h', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 09:58:53', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4351, 'y5psxv1b0h7tro9uz38en2gf', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 10:00:16', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4352, 'eumgnqfyvcrl6d37b28toazp', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 10:00:22', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4353, 'cfn437mlrv2beq0zw5ygkixp', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 10:01:05', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4354, '1siu8fw2gry6p4d0xeh5lmnb', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 10:01:17', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4355, 'i280y4wth1cqb3sfvku59mrx', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 10:01:44', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4356, '68zpnieukwgch5x17s4vdfto', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:01:55', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4357, 't50dqmeiopruxlz47319fgbv', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 10:03:09', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4358, 'svid1fac8j6w4beyop0ktlx7', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:03:36', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4359, '93eidcafx6jo1ltqnwbkh7r5', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 10:18:10', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4360, 'oul1eahk0p9i8dn5t26yjxqf', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:27:52', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4361, '2joeqv0bwpkx7fli8ndzh5g9', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 10:29:57', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4362, 'x8rho36lz7sde1yfcmjwvtu0', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:30:27', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4363, '0n4vt7bfyhu3msarwce9jxzq', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 10:33:54', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4364, 'nhpd4ul98weazi6bt1kc0fjm', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:34:59', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4365, 't4uodm190n32li85rawp7hyq', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 10:49:21', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4366, 'k82ny1r7t05qchsjb6zudv9i', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:50:23', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4367, 'c2zgd943qf1u6opnx5wbj8va', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 10:51:25', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4368, 'bxum8cd0vh1462i9jq3y5wzg', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:51:43', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4369, 'upty8vi5ro0ndze9wj2l47gq', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 10:53:44', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4370, '3iqsjo249y0cv5rte87wm6k1', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:54:05', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4371, 'v60w274dr1ozunket9sj8afl', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 10:54:32', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4372, 'neb0q8zcau7sr5mlpidkhygv', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:56:38', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4373, 'fqo21hw4s3abzvgriy75t6j8', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 10:56:55', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4374, 'rf8muvqcoi0w7z9jt6l51n3a', 'y680trgedcavbhnz24u7i5m3', '', '重做了任务 ', 'redo', '2019-01-22 10:57:20', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4375, 'moez3livtwyq645p9rg2kd8n', '6v7be19pwman2fird04gqu53', '', '完成了任务 ', 'done', '2019-01-22 11:00:01', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4376, '1uq6fatcygw9phmjs072dibl', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 11:00:24', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4377, '7l0coj4vxedk1mgunp2bq6ws', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 11:00:34', 'gjmotpbrwva079ukde4izn38', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4378, 'an1bp8m6hxr34kl7qe9tvgfd', 'y680trgedcavbhnz24u7i5m3', '', '完成了任务 ', 'done', '2019-01-22 11:00:51', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'check');
+INSERT INTO `pear_project_log` VALUES (4379, 'h71rxei48g6wbyqvnfpc05j2', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 11:17:09', 'uwq87z2f0hnvrl6o9gtcb3iy', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4380, 'gmwq053ujbkc4yrnexi9dtvf', '6v7be19pwman2fird04gqu53', '', '指派给了 Chihiro', 'assign', '2019-01-22 11:17:25', 'xkic58d20srnu9jm7ohqw14f', 'task', 'y680trgedcavbhnz24u7i5m3', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'user');
+INSERT INTO `pear_project_log` VALUES (4381, 'xo3sc4hezl9qnw72ud01ym8b', '6v7be19pwman2fird04gqu53', '', '移除了参与者 Alians', 'removeMember', '2019-01-22 11:17:33', 'xkic58d20srnu9jm7ohqw14f', 'task', 'kqdcn2w40p58r31zyo6efjib', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'user-delete');
+INSERT INTO `pear_project_log` VALUES (4382, '0mzwq9finea16p5rtx8ljco2', '6v7be19pwman2fird04gqu53', '', '重做了任务 ', 'redo', '2019-01-22 12:37:23', 'gjmotpbrwva079ukde4izn38', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'border');
+INSERT INTO `pear_project_log` VALUES (4383, 'e4rpklq1bch96gdsiy0tnmjv', '6v7be19pwman2fird04gqu53', '', '指派给了 Chihiro', 'assign', '2019-01-22 15:33:47', 'g15scwqm9zxroy7p8bvjt632', 'task', 'y680trgedcavbhnz24u7i5m3', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'user');
+INSERT INTO `pear_project_log` VALUES (4384, 'copzlu1wvej2fski30xmt4y6', '6v7be19pwman2fird04gqu53', '修复了 Form 高级搜索模式下的样式问题', '更新了内容 ', 'name', '2019-01-22 16:01:31', '0a84xkg12enqjml7rz6dbifw', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'edit');
+INSERT INTO `pear_project_log` VALUES (4385, '57l1hptgz4bfo0js9w6xy2ia', '6v7be19pwman2fird04gqu53', '修复了 Form 高级搜索模式下的样式问题', '更新了内容 ', 'name', '2019-01-22 16:03:24', '0a84xkg12enqjml7rz6dbifw', 'task', '', 0, 'mo4uqwfb06dxv8ez2spkl3rg', 'edit');
 
 -- ----------------------------
 -- Table structure for pear_project_member
@@ -1784,7 +1832,7 @@ CREATE TABLE `pear_project_node`  (
   `create_at` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `index_system_node_node`(`node`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 603 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目端节点表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 606 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目端节点表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pear_project_node
@@ -1924,6 +1972,9 @@ INSERT INTO `pear_project_node` VALUES (599, 'project/source_link', '资源关�
 INSERT INTO `pear_project_node` VALUES (600, 'project/source_link/delete', '取消关联', 0, 1, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (601, 'project/task/tasklog', '任务动态', 0, 1, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (602, 'project/task/recyclebatch', '批量移动任务到回收站', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (603, 'project/invite_link', '邀请链接管理', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (604, 'project/invite_link/save', '创建邀请链接', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (605, 'project/task/setprivate', '设置任务隐私模式', 0, 1, 1, NULL);
 
 -- ----------------------------
 -- Table structure for pear_project_template
@@ -2088,19 +2139,19 @@ INSERT INTO `pear_task` VALUES (12295, 'q9y6ksvtifwpuhna0e32jgm1', '8ulzfth64cd0
 INSERT INTO `pear_task` VALUES (12296, 'wyklgmhpt5qr47x3zsf9nibj', '8ulzfth64cd0k1x5peivowm2', '2', 0, 'wait', '<p>66</p>', 'kqdcn2w40p58r31zyo6efjib', '2019-01-03 10:46:13', '6v7be19pwman2fird04gqu53', 0, 'ht0gfnevaq7kp3ldx16i82yj', NULL, 1, NULL, NULL, NULL, '', 0, 0, 0, NULL, 0, 2);
 INSERT INTO `pear_task` VALUES (12297, 'm6cloqrbh7tf0wg1jsvp9nay', 'mo4uqwfb06dxv8ez2spkl3rg', '99', 0, 'wait', NULL, 'kqdcn2w40p58r31zyo6efjib', '2019-01-03 11:00:15', 'y680trgedcavbhnz24u7i5m3', 0, '7z8tgb6xevy2aj9nui5fk0w1', NULL, 1, NULL, NULL, NULL, 'aut9wrz1pn0elf5s47ivx26o', 0, 0, 0, NULL, 0, 8);
 INSERT INTO `pear_task` VALUES (12298, 'p1aujdigrlxky76h8cs3z4w0', 'mo4uqwfb06dxv8ez2spkl3rg', '增加了一个新组件 Comment', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:25:29', 'y680trgedcavbhnz24u7i5m3', 0, 'jvyswuxz34qk2cpt9o7ldb60', NULL, 0, NULL, '2019-01-01 18:00', NULL, '', 0, 0, 0, NULL, 0, 9);
-INSERT INTO `pear_task` VALUES (12299, '2bn918l6ejyzousa73dkpgci', 'mo4uqwfb06dxv8ez2spkl3rg', '增加了一个新组件 ConfigProvider 为组件提供统一的全局化配置', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:25:37', '6v7be19pwman2fird04gqu53', 0, 'psemnf3ugo89vc5r2hkxid1t', NULL, 0, NULL, NULL, NULL, '', 2, 0, 0, NULL, 0, 10);
+INSERT INTO `pear_task` VALUES (12299, '2bn918l6ejyzousa73dkpgci', 'mo4uqwfb06dxv8ez2spkl3rg', '增加了一个新组件 ConfigProvider 为组件提供统一的全局化配置', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:25:37', '6v7be19pwman2fird04gqu53', 0, 'psemnf3ugo89vc5r2hkxid1t', NULL, 1, NULL, NULL, NULL, '', 2, 0, 0, NULL, 0, 10);
 INSERT INTO `pear_task` VALUES (12300, '3qz5hfsin69xt8cgbd70lkew', 'mo4uqwfb06dxv8ez2spkl3rg', 'Avatar 组件增加 srcSet 属性，用于设置图片类头像响应式资源地址', 1, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:25:45', 'kqdcn2w40p58r31zyo6efjib', 0, 'jvyswuxz34qk2cpt9o7ldb60', NULL, 0, NULL, NULL, NULL, '', 2, 0, 0, NULL, 0, 11);
-INSERT INTO `pear_task` VALUES (12301, 'xkic58d20srnu9jm7ohqw14f', 'mo4uqwfb06dxv8ez2spkl3rg', '增加 less 变量 @font-variant-base 定制 font-variant 样式', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:25:53', 'kqdcn2w40p58r31zyo6efjib', 0, 'jvyswuxz34qk2cpt9o7ldb60', NULL, 1, NULL, NULL, NULL, '', 0, 0, 0, NULL, 0, 12);
+INSERT INTO `pear_task` VALUES (12301, 'xkic58d20srnu9jm7ohqw14f', 'mo4uqwfb06dxv8ez2spkl3rg', '增加 less 变量 @font-variant-base 定制 font-variant 样式', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:25:53', 'y680trgedcavbhnz24u7i5m3', 0, 'jvyswuxz34qk2cpt9o7ldb60', NULL, 0, NULL, NULL, NULL, '', 0, 0, 0, NULL, 0, 12);
 INSERT INTO `pear_task` VALUES (12302, '6hj43ueim2bk187sqzcoy59v', 'mo4uqwfb06dxv8ez2spkl3rg', '优化鼠标悬停在可排序的表头上时 title 的显示', 2, 'wait', '<p><a href=\"https://www.baidu.com\" target=\"_blank\">这里是备注内容</a><br></p><p><img src=\"https://beta.vilson.xyz/static/upload/image/default/20181229/54cd2d50d19731f3231fc96d26a823bf.png\" style=\"max-width:100%;\"><br></p>', '6v7be19pwman2fird04gqu53', '2019-01-03 22:26:01', 'y680trgedcavbhnz24u7i5m3', 0, 'psemnf3ugo89vc5r2hkxid1t', NULL, 0, NULL, '2019-01-06 18:00', NULL, '', 1, 1, 0, NULL, 0, 13);
 INSERT INTO `pear_task` VALUES (12303, 'twb8f52jasn9vry6iko0dqg4', 'mo4uqwfb06dxv8ez2spkl3rg', '修正 Comment author 属性的类型为 ReactNode', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:26:09', '', 0, 'g0yw3r54qahbk7lets6fv2on', NULL, 0, NULL, NULL, NULL, '', 0, 0, 1, NULL, 0, 14);
-INSERT INTO `pear_task` VALUES (12304, 'gjmotpbrwva079ukde4izn38', 'mo4uqwfb06dxv8ez2spkl3rg', '优化 Spin 样式并略微提升了切换状态的性能', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:26:16', '6v7be19pwman2fird04gqu53', 0, 'p56enm7zck4id2rb0tx9lguh', NULL, 1, NULL, NULL, NULL, '', 0, 0, 0, NULL, 0, 15);
+INSERT INTO `pear_task` VALUES (12304, 'gjmotpbrwva079ukde4izn38', 'mo4uqwfb06dxv8ez2spkl3rg', '优化 Spin 样式并略微提升了切换状态的性能', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:26:16', '6v7be19pwman2fird04gqu53', 0, 'p56enm7zck4id2rb0tx9lguh', NULL, 0, NULL, NULL, NULL, '', 0, 0, 0, NULL, 0, 15);
 INSERT INTO `pear_task` VALUES (12305, 'uwq87z2f0hnvrl6o9gtcb3iy', 'mo4uqwfb06dxv8ez2spkl3rg', '微调 Card 头部和加载中的样式细节', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:26:21', 'y680trgedcavbhnz24u7i5m3', 0, 'p56enm7zck4id2rb0tx9lguh', NULL, 0, NULL, NULL, NULL, '', 0, 0, 2, NULL, 0, 16);
 INSERT INTO `pear_task` VALUES (12306, 'qug5e4alndm7930ipxwyvc2h', 'mo4uqwfb06dxv8ez2spkl3rg', 'Cascader 升级 rc-calendar', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:27:04', '6v7be19pwman2fird04gqu53', 0, 'psemnf3ugo89vc5r2hkxid1t', NULL, 0, NULL, NULL, NULL, '', 3, 0, 0, NULL, 0, 17);
 INSERT INTO `pear_task` VALUES (12307, 'yctbsv81x6dmahkf7ei5o4r9', 'mo4uqwfb06dxv8ez2spkl3rg', 'Upload 组件升级 rc-upload 到 2.5.0', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:27:17', 'kqdcn2w40p58r31zyo6efjib', 0, 'psemnf3ugo89vc5r2hkxid1t', NULL, 0, NULL, NULL, NULL, '', 4, 0, 0, NULL, 0, 18);
 INSERT INTO `pear_task` VALUES (12308, 'm7u8fdp41cwrtkjxyzq2ion3', 'mo4uqwfb06dxv8ez2spkl3rg', '重构 Tag 组件，简化代码并提升性能', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:27:30', 'kqdcn2w40p58r31zyo6efjib', 0, 'g0yw3r54qahbk7lets6fv2on', NULL, 0, NULL, NULL, NULL, '', 2, 0, 0, NULL, 0, 19);
 INSERT INTO `pear_task` VALUES (12309, 'jo0i8fq2579kbdgsmcw1nev4', 'mo4uqwfb06dxv8ez2spkl3rg', 'Badge 进行了重构，count 支持自定义组件', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:27:36', '6v7be19pwman2fird04gqu53', 0, 'g0yw3r54qahbk7lets6fv2on', NULL, 0, NULL, NULL, NULL, '', 3, 0, 0, NULL, 0, 20);
 INSERT INTO `pear_task` VALUES (12310, 'owrs04m3e2klj8uqac6tiy17', 'mo4uqwfb06dxv8ez2spkl3rg', '重构了 Tree 底层的代码，以解决一些存在了很久的问题', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:27:54', 'y680trgedcavbhnz24u7i5m3', 0, 'g0yw3r54qahbk7lets6fv2on', NULL, 0, NULL, NULL, NULL, '', 2, 0, 0, '2019-01-12 22:27:56', 0, 21);
-INSERT INTO `pear_task` VALUES (12311, 'g15scwqm9zxroy7p8bvjt632', 'mo4uqwfb06dxv8ez2spkl3rg', '修复了 Divider 与浮动元素一起使用时的样式问题', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:28:21', '6v7be19pwman2fird04gqu53', 0, '7z8tgb6xevy2aj9nui5fk0w1', NULL, 0, NULL, NULL, NULL, '', 0, 0, 0, NULL, 0, 22);
+INSERT INTO `pear_task` VALUES (12311, 'g15scwqm9zxroy7p8bvjt632', 'mo4uqwfb06dxv8ez2spkl3rg', '修复了 Divider 与浮动元素一起使用时的样式问题', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:28:21', 'y680trgedcavbhnz24u7i5m3', 0, '7z8tgb6xevy2aj9nui5fk0w1', NULL, 0, NULL, NULL, NULL, '', 0, 0, 0, NULL, 1, 22);
 INSERT INTO `pear_task` VALUES (12312, '0a84xkg12enqjml7rz6dbifw', 'mo4uqwfb06dxv8ez2spkl3rg', '修复了 Form 高级搜索模式下的样式问题', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:28:25', 'kqdcn2w40p58r31zyo6efjib', 0, '7z8tgb6xevy2aj9nui5fk0w1', NULL, 0, NULL, '2019-01-04 18:00', NULL, '', 0, 0, 0, NULL, 0, 23);
 INSERT INTO `pear_task` VALUES (12313, 'fax4gez2jlk15tvsu3dc6p98', 'mo4uqwfb06dxv8ez2spkl3rg', '修复了 Upload 对无扩展名图片地址的预览展示问题', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:28:29', '6v7be19pwman2fird04gqu53', 0, '7z8tgb6xevy2aj9nui5fk0w1', NULL, 0, NULL, NULL, NULL, '', 0, 0, 0, NULL, 0, 24);
 INSERT INTO `pear_task` VALUES (12314, 'zv4hx1ugpn98be5skc3wym72', 'mo4uqwfb06dxv8ez2spkl3rg', '修复一处 less 语法错误', 0, 'wait', NULL, '6v7be19pwman2fird04gqu53', '2019-01-03 22:28:33', '6v7be19pwman2fird04gqu53', 0, '7z8tgb6xevy2aj9nui5fk0w1', NULL, 0, NULL, NULL, NULL, '', 0, 0, 0, NULL, 0, 25);
@@ -2189,7 +2240,7 @@ CREATE TABLE `pear_task_member`  (
   `is_owner` tinyint(1) NULL DEFAULT 0 COMMENT '是否创建人',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 263 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '任务-成员表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 266 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '任务-成员表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pear_task_member
@@ -2349,7 +2400,7 @@ INSERT INTO `pear_task_member` VALUES (176, 'yctbsv81x6dmahkf7ei5o4r9', 0, '6v7b
 INSERT INTO `pear_task_member` VALUES (177, 'm7u8fdp41cwrtkjxyzq2ion3', 0, '6v7be19pwman2fird04gqu53', '2019-01-03 22:27:30', 1);
 INSERT INTO `pear_task_member` VALUES (178, 'jo0i8fq2579kbdgsmcw1nev4', 1, '6v7be19pwman2fird04gqu53', '2019-01-03 22:27:36', 1);
 INSERT INTO `pear_task_member` VALUES (179, 'owrs04m3e2klj8uqac6tiy17', 0, '6v7be19pwman2fird04gqu53', '2019-01-03 22:27:54', 1);
-INSERT INTO `pear_task_member` VALUES (180, 'g15scwqm9zxroy7p8bvjt632', 1, '6v7be19pwman2fird04gqu53', '2019-01-03 22:28:21', 1);
+INSERT INTO `pear_task_member` VALUES (180, 'g15scwqm9zxroy7p8bvjt632', 0, '6v7be19pwman2fird04gqu53s', '2019-01-03 22:28:21', 1);
 INSERT INTO `pear_task_member` VALUES (181, '0a84xkg12enqjml7rz6dbifw', 0, '6v7be19pwman2fird04gqu53', '2019-01-03 22:28:25', 1);
 INSERT INTO `pear_task_member` VALUES (182, 'fax4gez2jlk15tvsu3dc6p98', 1, '6v7be19pwman2fird04gqu53', '2019-01-03 22:28:29', 1);
 INSERT INTO `pear_task_member` VALUES (183, 'zv4hx1ugpn98be5skc3wym72', 1, '6v7be19pwman2fird04gqu53', '2019-01-03 22:28:33', 1);
@@ -2365,7 +2416,6 @@ INSERT INTO `pear_task_member` VALUES (192, '0a84xkg12enqjml7rz6dbifw', 1, 'kqdc
 INSERT INTO `pear_task_member` VALUES (193, 'td1qznl9ms65gbcfej0k4vup', 1, 'y680trgedcavbhnz24u7i5m3', '2019-01-03 22:30:15', 0);
 INSERT INTO `pear_task_member` VALUES (194, 'uwq87z2f0hnvrl6o9gtcb3iy', 1, 'y680trgedcavbhnz24u7i5m3', '2019-01-03 22:30:27', 0);
 INSERT INTO `pear_task_member` VALUES (195, '3qz5hfsin69xt8cgbd70lkew', 1, 'kqdcn2w40p58r31zyo6efjib', '2019-01-03 22:30:31', 0);
-INSERT INTO `pear_task_member` VALUES (196, 'xkic58d20srnu9jm7ohqw14f', 1, 'kqdcn2w40p58r31zyo6efjib', '2019-01-03 22:30:38', 0);
 INSERT INTO `pear_task_member` VALUES (197, 'owrs04m3e2klj8uqac6tiy17', 1, 'y680trgedcavbhnz24u7i5m3', '2019-01-03 22:30:46', 0);
 INSERT INTO `pear_task_member` VALUES (198, '6hj43ueim2bk187sqzcoy59v', 1, 'y680trgedcavbhnz24u7i5m3', '2019-01-04 08:57:04', 0);
 INSERT INTO `pear_task_member` VALUES (199, 'gk8ipqm5406br7cwd9l1zefs', 1, 'y680trgedcavbhnz24u7i5m3', '2019-01-04 09:09:29', 1);
@@ -2432,6 +2482,9 @@ INSERT INTO `pear_task_member` VALUES (259, 'as2y4r6mwxuhgvncop3f8z90', 1, 'y680
 INSERT INTO `pear_task_member` VALUES (260, 'vmzeciodgbfp7ysu38tq10kj', 1, 'y680trgedcavbhnz24u7i5m3', '2019-01-04 21:38:25', 0);
 INSERT INTO `pear_task_member` VALUES (261, '6cagd725tifonvw0qphe9zsb', 1, 'kqdcn2w40p58r31zyo6efjib', '2019-01-04 21:38:30', 0);
 INSERT INTO `pear_task_member` VALUES (262, 'zj6skt9orn748gh5mvb2ueif', 1, 'y680trgedcavbhnz24u7i5m3', '2019-01-04 21:38:45', 0);
+INSERT INTO `pear_task_member` VALUES (263, '6hj43ueim2bk187sqzcoy59v', 0, 'kqdcn2w40p58r31zyo6efjib', '2019-01-22 09:29:26', 0);
+INSERT INTO `pear_task_member` VALUES (264, 'xkic58d20srnu9jm7ohqw14f', 1, 'y680trgedcavbhnz24u7i5m3', '2019-01-22 11:17:25', 0);
+INSERT INTO `pear_task_member` VALUES (265, 'g15scwqm9zxroy7p8bvjt632', 1, 'y680trgedcavbhnz24u7i5m3', '2019-01-22 15:33:47', 0);
 
 -- ----------------------------
 -- Table structure for pear_task_stages
