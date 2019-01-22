@@ -236,7 +236,7 @@ class Index extends BasicApi
         $uid = $request::param('uid');
         $messageService = new MessageService();
         $messageService->sendToUid($uid, '888', 'notice');
-        $this->success();
+        $this->success('', $messageService->isUidOnline($uid));
 
     }
 

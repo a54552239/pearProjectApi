@@ -13,6 +13,7 @@ use GatewayWorker\Lib\Gateway;
  */
 class MessageService
 {
+
     /**
      * MessageService constructor.
      */
@@ -26,6 +27,11 @@ class MessageService
          *注意：ip不能是0.0.0.0
          **/
         Gateway::$registerAddress = '192.168.0.159:2346';
+    }
+
+    public function isUidOnline($uid)
+    {
+        return Gateway::isUidOnline($uid);
     }
 
     public function sendToAll($message, $action = '', $client_id_array = null, $exclude_client_id = null, $raw = false)

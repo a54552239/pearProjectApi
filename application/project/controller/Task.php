@@ -271,6 +271,25 @@ class Task extends BasicApi
     }
 
     /**
+     * 设置隐私模式
+     * @param Request $request
+     * @throws \Exception
+     */
+    public function setPrivate(Request $request)
+    {
+        $private = intval($request::post('private', 0));
+        $code = $request::post('taskCode');
+        if ($private === 0 || $private === 1) {
+            $result = $this->model->edit($code, ['private' => $private]);
+            if ($result) {
+                $this->success();
+            }
+            $this->error("操作失败，请稍候再试！");
+        }
+        $this->success();
+    }
+
+    /**
      * 点赞
      * @param Request $request
      * @return void
@@ -366,6 +385,7 @@ class Task extends BasicApi
         }
         $this->success('', $list);
     }
+
     /**
      * 批量放入回收站
      */

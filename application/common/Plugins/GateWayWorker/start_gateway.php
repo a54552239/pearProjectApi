@@ -54,7 +54,7 @@ $gateway->startPort = 2900;
 $gateway->registerAddress = '192.168.0.159:2346';
 
 // 心跳间隔
-$gateway->pingInterval = 10;
+$gateway->pingInterval = 60;
 // 心跳数据
 $data = ['action' => 'ping'];
 $gateway->pingData = json_encode($data);

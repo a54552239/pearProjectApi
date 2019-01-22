@@ -14,7 +14,7 @@ use think\facade\Hook;
  */
 class Task extends CommonModel
 {
-    protected $append = ['priText', 'liked', 'stared', 'childCount', 'hasComment', 'hasSource'];
+    protected $append = ['priText', 'liked', 'stared', 'childCount', 'hasComment', 'hasSource', 'canRead'];
 
     public function read($code)
     {
@@ -535,6 +535,29 @@ class Task extends CommonModel
             $sources = SourceLink::where(['link_code' => $data['code'], 'link_type' => 'task'])->count('id');
         }
         return $sources;
+    }
+
+    /**
+     * 是否有阅读权限
+     * @param $value
+     * @param $data
+     * @return bool
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getCanReadAttr($value, $data)
+    {
+        $canRead = 1;
+        if (isset($data['private'])) {
+            if ($data['private']) {
+                $taskMember = TaskMember::where(['task_code' => $data['code'], 'member_code' => getCurrentMember()['code']])->field('id')->find();
+                if (!$taskMember) {
+                    $canRead = 0;
+                }
+            }
+        }
+        return $canRead;
     }
 
     public function getLikedAttr($value, $data)
