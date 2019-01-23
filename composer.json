@@ -1,41 +1,38 @@
 {
-  "type": "pearProject",
-  "name": "pearProject",
-  "description": "pearProject",
-  "homepage": "https://beta.vilson.xyz",
+  "name": "phalapi/phalapi",
+  "description": "PhalApi v2.x，一个PHP轻量级开源接口框架，致力于快速开发接口服务",
+  "type": "project",
   "keywords": [
-    "project",
-    "plan"
+    "api"
   ],
-  "license": "MIT",
+  "homepage": "http://www.phalapi.net",
+  "license": "GPL-3.0+",
+  "minimum-stability": "dev",
   "authors": [
     {
-      "name": "vilson",
-      "email": "545522390@qq.com"
+      "name": "Dogstar Huang",
+      "email": "chanzonghuang@gmail.com",
+      "homepage": "http://my.oschina.net/dogstar",
+      "role": "Developer"
     }
   ],
   "require": {
-    "php": ">=7.2",
-    "qiniu/php-sdk": "^7.2",
-    "endroid/qr-code": "^1.9",
-    "topthink/framework": "5.1.*",
-    "aliyuncs/oss-sdk-php": "^2.2",
-    "zoujingli/ip2region": "dev-master",
-    "topthink/think-image": "^1.0",
+    "php": ">=5.3.3",
+    "phalapi/cors":"dev-master",
+    "phalapi/kernal": "dev-master",
+    "phalapi/task": "dev-master",
+    "phalapi/qiniu": "dev-master",
     "workerman/gateway-worker-for-win" : ">=3.0.0",
-    "workerman/gateway-worker" : ">=3.0.0",
-    "overtrue/easy-sms": "^1.1",
-    "phpoffice/phpspreadsheet": "^1.5"
+    "workerman/gateway-worker" : ">=3.0.0"
   },
   "autoload": {
+    "files": [
+      "src/App/functions.php"
+    ],
     "psr-4": {
-      "app\\": "application"
+      "App\\": "src/App",
+      "PhalApi\\Qiniu\\": "vendor/phalapi/qiniu/src/qiniu",
+      "GatewayWorker\\": "vendor/workerman/gateway-worker-for-win/src"
     }
-  },
-  "extra": {
-    "think-path": "thinkphp"
-  },
-  "config": {
-    "preferred-install": "dist"
   }
 }
