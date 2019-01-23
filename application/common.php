@@ -107,6 +107,15 @@ function isError($data)
 }
 
 /**
+ * 是否开启消息推送
+ * @return mixed
+ */
+function isOpenNoticePush()
+{
+    return config('config.notice_push');
+}
+
+/**
  * 日期格式标准输出
  * @param string $datetime 输入日期
  * @param string $format 输出格式

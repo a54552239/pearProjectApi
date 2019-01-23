@@ -11,7 +11,7 @@
  Target Server Version : 50642
  File Encoding         : 65001
 
- Date: 22/01/2019 16:38:56
+ Date: 23/01/2019 10:01:17
 */
 
 SET NAMES utf8mb4;
@@ -157,6 +157,21 @@ INSERT INTO `pear_file` VALUES (39, 'txu5z7rg6bavnk4h3y8wq9i2', 'static/upload/f
 INSERT INTO `pear_file` VALUES (40, 'dqkx4o6wp2r9uzt15fyaenlv', 'static/upload/file/default/6v7be19pwman2fird04gqu53/6v7be19pwman2fird04gqu53/20190112/20190112184741-5a1d10000fc8c.jpg', '5a1d10000fc8c', 'jpg', 445137, '', '6v7be19pwman2fird04gqu53', NULL, 'mo4uqwfb06dxv8ez2spkl3rg', '6v7be19pwman2fird04gqu53', '2019-01-12 18:47:41', 0, '', 0, 'http://easyproject.net/static/upload/file/default/6v7be19pwman2fird04gqu53/6v7be19pwman2fird04gqu53/20190112/20190112184741-5a1d10000fc8c.jpg', 'image/jpeg', '');
 INSERT INTO `pear_file` VALUES (42, '7ru54lhm6i198stqkdcy3ap2', 'static/upload/file/default/6v7be19pwman2fird04gqu53/6v7be19pwman2fird04gqu53/20190112/20190112184757-05990022176026337.jpg', '05990022176026337', 'jpg', 45930, '', '6v7be19pwman2fird04gqu53', NULL, 'mo4uqwfb06dxv8ez2spkl3rg', '6v7be19pwman2fird04gqu53', '2019-01-12 18:47:57', 0, '', 0, 'http://easyproject.net/static/upload/file/default/6v7be19pwman2fird04gqu53/6v7be19pwman2fird04gqu53/20190112/20190112184757-05990022176026337.jpg', 'image/jpeg', '2019-01-12 22:26:56');
 INSERT INTO `pear_file` VALUES (43, 'tfydkno68i4b7ha0q1x2uwcs', 'static/upload/file/default/bh5mdpzy7wg46kiqx9uclns2/6v7be19pwman2fird04gqu53/20190113/20190113122337-avatar.png', 'avatar', 'png', 51574, '', 'bh5mdpzy7wg46kiqx9uclns2', NULL, 'mo4uqwfb06dxv8ez2spkl3rg', '6v7be19pwman2fird04gqu53', '2019-01-13 12:23:37', 0, '', 0, 'http://easyproject.net/static/upload/file/default/bh5mdpzy7wg46kiqx9uclns2/6v7be19pwman2fird04gqu53/20190113/20190113122337-avatar.png', 'image/png', '');
+
+-- ----------------------------
+-- Table structure for pear_invite_link
+-- ----------------------------
+DROP TABLE IF EXISTS `pear_invite_link`;
+CREATE TABLE `pear_invite_link`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邀请码',
+  `create_by` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邀请人',
+  `invite_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '链接类型',
+  `source_code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '资源编码',
+  `create_time` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建时间',
+  `over_time` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '过期时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '邀请链接表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for pear_lock

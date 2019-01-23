@@ -94,6 +94,28 @@ class Account extends BasicApi
         $this->success('', $list);
     }
 
+    public function read()
+    {
+        $code = Request::param('code');
+        if (!$code) {
+            $this->error("缺少参数");
+        }
+        $memberAccount = $this->model->where(['code' => $code])->field('id', true)->find();
+        if ($memberAccount) {
+            $departments = '';
+            $departmentCodes = $memberAccount['department_code'];
+            if ($departmentCodes) {
+                $departmentCodes = explode(',', $departmentCodes);
+                foreach ($departmentCodes as $departmentCode) {
+                    $department = \app\common\Model\Department::where(['code' => $departmentCode])->field('name')->find();
+                    $departments .= "{$department['name']} ";
+                }
+            }
+            $memberAccount['departments'] = $departments;
+        }
+        $this->success('', $memberAccount);
+    }
+
     /**
      * 授权管理
      * @return array|string
@@ -177,8 +199,8 @@ class Account extends BasicApi
     {
         //todo 权限判断
 
-        $params = Request::only('mobile,email,desc,name,id,description');
-        $result = $this->model->_edit($params, ['id' => $params['id']]);
+        $params = Request::only('mobile,email,desc,name,position,code,description');
+        $result = $this->model->_edit($params, ['code' => $params['code']]);
         if ($result) {
             $this->success('');
         }
