@@ -14,7 +14,7 @@ use think\facade\Hook;
  */
 class Task extends CommonModel
 {
-    protected $append = ['priText', 'liked', 'stared', 'childCount', 'hasComment', 'hasSource', 'canRead'];
+    protected $append = ['priText', 'liked', 'stared', 'childCount', 'hasUnDone', 'parentDone', 'hasComment', 'hasSource', 'canRead'];
 
     public function read($code)
     {
@@ -213,6 +213,9 @@ class Task extends CommonModel
             if ($parentTask['deleted']) {
                 throw new \Exception('父任务在回收站中无法编辑', 6);
             }
+            if ($parentTask['done']) {
+                throw new \Exception('父任务已完成，无法添加新的子任务', 7);
+            }
         }
         if ($assignTo) {
             $assignMember = Member::where(['code' => $assignTo])->field('id')->find();
@@ -285,6 +288,13 @@ class Task extends CommonModel
         if ($task['deleted']) {
             throw new \Exception('任务在回收站中无法进行编辑', 3);
         }
+        if ($task['parentDone']) {
+            throw new \Exception('父任务已完成，无法重做子任务', 4);
+        }
+        if ($task['hasUnDone']) {
+            throw new \Exception('子任务尚未全部完成，无法完成父任务', 5);
+        }
+
         Db::startTrans();
         try {
             $result = self::update(['done' => $done], ['code' => $taskCode]);
@@ -521,6 +531,30 @@ class Task extends CommonModel
             $childTasks[] = $childTaskCount;
         }
         return $childTasks;
+    }
+
+    public function getParentDoneAttr($value, $data)
+    {
+        $done = 1;
+        if (isset($data['code']) && isset($data['pcode']) && $data['pcode']) {
+            $task = self::where(['code' => $data['pcode']])->field('done')->find();
+            if ($task && !$task['done']) {
+                $done = 0;
+            }
+        }
+        return $done;
+    }
+
+    public function getHasUnDoneAttr($value, $data)
+    {
+        $hasUnDone = 0;
+        if (isset($data['code'])) {
+            $taskCount = self::where(['pcode' => $data['code'], 'done' => 0])->count('id');
+            if ($taskCount) {
+                $hasUnDone = 1;
+            }
+        }
+        return $hasUnDone;
     }
 
     public function getHasCommentAttr($value, $data)

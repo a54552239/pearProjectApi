@@ -116,8 +116,8 @@ class Task extends BasicApi
 
     public function read(Request $request)
     {
+        //todo 隐私模式阅读权限
         $data = $request::only('taskCode');
-
         try {
             $result = $this->model->read($data['taskCode']);
         } catch (\Exception $e) {
