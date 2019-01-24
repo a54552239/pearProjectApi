@@ -103,7 +103,7 @@ class Project extends BasicApi
     }
 
     /**
-     * 获取自己的任务
+     * 获取自己的项目
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -111,7 +111,12 @@ class Project extends BasicApi
     public function selfList()
     {
         $type = Request::post('type');
-        $member = getCurrentMember();
+        $memberCode = Request::post('memberCode', '');
+        if (!$memberCode) {
+            $member = getCurrentMember();
+        } else {
+            $member = Member::where(['code' => $memberCode])->find();
+        }
         $deleted = 1;
         if (!$type) {
             $deleted = 0;

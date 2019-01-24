@@ -397,7 +397,11 @@ class Task extends CommonModel
         $offset = ($page - 1) * $page;
         $limit = $pageSize;
         $prefix = config('database.prefix');
-        $sql = "select *,t.id as id,t.name as name,t.code as code from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code where t.done = {$done} and t.deleted = 0 and t.assign_to = '{$memberCode}' and p.deleted = 0 order by t.id desc";
+        $doneSql = '';
+        if ($done != -1) {
+            $doneSql = " and t.done = {$done}";
+        }
+        $sql = "select *,t.id as id,t.name as name,t.code as code from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code where  t.deleted = 0 {$doneSql} and t.assign_to = '{$memberCode}' and p.deleted = 0 order by t.id desc";
         $total = Db::query($sql);
         $total = count($total);
         $sql .= " limit {$offset},{$limit}";

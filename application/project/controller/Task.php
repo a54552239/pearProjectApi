@@ -81,12 +81,18 @@ class Task extends BasicApi
      */
     public function selfList()
     {
-        $type = Request::post('type');
-        $member = getCurrentMember();
+        $type = Request::post('type', 0);
+        $memberCode = Request::post('memberCode', '');
+        if (!$memberCode) {
+            $member = getCurrentMember();
+        } else {
+            $member = Member::where(['code' => $memberCode])->find();
+        }
         $done = 1;
         if (!$type) {
             $done = 0;
         }
+        $type == -1 && $done = $type;
         $list = $this->model->getMemberTasks($member['code'], $done, Request::post('page'), Request::post('pageSize'));
         if ($list['list']) {
             foreach ($list['list'] as &$task) {
