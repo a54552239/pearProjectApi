@@ -17,6 +17,7 @@ use GatewayWorker\Gateway;
 use GatewayWorker\BusinessWorker;
 use Workerman\Autoloader;
 require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/config.php';
 
 // 自动加载类
 
@@ -27,7 +28,7 @@ $worker->name = 'YourAppBusinessWorker';
 // bussinessWorker进程数量
 $worker->count = 4;
 // 服务注册地址
-$worker->registerAddress = '192.168.0.159:2346';
+$worker->registerAddress =  SERVER_ADDRESS . ':' . SERVER_PORT;
 
 // 如果不是在根目录启动，则运行runAll方法
 if(!defined('GLOBAL_START'))

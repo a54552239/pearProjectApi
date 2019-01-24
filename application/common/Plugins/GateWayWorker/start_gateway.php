@@ -16,27 +16,18 @@ use Workerman\Worker;
 use GatewayWorker\Gateway;
 
 require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/config.php';
 
-$ssl = false;
 $context = array();
-if ($ssl) {
+if (USE_SSL) {
     // 证书最好是申请的证书
-    $context = array(
-        // 更多ssl选项请参考手册 http://php.net/manual/zh/context.ssl.php
-        'ssl' => array(
-            // 请使用绝对路径
-            'local_cert' => '/www/wwwroot/pms/server.pem', // 也可以是crt文件
-            'local_pk' => '/www/wwwroot/pms/server.key',
-            'verify_peer' => false,
-            'allow_self_signed' => true, //如果是自签名证书需要开启此选项
-        )
-    );
+    $context = SSL_CONFIG;
 }
 
 // gateway 进程，这里使用Text协议，可以用telnet测试
-$gateway = new Gateway("websocket://192.168.0.159:2345", $context);
+$gateway = new Gateway('websocket://' . SERVER_ADDRESS . ':' . CLIENT_PORT, $context);
 
-if ($ssl) {
+if (USE_SSL) {
     // 开启SSL，websocket+SSL 即wss
     $gateway->transport = 'ssl';
 }
@@ -51,7 +42,7 @@ $gateway->lanIp = '127.0.0.1';
 // 则一般会使用4000 4001 4002 4003 4个端口作为内部通讯端口
 $gateway->startPort = 2900;
 // 服务注册地址
-$gateway->registerAddress = '192.168.0.159:2346';
+$gateway->registerAddress = SERVER_ADDRESS . ':' . SERVER_PORT;
 
 // 心跳间隔
 $gateway->pingInterval = 60;
