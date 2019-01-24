@@ -5,6 +5,9 @@ namespace app\common\Model;
 use function GuzzleHttp\Promise\task;
 use service\DateService;
 use think\Db;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\facade\Hook;
 
 /**
@@ -362,6 +365,20 @@ class Task extends CommonModel
             throw new \Exception($e->getMessage());
         }
         return $result;
+    }
+
+    public function batchAssignTask($taskCodes, $executorCode)
+    {
+        if ($taskCodes) {
+            try {
+                foreach ($taskCodes as $taskCode) {
+                    $this->assignTask($taskCode, $executorCode);
+                }
+            } catch (\Exception $e) {
+                return error(201, $e->getMessage());
+            }
+        }
+        return true;
     }
 
     /**

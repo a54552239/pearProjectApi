@@ -88,7 +88,7 @@ function error($errno, $message = '')
 {
     return [
         'errno' => $errno,
-        'message' => $message,
+        'msg' => $message,
     ];
 }
 

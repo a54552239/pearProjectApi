@@ -32,7 +32,7 @@ class ProjectMember extends BasicApi
         $list = $this->model->_list($where, 'is_owner desc');
         if ($list['list']) {
             foreach ($list['list'] as &$item) {
-                $member = Member::where(['code' => $item['member_code']])->field('id,name,avatar,code,email')->find();
+                $member = Member::where(['code' => $item['member_code']])->field('name,avatar,code,email')->find();
                 !$member && $member = [];
                 $member['is_owner'] = $item['is_owner'];
                 $item = $member;

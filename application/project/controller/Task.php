@@ -210,6 +210,25 @@ class Task extends BasicApi
         $this->error("操作失败，请稍候再试！");
     }
 
+
+    /**
+     * 批量
+     * 指派任务
+     * @param Request $request
+     */
+    public function batchAssignTask(Request $request)
+    {
+        $taskCodes = $request::param('taskCodes');
+        $executorCode = $request::param('executorCode');
+        if ($taskCodes) {
+            $result = $this->model->batchAssignTask(json_decode($taskCodes), $executorCode);
+            if (isError($result)) {
+                $this->error($result['msg'], $result['errno']);
+            }
+        }
+        $this->success();
+    }
+
     /**
      * 排序
      * @param Request $request
