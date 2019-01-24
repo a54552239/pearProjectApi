@@ -33,6 +33,17 @@ class Task extends CommonModel
         }
         if ($task['pcode']) {
             $task['parentTask'] = self::where(['code' => $task['pcode']])->field('id', true)->find();
+            $parents = [];
+            if (isset($task['path'])) {
+                $paths = explode(',', $task['path']);
+                if ($paths) {
+                    foreach ($paths as $parentCode) {
+                        $item = self::where(['code' => $parentCode])->field('name')->find();
+                        $parents[] = ['code' => $parentCode, 'name' => $item['name']];
+                    }
+                }
+            }
+            $task['parentTasks'] = array_reverse($parents);
         }
         $task['projectName'] = $project['name'];
         $task['stageName'] = $stage['name'];
@@ -235,6 +246,11 @@ class Task extends CommonModel
                 if (!$maxNum) {
                     $maxNum = 0;
                 }
+                $path = '';
+                if ($parentCode) {
+                    $parentTask['path'] && $parentTask['path'] = ",{$parentTask['path']}";
+                    $path = "{$parentTask['code']}{$parentTask['path']}";
+                }
                 $data = [
                     'create_time' => nowTime(),
                     'code' => createUniqueCode('task'),
@@ -243,6 +259,7 @@ class Task extends CommonModel
                     'id_num' => $maxNum + 1,
                     'project_code' => $projectCode,
                     'pcode' => $parentCode,
+                    'path' => $path,
                     'stage_code' => $stageCode,
                     'name' => trim($taskTitle),
                 ];
@@ -521,6 +538,9 @@ class Task extends CommonModel
         return $status[$data['pri']];
     }
 
+    /**
+     * 子任务数
+     */
     public function getChildCountAttr($value, $data)
     {
         $childTasks = [];
@@ -533,6 +553,9 @@ class Task extends CommonModel
         return $childTasks;
     }
 
+    /**
+     * 父任务是否完成
+     */
     public function getParentDoneAttr($value, $data)
     {
         $done = 1;
@@ -545,6 +568,9 @@ class Task extends CommonModel
         return $done;
     }
 
+    /**
+     * 是否有子任务未完成
+     */
     public function getHasUnDoneAttr($value, $data)
     {
         $hasUnDone = 0;

@@ -25,5 +25,6 @@ ALTER TABLE `pearproject`.`pear_notify` MODIFY COLUMN `terminal` varchar(255) CH
 
 ALTER TABLE `pearproject`.`pear_notify` MODIFY COLUMN `from_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '\'project\',\'system\'' AFTER `terminal`;
 
+ALTER TABLE `pearproject`.`pear_task` ADD COLUMN `path` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '上级任务路径' AFTER `id_num`;
 
 SET FOREIGN_KEY_CHECKS=1;
