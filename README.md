@@ -63,16 +63,27 @@ Composer
     3. 启动项目：npm run serve
     4. 根据提示填写数据库信息进行安装
         ![1](https://static.vilson.xyz/help/pearproject/3.png)
-6. 打包项目（有必要的话）
+6. 打包前端项目（有必要的话）
     1. 修改./src/config/config.js，修改PRO_URL地址
     2. 修改./vue.config.js，将publicPath 值改为‘/’。如果有CDN的话改为CDN地址
     3. 运行cmd，输入 npm run build
     4. 运行dist目录下的index.html，或者将dist目录下的文件部署到服务器上
 7. 跨域支持
-    1. 默认开启跨域，如需关闭，须进行以下操作
+    1. 默认开启跨域，如需关闭，须在前端项目进行以下操作
         1. 修改./src/config.js，将crossDomain 值改为‘false’
         2. 修改./vue.config.js，将DEV_URL的值改为接口的访问地址
         3. 重启启动项目
+8. 消息推送
+    1. 后端
+        1. 进入application/common/Plugins/GateWayWorker
+        2. 修改config.php，修改 SERVER_ADDRESS 的值为内网IP地址。端口号根据情况需改，注意服务器要放行对应的端口
+        3. 如果是HTTPS协议，需要开启SSL支持
+        4. Windows环境下，直接运行start_for_win.bat文件
+        5. Linux环境下，运行 bash start.sh 启动服务，运行 bash stop.sh 终止服务
+    2. 前端
+        1. 进入 src/config/config.js
+        2.WS_URI 地址修改为相应的ip地址。如果使用https，不能写ip需要写域名  
+        
 ### 鼓励一下 ###
 <img src="https://static.vilson.xyz/pay/wechat.png" alt="Sample"  width="150" height="150">
 

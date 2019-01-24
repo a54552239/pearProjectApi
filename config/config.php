@@ -1,4 +1,4 @@
 <?php
 return [
-    'notice_push' => false,
+    'notice_push' => true, //是否开启websocket消息推送
 ];
