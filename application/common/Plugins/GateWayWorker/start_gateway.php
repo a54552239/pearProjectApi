@@ -21,7 +21,16 @@ require_once __DIR__ . '/config.php';
 $context = array();
 if (USE_SSL) {
     // 证书最好是申请的证书
-    $context = SSL_CONFIG;
+    $context = [
+        // 更多ssl选项请参考手册 http://php.net/manual/zh/context.ssl.php
+        'ssl' => [
+            // 请使用绝对路径
+            'local_cert' => LOCAL_CERT, // 也可以是crt文件
+            'local_pk' => LOCAL_PK,
+            'verify_peer' => VERIFY_PEER,
+            'allow_self_signed' => ALLOW_SELF_SIGNED, //如果是自签名证书需要开启此选项
+        ]
+    ];
 }
 
 // gateway 进程，这里使用Text协议，可以用telnet测试

@@ -56,6 +56,7 @@ class BasicApi
      */
     protected function error($msg, $code = 201, $data = [])
     {
+        $code < 200 && $code += 200;
         ToolsService::error($msg, $data, $code);
     }
 
