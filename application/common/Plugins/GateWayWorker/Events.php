@@ -17,6 +17,7 @@
  * 如果发现业务卡死，可以将下面declare打开（去掉//注释），并执行php start.php reload
  * 然后观察一段时间workerman.log看是否有process_timeout异常
  */
+
 //declare(ticks=1);
 
 use GatewayWorker\Lib\Gateway;
@@ -36,11 +37,10 @@ class Events
      */
     public static function onConnect($client_id)
     {
-        // 向当前client_id发送数据
-        $data = ['action' => 'connect', 'data' => ['client_id' => $client_id]];
-        Gateway::sendToClient($client_id, json_encode($data));
         // 向所有人发送
-//        Gateway::sendToAll("$client_id login\r\n");
+        //getAllUidCount
+        $data = ['action' => 'connect', 'data' => ['client_id' => $client_id, 'online' => Gateway::getAllClientCount()]];
+        Gateway::sendToAll(json_encode($data));
     }
 
     /**
@@ -49,20 +49,22 @@ class Events
      * @param mixed $message 具体消息
      * @throws Exception
      */
-   public static function onMessage($client_id, $message)
-   {
+    public static function onMessage($client_id, $message)
+    {
         // 向所有人发送
-        Gateway::sendToAll("$client_id said $message\r\n");
-   }
+        $data = ['action' => 'onMessage', 'data' => ['client_id' => $client_id, 'msg' => "$client_id said $message\r\n"]];
+        Gateway::sendToAll(json_encode($data));
+    }
 
     /**
      * 当用户断开连接时触发
      * @param int $client_id 连接id
      * @throws Exception
      */
-   public static function onClose($client_id)
-   {
-       // 向所有人发送
-       GateWay::sendToAll("$client_id logout\r\n");
-   }
+    public static function onClose($client_id)
+    {
+        // 向所有人发送
+        $data = ['action' => 'onClose', 'data' => ['client_id' => $client_id, 'online' => Gateway::getAllClientCountindex.html()]];
+        GateWay::sendToAll(json_encode($data));
+    }
 }
