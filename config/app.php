@@ -6,7 +6,7 @@ return [
     // 应用名称
     'app_name'               => 'pearProject',
     // 应用版本
-    'app_version'            => '2.0.0',
+    'app_version'            => '2.1.0',
     // 应用地址
     'app_host'               => '',
     // 应用调试模式
