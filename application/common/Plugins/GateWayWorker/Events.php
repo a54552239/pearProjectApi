@@ -64,7 +64,7 @@ class Events
     public static function onClose($client_id)
     {
         // 向所有人发送
-        $data = ['action' => 'onClose', 'data' => ['client_id' => $client_id, 'online' => Gateway::getAllClientCountindex.html()]];
+        $data = ['action' => 'onClose', 'data' => ['client_id' => $client_id, 'online' => Gateway::getAllClientCount()]];
         GateWay::sendToAll(json_encode($data));
     }
 }
