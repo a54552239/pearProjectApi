@@ -81,10 +81,9 @@ class DepartmentMember extends CommonModel
         }
         $result = $hasJoined->delete();
         $department_codes = self::where(['account_code' => $accountCode, 'organization_code' => $orgCode])->column('department_code');
-        if ($department_codes) {
-            $department_codes = implode(',', $department_codes);
-            MemberAccount::update(['department_code' => $department_codes], ['code' => $accountCode]);
-        }
+        !$department_codes && $department_codes = [];
+        $department_codes = implode(',', $department_codes);
+        MemberAccount::update(['department_code' => $department_codes], ['code' => $accountCode]);
         return $result;
     }
 }
