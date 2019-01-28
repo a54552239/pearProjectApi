@@ -60,9 +60,6 @@ class Login extends BasicApi
 //            'password.require' => '登录密码不能为空！',
 //            'password.min' => '登录密码长度不能少于4位有效字符！',
 //        ]);
-        if (session('captcha') != Request::param('captcha')) {
-            $this->error('验证码错误', 203);
-        }
         $data = [
             'account' => $this->request->post('account', ''),
             'password' => $this->request->post('password', ''),
@@ -71,6 +68,9 @@ class Login extends BasicApi
         // 用户信息验证
         $mobile = $this->request->post('mobile', '');
         if ($mobile) {
+            if (session('captcha') != Request::param('captcha')) {
+                $this->error('验证码错误', 203);
+            }
             $member = \app\common\Model\Member::where(['mobile' => $mobile])->order('id asc')->find();
         } else {
             $member = \app\common\Model\Member::where(['account' => $data['account']])->whereOr(['email' => $data['account']])->order('id asc')->find();
