@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'debug' => false, //debug模式下不发送短信
     // HTTP 请求的超时时间（秒）
     'timeout' => 5.0,
 

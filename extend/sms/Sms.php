@@ -18,7 +18,7 @@ class Sms extends EasySms
     public function __construct()
     {
         parent::__construct(config('sms.'));
-        Log::init(['path' => 'log/sms/order']);
+        Log::init(['path' => 'log/sms']);
     }
 
     /**
@@ -30,32 +30,19 @@ class Sms extends EasySms
      */
     public function vSend($to, $message, array $gateways = [])
     {
-        $result = false;
+        if (config('sms.debug')) {
+            return true;
+        }
         try {
             $result = $this->send($to, $message, $gateways);
         } catch (InvalidArgumentException $e) {
-            Log::write(json_encode($e->getResults()), "sms-exception");
+//            Log::write($e->getResults(), "sms-exception");
+            return error(1);
         } catch (NoGatewayAvailableException $e) {
-            Log::write(json_encode($e->getResults()), "sms-exception");
+//            Log::write($e->getResults(), "sms-exception");
+            return error(1);
         }
-        Log::write(json_encode($result), "sms");
-        return $result;
-    }
-
-    /**
-     * 暂时保留
-     * @param $phoneNumber
-     * @param $content
-     * @param string $vars
-     * @return mixed
-     */
-    public function sends($phoneNumber, $content, $vars = '')
-    {
-
-        $sms = new SubmailSms();
-        $result = $sms->send($phoneNumber, $content);
-//        $result = $sms->multiSend($phoneNumber, $content, $vars);
-        Log::write(json_encode($result), "sms");
+        Log::write($result, "sms");
         return $result;
     }
 }

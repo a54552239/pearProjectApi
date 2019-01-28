@@ -36,9 +36,9 @@ class File extends BasicApi
             $this->error("请选择项目");
         }
         $where = [];
-        $where[] = ['organization_code', '=', $orgCode];
+//        $where[] = ['organization_code', '=', $orgCode];
         $where[] = ['project_code', '=', $projectCode];
-        $where[] = ['create_by', '=', $memberCode];
+//        $where[] = ['create_by', '=', $memberCode];
         $where[] = ['deleted', '=', $deleted];
         $list = $this->model->_list($where);
         if ($list['list']) {

@@ -8,6 +8,7 @@ use controller\BasicApi;
 use service\LogService;
 use service\NodeService;
 use service\RandomService;
+use sms\Sms;
 use think\Db;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
@@ -59,6 +60,9 @@ class Login extends BasicApi
 //            'password.require' => '登录密码不能为空！',
 //            'password.min' => '登录密码长度不能少于4位有效字符！',
 //        ]);
+        if (session('captcha') != Request::param('captcha')) {
+            $this->error('验证码错误', 203);
+        }
         $data = [
             'account' => $this->request->post('account', ''),
             'password' => $this->request->post('password', ''),
@@ -103,9 +107,25 @@ class Login extends BasicApi
         $this->success('', ['member' => $member, 'organizationList' => $organizationList]);
     }
 
+    /**
+     * 获取验证码
+     */
     public function getCaptcha()
     {
-        $this->success('', RandomService::numeric(6));
+        $mobile = $this->request->post('mobile', '');
+        $code = RandomService::numeric(6);
+        $sms = new Sms();
+        $result = $sms->vSend($mobile, [
+            'data' => [
+                'project' => 'DWYsW1',
+                'code' => $code
+            ],
+        ]);
+        if (isError($result)) {
+            $this->error('系统繁忙');
+        }
+        session('captcha', $code);
+        $this->success('', config('sms.debug') ? $code : '');
     }
 
     public function register()
@@ -138,6 +158,9 @@ class Login extends BasicApi
         $member = Member::where(['mobile' => $data['mobile']])->field('id')->find();
         if ($member) {
             $this->error('该手机已被注册', 202);
+        }
+        if (session('captcha') != $data['captcha']) {
+            $this->error('验证码错误', 203);
         }
         $memberData = [
             'email' => $data['email'],
