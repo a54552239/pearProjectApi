@@ -20,14 +20,17 @@ class NodeService
     public static function applyProjectAuthNode()
     {
         cache('member_need_access_node', null);
-        if (($authorize = session('member.authorize'))) {
+        $member = getCurrentMember();
+        if (($authorize = $member['authorize'])) {
             $where = ['status' => '1'];
             $authorizeIds = Db::name('ProjectAuth')->whereIn('id', explode(',', $authorize))->where($where)->column('id');
             if (empty($authorizeIds)) {
-                return session('member.nodes', []);
+                $member['nodes'] = [];
+                return setCurrentMember($member);
             }
             $nodes = Db::name('ProjectAuthNode')->whereIn('auth', $authorizeIds)->column('node');
-            return session('member.nodes', $nodes);
+            $member['nodes'] = $nodes;
+            return setCurrentMember($member);
         }
         return false;
     }
@@ -56,15 +59,16 @@ class NodeService
     {
         list($module, $controller, $action) = explode('/', str_replace(['?', '=', '&'], '/', $node . '///'));
         $currentNode = self::parseNodeStr("{$module}/{$controller}") . strtolower("/{$action}");
+        $member = getCurrentMember();
         if ($moduleApp == 'project') {
             //拥有者账号不加入权限判断
-            if (session('member.is_owner') == 1) {
+            if ($member['is_owner'] == 1) {
                 return true;
             }
             if (!in_array($currentNode, self::getProjectAuthNode())) {
                 return true;
             }
-            return in_array($currentNode, (array)session('member.nodes'));
+            return in_array($currentNode, (array)$member['nodes']);
         }
         return false;
     }
