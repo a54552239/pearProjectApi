@@ -87,7 +87,7 @@ class DepartmentMember extends BasicApi
         }
         if (!$department_code) {
             //从平台查询
-            $memberList = Member::where([['email', 'like', "%{$keyword}%"]])->whereNotIn('code', $departmentMemberIds)->select()->toArray();
+            $memberList = Member::where([['email', '=', "{$keyword}"]])->whereNotIn('code', $departmentMemberIds)->select()->toArray();
             if ($memberList) {
                 foreach ($memberList as $member) {
                     $item = [];
