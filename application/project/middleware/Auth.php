@@ -30,21 +30,22 @@ class Auth
         if ($currentOrganizationCode) {
             setCurrentOrganizationCode($currentOrganizationCode);
         }
-        $authorization = $request->header('Authorization');
-        $accessToken = '';
-        if ($authorization) {
-            $accessToken = explode(' ', $authorization)[1];
-        }
-        $data = JwtService::decodeToken($accessToken);
         // 登录状态检查
         if (!empty($access['is_login'])) {
+            $authorization = $request->header('Authorization');
+            $accessToken = '';
+            if ($authorization) {
+                $accessToken = explode(' ', $authorization)[1];
+            }
+            $data = JwtService::decodeToken($accessToken);
             $isError = isError($data);
             if ($isError) {
+                //TODO 启用refreshToken
                 if ($data['errno'] == 3) {
-                    $msg = ['code' => 4010, 'msg' => 'accessToken过期'];
+                    $msg = ['code' => 401, 'msg' => 'accessToken过期'];
                     return json($msg);
                 }
-                $msg = ['code' => 401, 'msg' => 'token过期，请重新登录'];
+                $msg = ['code' => 402, 'msg' => 'token过期，请重新登录'];
                 return json($msg);
             }
             setCurrentMember(get_object_vars($data->data));

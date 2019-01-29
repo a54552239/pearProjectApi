@@ -100,7 +100,7 @@ class JwtService
     public static function decodeToken($token)
     {
         $jwtConfig = config('jwt.');
-        JWT::$leeway = 60;//当前时间减去60，把时间留点余地
+//        JWT::$leeway = 60; //当前时间减去60，把时间留点余地
         try {
             $decoded = JWT::decode($token, $jwtConfig['key'], array($jwtConfig['alg']));//解密方式，这里要和签发的时候对应
         } catch (\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确

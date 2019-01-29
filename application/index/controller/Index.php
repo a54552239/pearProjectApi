@@ -196,7 +196,7 @@ class Index extends BasicApi
     }
 
     /**
-     *刷新token
+     * 刷新token
      */
     public function refreshAccessToken()
     {
@@ -205,7 +205,10 @@ class Index extends BasicApi
         if (isError($data)) {
             $this->error('token过期，请重新登录', 401);
         }
-        $this->success('', JwtService::getAccessToken(get_object_vars($data->data)));
+        $accessToken = JwtService::getAccessToken(get_object_vars($data->data));
+        $accessTokenExp = JwtService::decodeToken($accessToken)->exp;
+        $tokenList['accessTokenExp'] = $accessTokenExp;
+        $this->success('', ['accessToken' => $accessToken, 'accessTokenExp' => $accessTokenExp]);
 
     }
 
