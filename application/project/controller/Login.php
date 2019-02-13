@@ -5,6 +5,7 @@ namespace app\project\controller;
 use app\common\Model\Member;
 use app\common\Model\Organization;
 use controller\BasicApi;
+use service\JwtService;
 use service\LogService;
 use service\NodeService;
 use service\RandomService;
@@ -101,10 +102,13 @@ class Login extends BasicApi
         $member['position'] = $list[0]['position'];
         $member['department'] = $list[0]['department'];
 
-        session('member', $member);
+        setCurrentMember($member);
         !empty($member['authorize']) && NodeService::applyProjectAuthNode();
         Log::write(json_encode($member), "member-login");
-        $this->success('', ['member' => $member, 'organizationList' => $organizationList]);
+        $tokenList = JwtService::initToken($member);
+        $accessTokenExp = JwtService::decodeToken($tokenList['accessToken'])->exp;
+        $tokenList['accessTokenExp'] = $accessTokenExp;
+        $this->success('', ['member' => $member, 'tokenList' => $tokenList, 'organizationList' => $organizationList]);
     }
 
     /**

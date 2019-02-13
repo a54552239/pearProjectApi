@@ -3,9 +3,8 @@
 namespace app\project\middleware;
 
 use app\common\Model\ProjectNode;
+use service\JwtService;
 use service\NodeService;
-use think\facade\Response;
-use think\facade\Session;
 use think\Request;
 
 /**
@@ -29,14 +28,28 @@ class Auth
         $access = $this->buildAuth($node = NodeService::parseNodeStr("{$module}/{$controller}/{$action}"));
         $currentOrganizationCode = $request->header('organizationCode');
         if ($currentOrganizationCode) {
-            session('currentOrganizationCode', $currentOrganizationCode);
+            setCurrentOrganizationCode($currentOrganizationCode);
         }
         // 登录状态检查
-        if (!empty($access['is_login']) && !session('member')) {
-            $msg = ['code' => 401, 'msg' => '抱歉，您还没有登录获取访问权限！'];
-            return json($msg);
+        if (!empty($access['is_login'])) {
+            $authorization = $request->header('Authorization');
+            $accessToken = '';
+            if ($authorization) {
+                $accessToken = explode(' ', $authorization)[1];
+            }
+            $data = JwtService::decodeToken($accessToken);
+            $isError = isError($data);
+            if ($isError) {
+                //TODO 启用refreshToken
+                if ($data['errno'] == 3) {
+                    $msg = ['code' => 401, 'msg' => 'accessToken过期'];
+                    return json($msg);
+                }
+                $msg = ['code' => 402, 'msg' => 'token过期，请重新登录'];
+                return json($msg);
+            }
+            setCurrentMember(get_object_vars($data->data));
         }
-
         // 访问权限检查
         if (!empty($access['is_auth']) && !auth($node, 'project')) {
             return json(['code' => 403, 'msg' => '无权限操作资源，访问被拒绝']);

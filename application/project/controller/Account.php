@@ -179,10 +179,12 @@ class Account extends BasicApi
         } else {
             unset($params['password']);
         }
+        $member = getCurrentMember();
+        $currentOrganizationCode = getCurrentOrganizationCode();
         $params['create_time'] = nowTime();
-        $params['member_code'] = session('member.code');
-        $params['organization_code'] = session('currentOrganizationCode');
-        $user = $this->model->where(['account' => $params['account'], 'member_code' => session('member.code'), 'organization_code' => session('currentOrganizationCode')])->find();
+        $params['member_code'] = $member['code'];
+        $params['organization_code'] = $currentOrganizationCode;
+        $user = $this->model->where(['account' => $params['account'], 'member_code' => $member['code'], 'organization_code' => $currentOrganizationCode])->find();
         $user && $this->error("该账号已存在！");
         $result = $this->model->_add($params);
         if ($result) {
