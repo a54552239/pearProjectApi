@@ -118,15 +118,17 @@ class Login extends BasicApi
     {
         $mobile = $this->request->post('mobile', '');
         $code = RandomService::numeric(6);
-        $sms = new Sms();
-        $result = $sms->vSend($mobile, [
-            'data' => [
-                'project' => 'DWYsW1',
-                'code' => $code
-            ],
-        ]);
-        if (isError($result)) {
-            $this->error('系统繁忙');
+        if (config('sms.debug')) {
+            $sms = new Sms();
+            $result = $sms->vSend($mobile, [
+                'data' => [
+                    'project' => 'DWYsW1',
+                    'code' => $code
+                ],
+            ]);
+            if (isError($result)) {
+                $this->error('系统繁忙');
+            }
         }
         session('captcha', $code);
         $this->success('', config('sms.debug') ? $code : '');
