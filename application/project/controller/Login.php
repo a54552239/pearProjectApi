@@ -118,7 +118,7 @@ class Login extends BasicApi
     {
         $mobile = $this->request->post('mobile', '');
         $code = RandomService::numeric(6);
-        if (config('sms.debug')) {
+        if (!config('sms.debug')) {
             $sms = new Sms();
             $result = $sms->vSend($mobile, [
                 'data' => [

@@ -21,6 +21,7 @@ use app\common\Model\Task;
 use app\common\Model\TaskLike;
 use app\common\Model\TaskMember;
 use app\common\Model\TaskStages;
+use app\common\Model\Notify;
 use controller\BasicApi;
 use Exception;
 use Firebase\JWT\JWT;
@@ -193,6 +194,7 @@ class Index extends BasicApi
         TaskLike::where("id > 0")->delete();
         TaskMember::where("id > 0")->delete();
         TaskStages::where("id > 0")->delete();
+        Notify::where("id > 0")->delete();
     }
 
     /**
