@@ -45,7 +45,7 @@ class Auth
                     $msg = ['code' => 401, 'msg' => 'accessToken过期'];
                     return json($msg);
                 }
-                $msg = ['code' => 402, 'msg' => 'token过期，请重新登录'];
+                $msg = ['code' => 401, 'msg' => 'token过期，请重新登录'];
                 return json($msg);
             }
             setCurrentMember(get_object_vars($data->data));
