@@ -16,9 +16,11 @@ class TaskLike extends CommonModel
      * @param $memberCode
      * @param $like
      * @return TaskLike|bool
+     * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
     public static function likeTask($code, $memberCode, $like)
     {

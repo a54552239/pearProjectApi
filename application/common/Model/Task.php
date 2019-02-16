@@ -17,7 +17,7 @@ use think\facade\Hook;
  */
 class Task extends CommonModel
 {
-    protected $append = ['priText', 'liked', 'stared', 'childCount', 'hasUnDone', 'parentDone', 'hasComment', 'hasSource', 'canRead'];
+    protected $append = ['priText', 'liked', 'stared', 'tags', 'childCount', 'hasUnDone', 'parentDone', 'hasComment', 'hasSource', 'canRead'];
 
     public function read($code)
     {
@@ -556,6 +556,17 @@ class Task extends CommonModel
         return $status[$data['pri']];
     }
 
+    /**
+     * 标签
+     */
+    public function getTagsAttr($value, $data)
+    {
+        $tags = [];
+        if (isset($data['code'])) {
+            $tags = TaskToTag::where(['task_code' => $data['code']])->field('id', true)->order('id asc')->select()->toArray();
+        }
+        return $tags;
+    }
     /**
      * 子任务数
      */

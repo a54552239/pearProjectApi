@@ -3,21 +3,11 @@
 namespace app\project\controller;
 
 use app\common\Model\Member;
-use app\common\Model\MemberAccount;
-use app\common\Model\Notify;
-use app\common\Model\ProjectCollection;
 use app\common\Model\ProjectLog;
-use app\common\Model\ProjectMember;
-use app\common\Model\SystemConfig;
+use app\common\Model\TaskTag;
+use app\common\Model\TaskToTag;
 use controller\BasicApi;
-use OSS\Core\OssException;
-use service\FileService;
-use service\NodeService;
-use service\RandomService;
-use think\Exception;
-use think\exception\PDOException;
 use think\facade\Request;
-use think\File;
 
 /**
  */
@@ -247,6 +237,10 @@ class Task extends BasicApi
         $this->success();
     }
 
+    /**
+     * 发表评论
+     * @param Request $request
+     */
     public function createComment(Request $request)
     {
         $data = $request::only('taskCode,comment');
@@ -343,6 +337,41 @@ class Task extends BasicApi
             $this->success();
         }
         $this->error("操作失败，请稍候再试！");
+    }
+
+    /**
+     * 任务标签列表
+     * @param Request $request
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function taskToTags(Request $request)
+    {
+        $taskCode = $request::param('taskCode');
+        $tags = TaskToTag::where(['task_code' => $taskCode])->field('id', true)->select()->toArray();
+        $this->success('', $tags);
+    }
+
+    /**
+     * 设置标签
+     * @param Request $request
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function setTag(Request $request)
+    {
+        $tagCode = $request::param('tagCode');
+        $taskCode = $request::param('taskCode');
+        if (!$taskCode) {
+            $this->error("请选择一个任务");
+        }
+        if (!$tagCode) {
+            $this->error("请选择一个标签");
+        }
+        TaskTag::setTag($tagCode, $taskCode);
+        $this->success();
     }
 
     /**
