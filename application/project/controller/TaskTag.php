@@ -89,6 +89,8 @@ class TaskTag extends BasicApi
     /**
      * 删除标签
      * @return void
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
      */
     public function delete()
     {
