@@ -11,7 +11,7 @@
  Target Server Version : 50640
  File Encoding         : 65001
 
- Date: 16/02/2019 12:39:44
+ Date: 16/02/2019 14:15:30
 */
 
 SET NAMES utf8mb4;
@@ -462,7 +462,7 @@ CREATE TABLE `pear_project_auth_node`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `index_system_auth_auth`(`auth`) USING BTREE,
   INDEX `index_system_auth_node`(`node`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4381 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目角色与节点绑定' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 4452 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目角色与节点绑定' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pear_project_auth_node
@@ -1142,70 +1142,77 @@ INSERT INTO `pear_project_auth_node` VALUES (4188, 3, 'project/file/recycle');
 INSERT INTO `pear_project_auth_node` VALUES (4189, 3, 'project/file/recovery');
 INSERT INTO `pear_project_auth_node` VALUES (4190, 3, 'project/file/delete');
 INSERT INTO `pear_project_auth_node` VALUES (4191, 3, 'project');
-INSERT INTO `pear_project_auth_node` VALUES (4317, 4, 'project/account/index');
-INSERT INTO `pear_project_auth_node` VALUES (4318, 4, 'project/auth/index');
-INSERT INTO `pear_project_auth_node` VALUES (4319, 4, 'project/department/index');
-INSERT INTO `pear_project_auth_node` VALUES (4320, 4, 'project/department/read');
-INSERT INTO `pear_project_auth_node` VALUES (4321, 4, 'project/department_member/index');
-INSERT INTO `pear_project_auth_node` VALUES (4322, 4, 'project/department_member/searchinvitemember');
-INSERT INTO `pear_project_auth_node` VALUES (4323, 4, 'project/file/index');
-INSERT INTO `pear_project_auth_node` VALUES (4324, 4, 'project/file/read');
-INSERT INTO `pear_project_auth_node` VALUES (4325, 4, 'project/file/uploadfiles');
-INSERT INTO `pear_project_auth_node` VALUES (4326, 4, 'project/index/index');
-INSERT INTO `pear_project_auth_node` VALUES (4327, 4, 'project/index');
-INSERT INTO `pear_project_auth_node` VALUES (4328, 4, 'project/index/changecurrentorganization');
-INSERT INTO `pear_project_auth_node` VALUES (4329, 4, 'project/index/systemconfig');
-INSERT INTO `pear_project_auth_node` VALUES (4330, 4, 'project/index/info');
-INSERT INTO `pear_project_auth_node` VALUES (4331, 4, 'project/index/editpersonal');
-INSERT INTO `pear_project_auth_node` VALUES (4332, 4, 'project/index/editpassword');
-INSERT INTO `pear_project_auth_node` VALUES (4333, 4, 'project/index/uploadimg');
-INSERT INTO `pear_project_auth_node` VALUES (4334, 4, 'project/index/uploadavatar');
-INSERT INTO `pear_project_auth_node` VALUES (4335, 4, 'project/menu/menu');
-INSERT INTO `pear_project_auth_node` VALUES (4336, 4, 'project/node/index');
-INSERT INTO `pear_project_auth_node` VALUES (4337, 4, 'project/node/alllist');
-INSERT INTO `pear_project_auth_node` VALUES (4338, 4, 'project/notify/index');
-INSERT INTO `pear_project_auth_node` VALUES (4339, 4, 'project/notify');
-INSERT INTO `pear_project_auth_node` VALUES (4340, 4, 'project/notify/noreads');
-INSERT INTO `pear_project_auth_node` VALUES (4341, 4, 'project/notify/setreadied');
-INSERT INTO `pear_project_auth_node` VALUES (4342, 4, 'project/notify/batchdel');
-INSERT INTO `pear_project_auth_node` VALUES (4343, 4, 'project/notify/read');
-INSERT INTO `pear_project_auth_node` VALUES (4344, 4, 'project/notify/delete');
-INSERT INTO `pear_project_auth_node` VALUES (4345, 4, 'project/organization/index');
-INSERT INTO `pear_project_auth_node` VALUES (4346, 4, 'project/organization');
-INSERT INTO `pear_project_auth_node` VALUES (4347, 4, 'project/organization/save');
-INSERT INTO `pear_project_auth_node` VALUES (4348, 4, 'project/organization/read');
-INSERT INTO `pear_project_auth_node` VALUES (4349, 4, 'project/organization/edit');
-INSERT INTO `pear_project_auth_node` VALUES (4350, 4, 'project/organization/delete');
-INSERT INTO `pear_project_auth_node` VALUES (4351, 4, 'project/project/index');
-INSERT INTO `pear_project_auth_node` VALUES (4352, 4, 'project/project/selflist');
-INSERT INTO `pear_project_auth_node` VALUES (4353, 4, 'project/project/save');
-INSERT INTO `pear_project_auth_node` VALUES (4354, 4, 'project/project/read');
-INSERT INTO `pear_project_auth_node` VALUES (4355, 4, 'project/project/getlogbyselfproject');
-INSERT INTO `pear_project_auth_node` VALUES (4356, 4, 'project/project/quit');
-INSERT INTO `pear_project_auth_node` VALUES (4357, 4, 'project/project_collect/collect');
-INSERT INTO `pear_project_auth_node` VALUES (4358, 4, 'project/project_collect');
-INSERT INTO `pear_project_auth_node` VALUES (4359, 4, 'project/project_member/index');
-INSERT INTO `pear_project_auth_node` VALUES (4360, 4, 'project/project_template/index');
-INSERT INTO `pear_project_auth_node` VALUES (4361, 4, 'project/task/index');
-INSERT INTO `pear_project_auth_node` VALUES (4362, 4, 'project/task/datetotalforproject');
-INSERT INTO `pear_project_auth_node` VALUES (4363, 4, 'project/task/selflist');
-INSERT INTO `pear_project_auth_node` VALUES (4364, 4, 'project/task/read');
-INSERT INTO `pear_project_auth_node` VALUES (4365, 4, 'project/task/save');
-INSERT INTO `pear_project_auth_node` VALUES (4366, 4, 'project/task/taskdone');
-INSERT INTO `pear_project_auth_node` VALUES (4367, 4, 'project/task/assigntask');
-INSERT INTO `pear_project_auth_node` VALUES (4368, 4, 'project/task/sort');
-INSERT INTO `pear_project_auth_node` VALUES (4369, 4, 'project/task/createcomment');
-INSERT INTO `pear_project_auth_node` VALUES (4370, 4, 'project/task/setprivate');
-INSERT INTO `pear_project_auth_node` VALUES (4371, 4, 'project/task/like');
-INSERT INTO `pear_project_auth_node` VALUES (4372, 4, 'project/task/star');
-INSERT INTO `pear_project_auth_node` VALUES (4373, 4, 'project/task/tasklog');
-INSERT INTO `pear_project_auth_node` VALUES (4374, 4, 'project/task_member/index');
-INSERT INTO `pear_project_auth_node` VALUES (4375, 4, 'project/task_member/searchinvitemember');
-INSERT INTO `pear_project_auth_node` VALUES (4376, 4, 'project/task_stages/index');
-INSERT INTO `pear_project_auth_node` VALUES (4377, 4, 'project/task_stages/tasks');
-INSERT INTO `pear_project_auth_node` VALUES (4378, 4, 'project/task_stages/sort');
-INSERT INTO `pear_project_auth_node` VALUES (4379, 4, 'project/task_stages_template/index');
-INSERT INTO `pear_project_auth_node` VALUES (4380, 4, 'project/account/read');
+INSERT INTO `pear_project_auth_node` VALUES (4381, 4, 'project/account/index');
+INSERT INTO `pear_project_auth_node` VALUES (4382, 4, 'project/account/read');
+INSERT INTO `pear_project_auth_node` VALUES (4383, 4, 'project/auth/index');
+INSERT INTO `pear_project_auth_node` VALUES (4384, 4, 'project/department/index');
+INSERT INTO `pear_project_auth_node` VALUES (4385, 4, 'project/department/read');
+INSERT INTO `pear_project_auth_node` VALUES (4386, 4, 'project/department_member/index');
+INSERT INTO `pear_project_auth_node` VALUES (4387, 4, 'project/department_member/searchinvitemember');
+INSERT INTO `pear_project_auth_node` VALUES (4388, 4, 'project/file/index');
+INSERT INTO `pear_project_auth_node` VALUES (4389, 4, 'project/file/read');
+INSERT INTO `pear_project_auth_node` VALUES (4390, 4, 'project/file/uploadfiles');
+INSERT INTO `pear_project_auth_node` VALUES (4391, 4, 'project/index/index');
+INSERT INTO `pear_project_auth_node` VALUES (4392, 4, 'project/index');
+INSERT INTO `pear_project_auth_node` VALUES (4393, 4, 'project/index/changecurrentorganization');
+INSERT INTO `pear_project_auth_node` VALUES (4394, 4, 'project/index/systemconfig');
+INSERT INTO `pear_project_auth_node` VALUES (4395, 4, 'project/index/info');
+INSERT INTO `pear_project_auth_node` VALUES (4396, 4, 'project/index/editpersonal');
+INSERT INTO `pear_project_auth_node` VALUES (4397, 4, 'project/index/editpassword');
+INSERT INTO `pear_project_auth_node` VALUES (4398, 4, 'project/index/uploadimg');
+INSERT INTO `pear_project_auth_node` VALUES (4399, 4, 'project/index/uploadavatar');
+INSERT INTO `pear_project_auth_node` VALUES (4400, 4, 'project/menu/menu');
+INSERT INTO `pear_project_auth_node` VALUES (4401, 4, 'project/node/index');
+INSERT INTO `pear_project_auth_node` VALUES (4402, 4, 'project/node/alllist');
+INSERT INTO `pear_project_auth_node` VALUES (4403, 4, 'project/notify/index');
+INSERT INTO `pear_project_auth_node` VALUES (4404, 4, 'project/notify');
+INSERT INTO `pear_project_auth_node` VALUES (4405, 4, 'project/notify/noreads');
+INSERT INTO `pear_project_auth_node` VALUES (4406, 4, 'project/notify/setreadied');
+INSERT INTO `pear_project_auth_node` VALUES (4407, 4, 'project/notify/batchdel');
+INSERT INTO `pear_project_auth_node` VALUES (4408, 4, 'project/notify/read');
+INSERT INTO `pear_project_auth_node` VALUES (4409, 4, 'project/notify/delete');
+INSERT INTO `pear_project_auth_node` VALUES (4410, 4, 'project/organization/index');
+INSERT INTO `pear_project_auth_node` VALUES (4411, 4, 'project/organization');
+INSERT INTO `pear_project_auth_node` VALUES (4412, 4, 'project/organization/save');
+INSERT INTO `pear_project_auth_node` VALUES (4413, 4, 'project/organization/read');
+INSERT INTO `pear_project_auth_node` VALUES (4414, 4, 'project/organization/edit');
+INSERT INTO `pear_project_auth_node` VALUES (4415, 4, 'project/organization/delete');
+INSERT INTO `pear_project_auth_node` VALUES (4416, 4, 'project/project/index');
+INSERT INTO `pear_project_auth_node` VALUES (4417, 4, 'project/project/selflist');
+INSERT INTO `pear_project_auth_node` VALUES (4418, 4, 'project/project/save');
+INSERT INTO `pear_project_auth_node` VALUES (4419, 4, 'project/project/read');
+INSERT INTO `pear_project_auth_node` VALUES (4420, 4, 'project/project/getlogbyselfproject');
+INSERT INTO `pear_project_auth_node` VALUES (4421, 4, 'project/project/quit');
+INSERT INTO `pear_project_auth_node` VALUES (4422, 4, 'project/project_collect/collect');
+INSERT INTO `pear_project_auth_node` VALUES (4423, 4, 'project/project_collect');
+INSERT INTO `pear_project_auth_node` VALUES (4424, 4, 'project/project_member/index');
+INSERT INTO `pear_project_auth_node` VALUES (4425, 4, 'project/project_template/index');
+INSERT INTO `pear_project_auth_node` VALUES (4426, 4, 'project/task/index');
+INSERT INTO `pear_project_auth_node` VALUES (4427, 4, 'project/task/datetotalforproject');
+INSERT INTO `pear_project_auth_node` VALUES (4428, 4, 'project/task/selflist');
+INSERT INTO `pear_project_auth_node` VALUES (4429, 4, 'project/task/read');
+INSERT INTO `pear_project_auth_node` VALUES (4430, 4, 'project/task/save');
+INSERT INTO `pear_project_auth_node` VALUES (4431, 4, 'project/task/taskdone');
+INSERT INTO `pear_project_auth_node` VALUES (4432, 4, 'project/task/assigntask');
+INSERT INTO `pear_project_auth_node` VALUES (4433, 4, 'project/task/sort');
+INSERT INTO `pear_project_auth_node` VALUES (4434, 4, 'project/task/createcomment');
+INSERT INTO `pear_project_auth_node` VALUES (4435, 4, 'project/task/setprivate');
+INSERT INTO `pear_project_auth_node` VALUES (4436, 4, 'project/task/like');
+INSERT INTO `pear_project_auth_node` VALUES (4437, 4, 'project/task/star');
+INSERT INTO `pear_project_auth_node` VALUES (4438, 4, 'project/task/tasklog');
+INSERT INTO `pear_project_auth_node` VALUES (4439, 4, 'project/task_member/index');
+INSERT INTO `pear_project_auth_node` VALUES (4440, 4, 'project/task_member/searchinvitemember');
+INSERT INTO `pear_project_auth_node` VALUES (4441, 4, 'project/task_stages/index');
+INSERT INTO `pear_project_auth_node` VALUES (4442, 4, 'project/task_stages/tasks');
+INSERT INTO `pear_project_auth_node` VALUES (4443, 4, 'project/task_stages/sort');
+INSERT INTO `pear_project_auth_node` VALUES (4444, 4, 'project/task_stages_template/index');
+INSERT INTO `pear_project_auth_node` VALUES (4445, 4, 'project/task/tasktotags');
+INSERT INTO `pear_project_auth_node` VALUES (4446, 4, 'project/task/settag');
+INSERT INTO `pear_project_auth_node` VALUES (4447, 4, 'project/task_tag');
+INSERT INTO `pear_project_auth_node` VALUES (4448, 4, 'project/task_tag/index');
+INSERT INTO `pear_project_auth_node` VALUES (4449, 4, 'project/task_tag/save');
+INSERT INTO `pear_project_auth_node` VALUES (4450, 4, 'project/task_tag/edit');
+INSERT INTO `pear_project_auth_node` VALUES (4451, 4, 'project/task_tag/delete');
 
 -- ----------------------------
 -- Table structure for pear_project_collection
@@ -1952,7 +1959,7 @@ CREATE TABLE `pear_project_node`  (
   `create_at` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `index_system_node_node`(`node`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 608 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目端节点表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 615 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目端节点表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pear_project_node
@@ -2097,6 +2104,13 @@ INSERT INTO `pear_project_node` VALUES (604, 'project/invite_link/save', '创建
 INSERT INTO `pear_project_node` VALUES (605, 'project/task/setprivate', '设置任务隐私模式', 0, 1, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (606, 'project/account/read', '账号信息', 0, 1, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (607, 'project/task/batchassigntask', '批量指派任务', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (608, 'project/task/tasktotags', '任务标签', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (609, 'project/task/settag', '设置任务标签', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (610, 'project/task_tag', '任务标签管理', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (611, 'project/task_tag/index', '任务标签列表', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (612, 'project/task_tag/save', '创建任务标签', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (613, 'project/task_tag/edit', '编辑任务标签', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (614, 'project/task_tag/delete', '删除任务标签', 0, 1, 1, NULL);
 
 -- ----------------------------
 -- Table structure for pear_project_template
