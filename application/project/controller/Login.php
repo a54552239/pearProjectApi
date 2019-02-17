@@ -9,7 +9,7 @@ use service\JwtService;
 use service\LogService;
 use service\NodeService;
 use service\RandomService;
-use sms\Sms;
+use mail\Mail;
 use think\Db;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
@@ -72,6 +72,9 @@ class Login extends BasicApi
             if (session('captcha') != Request::param('captcha')) {
                 $this->error('验证码错误', 203);
             }
+            if (session('captchaMobile') != $mobile) {
+                $this->error('手机号与验证码不匹配', 203);
+            }
             $member = \app\common\Model\Member::where(['mobile' => $mobile])->order('id asc')->find();
         } else {
             $member = \app\common\Model\Member::where(['account' => $data['account']])->whereOr(['email' => $data['account']])->order('id asc')->find();
@@ -119,7 +122,7 @@ class Login extends BasicApi
         $mobile = $this->request->post('mobile', '');
         $code = RandomService::numeric(6);
         if (!config('sms.debug')) {
-            $sms = new Sms();
+            $sms = new Mail();
             $result = $sms->vSend($mobile, [
                 'data' => [
                     'project' => 'DWYsW1',
@@ -131,6 +134,7 @@ class Login extends BasicApi
             }
         }
         session('captcha', $code);
+        session('captchaMobile', $mobile);
         $this->success('', config('sms.debug') ? $code : '');
     }
 
@@ -168,6 +172,9 @@ class Login extends BasicApi
         if (session('captcha') != $data['captcha']) {
             $this->error('验证码错误', 203);
         }
+        if (session('captchaMobile') != $data['mobile']) {
+            $this->error('手机号与验证码不匹配', 203);
+        }
         $memberData = [
             'email' => $data['email'],
             'name' => $data['name'],
@@ -187,6 +194,105 @@ class Login extends BasicApi
             $this->error('注册失败', 203);
         }
         $this->success('');
+    }
+
+    /**
+     * 绑定手机
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public function _bindMobile()
+    {
+        $mobile = $this->request->post('mobile', '');
+        if (session('captcha') != Request::param('captcha')) {
+            $this->error('验证码错误', 203);
+        }
+        if (session('captchaMobile') != $mobile) {
+            $this->error('手机号与验证码不匹配', 203);
+        }
+        $member = getCurrentMember();
+        if ($mobile && $member['mobile'] == $mobile) {
+            $this->error('你已绑定该手机', 203);
+        }
+        $other = Member::where(['mobile' => $mobile])->find();
+        if ($other && $other['id'] != $member['id']) {
+            $this->error('该手机已被绑定', 203);
+        }
+        $result = Member::update(['mobile' => $mobile], ['id' => $member['id']]);
+        $member['mobile'] = $mobile;
+        if ($result) {
+            setCurrentMember($member);
+            $tokenList = JwtService::initToken($member);
+            $accessTokenExp = JwtService::decodeToken($tokenList['accessToken'])->exp;
+            $tokenList['accessTokenExp'] = $accessTokenExp;
+            $this->success('绑定成功！', ['member' => $member, 'tokenList' => $tokenList]);
+        }
+    }
+
+    /**
+     * 绑定邮箱
+     */
+    public function _bindMail()
+    {
+        if (!config('mail.open')) {
+            $this->error('系统尚未开启邮件服务');
+        }
+        $email = $this->request->post('mail', '');
+        $mailer = new Mail();
+        try {
+            $mail = $mailer->mail;
+            $mail->setFrom(config('mail.Username'), 'pearProject');
+            $mail->addAddress($email, getCurrentMember()['name']);
+            //Content
+            $mail->isHTML(true);
+            $mail->Subject = '申请修改邮箱地址';
+            $member = getCurrentMember();
+            $info = [
+                'member_code' => $member['code'],
+                'email' => $member['email'],
+            ];
+            $accessToken = JwtService::getAccessToken($info);
+            $link = Request::domain() . '/#/reset/email?token=' . $accessToken;
+            $mail->Body = '
+<p>您最近申请了修改您的邮箱地址，点击下面的链接进行修改，如果您从未提交过此申请，请忽略此邮件。</p>
+<a href="' . $link . '" target="_blank" style="display: inline-block;padding: 8px 24px;background: #1890ff;border-radius: 4px;font-weight: normal;letter-spacing: 1px;font-size: 14px;color: white;text-decoration: none;" rel="noopener">
+                验证邮箱
+            </a>
+            <p>如果按钮无法点击，请点击以下链接进行验证:</p>
+            <a href="' . $link . '">' . $link . '</a>
+            ';
+            $mail->send();
+        } catch (\Exception $e) {
+            ob_clean();
+            $this->error('发送失败 ');
+        }
+        $this->success('发送邮件成功');
+    }
+
+    /**
+     * 验证绑定邮箱
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public function _checkBindMail()
+    {
+        $accessToken = $this->request->post('token', '');
+        $data = JwtService::decodeToken($accessToken);
+        $isError = isError($data);
+        if (!$isError) {
+            $other = Member::where(['email' => $data->data->email])->find();
+            if ($other && $other['code'] != $data->data->member_code) {
+                $this->error('该邮箱已被绑定', 203);
+            }
+            $result = Member::update(['email' => $data->data->email], ['code' => $data->data->member_code]);
+            if ($result) {
+                $this->success();
+            }
+        }
+        $this->error('验证失败！');
+
     }
 
     /**
