@@ -238,7 +238,12 @@ class Login extends BasicApi
         if (!config('mail.open')) {
             $this->error('系统尚未开启邮件服务');
         }
+        $member = getCurrentMember();
+
         $email = $this->request->post('mail', '');
+        if ($email && $member['email'] == $email) {
+            $this->error('你已绑定该邮箱', 203);
+        }
         $mailer = new Mail();
         try {
             $mail = $mailer->mail;
@@ -247,10 +252,9 @@ class Login extends BasicApi
             //Content
             $mail->isHTML(true);
             $mail->Subject = '申请修改邮箱地址';
-            $member = getCurrentMember();
             $info = [
                 'member_code' => $member['code'],
-                'email' => $member['email'],
+                'email' => $email,
             ];
             $accessToken = JwtService::getAccessToken($info);
             $link = Request::domain() . '/#/reset/email?token=' . $accessToken;
