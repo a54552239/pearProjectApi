@@ -23,7 +23,7 @@ class Project extends CommonModel
         return self::where(['id' => $id, 'deleted' => 0, 'archive' => 0])->find();
     }
 
-    public function getMemberProjects($memberCode = '', $deleted = 0, $page = 1, $pageSize = 10)
+    public function getMemberProjects($memberCode = '', $deleted = 0, $archive = 0, $page = 1, $pageSize = 10)
     {
         if (!$memberCode) {
             $memberCode = getCurrentMember()['code'];
@@ -34,7 +34,7 @@ class Project extends CommonModel
         $offset = ($page - 1) * $page;
         $limit = $pageSize;
         $prefix = config('database.prefix');
-        $sql = "select *,p.id as id,p.name as name,p.code as code from {$prefix}project as p join {$prefix}project_member as pm on p.code = pm.project_code where pm.member_code = '{$memberCode}' and p.deleted = {$deleted} order by p.id desc";
+        $sql = "select *,p.id as id,p.name as name,p.code as code from {$prefix}project as p join {$prefix}project_member as pm on p.code = pm.project_code where pm.member_code = '{$memberCode}' and p.deleted = {$deleted} and p.archive = {$archive} order by p.id desc";
         $total = Db::query($sql);
         $total = count($total);
         $sql .= " limit {$offset},{$limit}";

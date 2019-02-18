@@ -111,6 +111,7 @@ class Project extends BasicApi
     public function selfList()
     {
         $type = Request::post('type');
+        $archive = Request::param('archive', 0);
         $memberCode = Request::post('memberCode', '');
         if (!$memberCode) {
             $member = getCurrentMember();
@@ -121,7 +122,7 @@ class Project extends BasicApi
         if (!$type) {
             $deleted = 0;
         }
-        $list = $this->model->getMemberProjects($member['code'], $deleted, Request::post('page'), Request::post('pageSize'));
+        $list = $this->model->getMemberProjects($member['code'], $deleted, $archive, Request::post('page'), Request::post('pageSize'));
         if ($list['list']) {
             foreach ($list['list'] as $key => &$item) {
                 $item['collected'] = false;
