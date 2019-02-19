@@ -107,6 +107,7 @@ class Login extends BasicApi
 
         setCurrentMember($member);
         !empty($member['authorize']) && NodeService::applyProjectAuthNode();
+        $member = getCurrentMember();
         Log::write(json_encode($member), "member-login");
         $tokenList = JwtService::initToken($member);
         $accessTokenExp = JwtService::decodeToken($tokenList['accessToken'])->exp;
