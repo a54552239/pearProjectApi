@@ -69,10 +69,10 @@ class Login extends BasicApi
         // 用户信息验证
         $mobile = $this->request->post('mobile', '');
         if ($mobile) {
-            if (session('captcha') != Request::param('captcha')) {
+            if (cache('captcha') != Request::param('captcha')) {
                 $this->error('验证码错误', 203);
             }
-            if (session('captchaMobile') != $mobile) {
+            if (cache('captchaMobile') != $mobile) {
                 $this->error('手机号与验证码不匹配', 203);
             }
             $member = \app\common\Model\Member::where(['mobile' => $mobile])->order('id asc')->find();
@@ -134,8 +134,8 @@ class Login extends BasicApi
                 $this->error('系统繁忙');
             }
         }
-        session('captcha', $code);
-        session('captchaMobile', $mobile);
+        cache('captcha', $code);
+        cache('captchaMobile', $mobile);
         $this->success('', config('sms.debug') ? $code : '');
     }
 
@@ -170,10 +170,10 @@ class Login extends BasicApi
         if ($member) {
             $this->error('该手机已被注册', 202);
         }
-        if (session('captcha') != $data['captcha']) {
+        if (cache('captcha') != $data['captcha']) {
             $this->error('验证码错误', 203);
         }
-        if (session('captchaMobile') != $data['mobile']) {
+        if (cache('captchaMobile') != $data['mobile']) {
             $this->error('手机号与验证码不匹配', 203);
         }
         $memberData = [
@@ -206,10 +206,10 @@ class Login extends BasicApi
     public function _bindMobile()
     {
         $mobile = $this->request->post('mobile', '');
-        if (session('captcha') != Request::param('captcha')) {
+        if (cache('captcha') != Request::param('captcha')) {
             $this->error('验证码错误', 203);
         }
-        if (session('captchaMobile') != $mobile) {
+        if (cache('captchaMobile') != $mobile) {
             $this->error('手机号与验证码不匹配', 203);
         }
         $member = getCurrentMember();
