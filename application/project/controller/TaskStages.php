@@ -38,6 +38,8 @@ class TaskStages extends BasicApi
                 $item['fixedCreator'] = false; //添加任务按钮定位
                 $item['showTaskCard'] = false; //是否显示创建卡片
                 $item['tasks'] = [];
+                $item['doneTasks'] = [];
+                $item['unDoneTasks'] = [];
             }
         }
         $this->success('', $list);
@@ -52,11 +54,12 @@ class TaskStages extends BasicApi
     {
         $where = [];
         $code = Request::post('stageCode');
+        $done = Request::param('done', -1);
         if (!$code) {
             $this->error("数据解析异常");
         }
         $where[] = ['stage_code', '=', $code];
-        $list = $this->model->tasks($code);
+        $list = $this->model->tasks($code, 0, $done);
 //        $list = \app\common\Model\Task::alias('t')->join('member m','t.assign_to = m.code')->field()->where(['stage_code'=>$code])->select();
 
         $this->success('', $list);

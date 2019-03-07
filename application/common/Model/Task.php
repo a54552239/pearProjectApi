@@ -293,6 +293,7 @@ class Task extends CommonModel
             Db::rollback();
             throw new \Exception($e->getMessage());
         }
+        unset($result['id']);
         return $result;
     }
 

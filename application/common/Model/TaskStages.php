@@ -24,9 +24,13 @@ class TaskStages extends CommonModel
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function tasks($stageCode, $deleted = 0)
+    public function tasks($stageCode, $deleted = 0, $done = -1)
     {
-        $list = Task::where(['stage_code' => $stageCode, 'pcode' => '', 'deleted' => $deleted])->order('sort asc,id asc')->field('id', true)->select();
+        $where = ['stage_code' => $stageCode, 'pcode' => '', 'deleted' => $deleted];
+        if ($done != -1) {
+            $where['done'] = $done;
+        }
+        $list = Task::where($where)->order('sort asc,id asc')->field('id', true)->select();
         if ($list) {
             foreach ($list as &$task) {
                 $task['executor'] = Member::where(['code' => $task['assign_to']])->field('name,avatar')->find();

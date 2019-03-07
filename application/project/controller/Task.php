@@ -153,7 +153,7 @@ class Task extends BasicApi
             $this->error($e->getMessage(), $e->getCode());;
         }
         if ($result) {
-            $this->success();
+            $this->success('', $result);
         }
         $this->error("操作失败，请稍候再试！");
     }
