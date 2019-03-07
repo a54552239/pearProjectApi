@@ -568,6 +568,7 @@ class Task extends CommonModel
         }
         return $tags;
     }
+
     /**
      * 子任务数
      */
@@ -591,7 +592,7 @@ class Task extends CommonModel
         $done = 1;
         if (isset($data['code']) && isset($data['pcode']) && $data['pcode']) {
             $task = self::where(['code' => $data['pcode']])->field('done')->find();
-            if ($task && !$task['done']) {
+            if ($task && !$task['deleted'] && !$task['done']) {
                 $done = 0;
             }
         }
@@ -605,7 +606,7 @@ class Task extends CommonModel
     {
         $hasUnDone = 0;
         if (isset($data['code'])) {
-            $taskCount = self::where(['pcode' => $data['code'], 'done' => 0])->count('id');
+            $taskCount = self::where(['pcode' => $data['code'], 'done' => 0, 'deleted' => 0])->count('id');
             if ($taskCount) {
                 $hasUnDone = 1;
             }
