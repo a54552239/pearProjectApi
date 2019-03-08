@@ -293,8 +293,7 @@ class Task extends CommonModel
             Db::rollback();
             throw new \Exception($e->getMessage());
         }
-        unset($result['id']);
-        return $result;
+        return $this->read($result['code']);
     }
 
     public function taskDone($taskCode, $done)
@@ -591,7 +590,7 @@ class Task extends CommonModel
     {
         $done = 1;
         if (isset($data['code']) && isset($data['pcode']) && $data['pcode']) {
-            $task = self::where(['code' => $data['pcode']])->field('done')->find();
+            $task = self::where(['code' => $data['pcode']])->field('done,deleted')->find();
             if ($task && !$task['deleted'] && !$task['done']) {
                 $done = 0;
             }
