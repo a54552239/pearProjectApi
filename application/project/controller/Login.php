@@ -10,6 +10,7 @@ use service\LogService;
 use service\NodeService;
 use service\RandomService;
 use mail\Mail;
+use sms\Sms;
 use think\Db;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
@@ -21,10 +22,9 @@ use think\facade\Validate;
 
 
 /**
- * 系统登录控制器
- * class Order
- * @package app\admin\controller
- * @author Vilson
+ * @title 用户相关
+ * @description 接口说明
+ * @group 接口分组
  */
 class Login extends BasicApi
 {
@@ -37,12 +37,16 @@ class Login extends BasicApi
     }
 
     /**
-     * 用户登录
-     * @return string
+     * @title 用户登录
+     * @description 用户登录
+     * @author PearProject
+     * @url /project/login
+     * @method POST
+     * @return void :名称
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
     public function index()
@@ -123,7 +127,7 @@ class Login extends BasicApi
         $mobile = $this->request->post('mobile', '');
         $code = RandomService::numeric(6);
         if (!config('sms.debug')) {
-            $sms = new Mail();
+            $sms = new Sms();
             $result = $sms->vSend($mobile, [
                 'data' => [
                     'project' => 'DWYsW1',
