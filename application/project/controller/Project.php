@@ -118,6 +118,9 @@ class Project extends BasicApi
         } else {
             $member = Member::where(['code' => $memberCode])->find();
         }
+        if (!$member) {
+            $this->error("参数有误");
+        }
         $deleted = 1;
         if (!$type) {
             $deleted = 0;
@@ -210,7 +213,7 @@ class Project extends BasicApi
      */
     public function edit(Request $request)
     {
-        $data = $request::only('name,description,cover,private,prefix,open_prefix,schedule');
+        $data = $request::only('name,description,cover,private,prefix,open_prefix,schedule,open_begin_time,open_task_private');
         $code = $request::param('projectCode');
         try {
             $result = $this->model->edit($code, $data);

@@ -3,8 +3,10 @@
 namespace app\project\controller;
 
 use app\common\Model\Member;
+use app\common\Model\MemberAccount;
 use app\common\Model\Organization;
 use controller\BasicApi;
+use Exception;
 use service\JwtService;
 use service\LogService;
 use service\NodeService;
@@ -15,6 +17,7 @@ use think\Db;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\exception\DbException;
+use think\exception\PDOException;
 use think\facade\Hook;
 use think\facade\Log;
 use think\facade\Request;
@@ -47,7 +50,7 @@ class Login extends BasicApi
      * @throws DbException
      * @throws ModelNotFoundException
      * @throws \think\Exception
-     * @throws \think\exception\PDOException
+     * @throws PDOException
      */
     public function index()
     {
@@ -79,9 +82,9 @@ class Login extends BasicApi
             if (cache('captchaMobile') != $mobile) {
                 $this->error('手机号与验证码不匹配', 203);
             }
-            $member = \app\common\Model\Member::where(['mobile' => $mobile])->order('id asc')->find();
+            $member = Member::where(['mobile' => $mobile])->order('id asc')->find();
         } else {
-            $member = \app\common\Model\Member::where(['account' => $data['account']])->whereOr(['email' => $data['account']])->order('id asc')->find();
+            $member = Member::where(['account' => $data['account']])->whereOr(['email' => $data['account']])->order('id asc')->find();
         }
         empty($member) && $this->error('账号或密码错误', 201);
         $member = $member->toArray();
@@ -93,7 +96,7 @@ class Login extends BasicApi
         Db::name('Member')->where(['id' => $member['id']])->update([
             'last_login_time' => Db::raw('now()'),
         ]);
-        $list = \app\common\Model\MemberAccount::where(['member_code' => $member['code']])->order('id asc')->select()->toArray();
+        $list = MemberAccount::where(['member_code' => $member['code']])->order('id asc')->select()->toArray();
         $organizationList = [];
         if ($list) {
             foreach ($list as $item) {
@@ -192,7 +195,7 @@ class Login extends BasicApi
         ];
         try {
             $result = Member::createMember($memberData);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error($e->getMessage(), 205);
         }
         if (!$result) {
@@ -272,7 +275,7 @@ class Login extends BasicApi
             <a href="' . $link . '">' . $link . '</a>
             ';
             $mail->send();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             ob_clean();
             $this->error('发送失败 ');
         }

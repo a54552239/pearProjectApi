@@ -28,7 +28,7 @@ class Task extends CommonModel
         if (!$task) {
             throw new \Exception('该任务已失效', 404);
         }
-        $project = Project::where(['code' => $task['project_code']])->field('name')->find();
+        $project = Project::where(['code' => $task['project_code']])->field('name,open_begin_time')->find();
         $stage = TaskStages::where(['code' => $task['stage_code']])->field('name')->find();
         $task['executor'] = null;
         if ($task['assign_to']) {
@@ -48,6 +48,7 @@ class Task extends CommonModel
             }
             $task['parentTasks'] = array_reverse($parents);
         }
+        $task['openBeginTime'] = $project['open_begin_time'];
         $task['projectName'] = $project['name'];
         $task['stageName'] = $stage['name'];
         //TODO 查看权限
@@ -83,6 +84,7 @@ class Task extends CommonModel
 
     public function edit($code, $data)
     {
+
         if (!$code) {
             throw new \Exception('请选择任务', 1);
         }
@@ -215,9 +217,9 @@ class Task extends CommonModel
         if (!$stage) {
             throw new \Exception('该任务列表无效', 2);
         }
-        $project = Project::where(['code' => $projectCode, 'deleted' => 0])->field('id')->find();
+        $project = Project::where(['code' => $projectCode, 'deleted' => 0])->field('id,open_task_private')->find();
         if (!$project) {
-            throw new \Exception('该任务已失效', 3);
+            throw new \Exception('该项目已失效', 3);
         }
         if ($parentCode) {
             $parentTask = self::where(['code' => $parentCode])->find();
@@ -264,6 +266,7 @@ class Task extends CommonModel
                     'pcode' => $parentCode,
                     'path' => $path,
                     'stage_code' => $stageCode,
+                    'private' => $project['open_task_private'] ? 1 : 0,
                     'name' => trim($taskTitle),
                 ];
                 $result = self::create($data);

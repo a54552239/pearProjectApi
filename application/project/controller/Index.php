@@ -9,22 +9,35 @@ use app\common\Model\Notify;
 use app\common\Model\SourceLink;
 use app\common\Model\SystemConfig;
 use controller\BasicApi;
+use Exception;
+use OSS\Core\OssException;
 use service\FileService;
 use service\NodeService;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\Exception\DbException;
+use think\exception\PDOException;
 use think\facade\Request;
 use think\File;
 
 /**
- * 应用入口控制器
+ * @title 项目管理
+ * @description 接口说明
+ * @group 接口分组
  */
 class Index extends BasicApi
 {
 
     /**
-     * 后台框架布局
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @title 用户菜单
+     * @description 获取用户菜单列表
+     * @author PearProject
+     * @url /project/index
+     * @method GET
+     * @return void :名称
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function index()
     {
@@ -34,9 +47,9 @@ class Index extends BasicApi
 
     /**
      * 更换当前组织
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function changeCurrentOrganization()
     {
@@ -71,9 +84,9 @@ class Index extends BasicApi
 
     /**
      * 个人个信息
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function info()
     {
@@ -98,7 +111,7 @@ class Index extends BasicApi
     /**
      * 密码修改
      * @return array|string
-     * @throws \think\Exception\DbException
+     * @throws DbException
      */
     public function editPassword()
     {
@@ -124,9 +137,9 @@ class Index extends BasicApi
 
     /**
      * @return void
-     * @throws \OSS\Core\OssException
+     * @throws OssException
      * @throws \think\Exception
-     * @throws \think\exception\PDOException
+     * @throws PDOException
      */
     public function uploadImg()
     {
@@ -154,7 +167,7 @@ class Index extends BasicApi
         $accountModel = new MemberAccount();
         try {
             $file = $accountModel->uploadImg(Request::file('avatar'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error($e->getMessage(), $e->getCode());;
         }
         $this->success('', $file);

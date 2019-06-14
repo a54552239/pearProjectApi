@@ -145,10 +145,8 @@ class Task extends BasicApi
                 if ($parentTask['deleted']) {
                     throw new \Exception('父任务在回收站中无法编辑', 6);
                 }
-                $result = $this->model->createTask($parentTask['stage_code'], $parentTask['project_code'], $data['name'], $member['code'], $data['assign_to'], $data['pcode']);
-            } else {
-                $result = $this->model->createTask($data['stage_code'], $data['project_code'], $data['name'], $member['code'], $data['assign_to']);
             }
+            $result = $this->model->createTask($data['stage_code'], $data['project_code'], $data['name'], $member['code'], $data['assign_to'], $data['pcode']);
         } catch (\Exception $e) {
             $this->error($e->getMessage(), $e->getCode());;
         }
@@ -268,7 +266,7 @@ class Task extends BasicApi
      */
     public function edit(Request $request)
     {
-        $data = $request::only('name,sort,end_time,pri,description');
+        $data = $request::only('name,sort,end_time,begin_time,pri,description');
         $code = $request::post('taskCode');
         if (!$code) {
             $this->error("请选择一个任务");

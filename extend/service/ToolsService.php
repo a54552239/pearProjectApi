@@ -69,7 +69,7 @@ class ToolsService
      */
     public static function success($msg, $data = [], $code = 1)
     {
-        $result = ['code' => $code, 'msg' => $msg, 'data' => $data, 'token' => encode(session_name() . '=' . session_id())];
+        $result = ['code' => $code, 'msg' => $msg, 'data' => $data];
         throw new HttpResponseException(Response::create($result, 'json', 200, self::corsRequestHander()));
     }
 
@@ -81,7 +81,7 @@ class ToolsService
      */
     public static function error($msg, $data = [], $code = 0)
     {
-        $result = ['code' => $code, 'msg' => $msg, 'data' => $data, 'token' => encode(session_name() . '=' . session_id())];
+        $result = ['code' => $code, 'msg' => $msg, 'data' => $data];
         throw new HttpResponseException(Response::create($result, 'json', $code, self::corsRequestHander()));
     }
 
