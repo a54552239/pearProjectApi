@@ -212,7 +212,7 @@ class Project extends BasicApi
      */
     public function edit(Request $request)
     {
-        $data = $request::only('name,description,cover,private,prefix,open_prefix,schedule,open_begin_time,open_task_private');
+        $data = $request::only('name,description,cover,private,prefix,open_prefix,schedule,open_begin_time,open_task_private,task_board_theme');
         $code = $request::param('projectCode');
         try {
             $result = $this->model->edit($code, $data);
