@@ -110,6 +110,12 @@ class Task extends CommonModel
         if (isset($data['pri'])) {
             $type = 'pri';
         }
+        if (isset($data['begin_time'])) {
+            $type = 'setBeginTime';
+            if (!$data['begin_time']) {
+                $type = 'clearBeginTime';
+            }
+        }
         if (isset($data['end_time'])) {
             $type = 'setEndTime';
             if (!$data['end_time']) {

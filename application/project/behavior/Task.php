@@ -114,6 +114,14 @@ class Task
                 $icon = 'user-delete';
                 $remark = '移除了参与者 ' . $toMember['name'];
                 break;
+            case 'setBeginTime':
+                $icon = 'calendar';
+                $remark = '更新开始时间为 ' . date('m月d日 H:i', strtotime($task['begin_time']));
+                break;
+            case 'clearBeginTime':
+                $icon = 'calendar';
+                $remark = '清除了开始时间 ';
+                break;
             case 'setEndTime':
                 $icon = 'calendar';
                 $remark = '更新截止时间为 ' . date('m月d日 H:i', strtotime($task['end_time']));
