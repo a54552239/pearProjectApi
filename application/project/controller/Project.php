@@ -2,6 +2,7 @@
 
 namespace app\project\controller;
 
+use app\common\Model\CommonModel;
 use app\common\Model\Member;
 use app\common\Model\MemberAccount;
 use app\common\Model\Notify;
@@ -14,7 +15,10 @@ use service\FileService;
 use service\NodeService;
 use service\RandomService;
 use think\Db;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
 use think\Exception;
+use think\Exception\DbException;
 use think\exception\PDOException;
 use think\facade\Request;
 use think\File;
@@ -35,53 +39,48 @@ class Project extends BasicApi
      * 显示资源列表
      *
      * @return void
-     * @throws \think\exception\DbException
+     * @throws DbException
      */
     public function index()
     {
-        $where = [];
+        $prefix = config('database.prefix');
         $type = Request::post('type');
+        $page = Request::param('page', 1);
+        $pageSize = Request::param('pageSize', cookie('pageSize'));
         $data = Request::only('recycle,archive,all');
-        $member = getCurrentMember();
+        $currentMember = getCurrentMember();
+        $memberCode = $currentMember['code'];
 
-        $where[] = ['member_code', '=', $member['code']];
+        $orgCode = getCurrentOrganizationCode();
         if ($type == 'my' || $type == 'other') {
-            $projectMemberModel = new ProjectMember();
-            $list = $projectMemberModel->_list($where);
+            $sql = "select * from {$prefix}project as pp join {$prefix}project_member as pm on pm.project_code = pp.code where pp.organization_code = '{$orgCode}' and (pm.member_code = '{$memberCode}' or pp.private = 0) group by pp.`code`";
+            $list = CommonModel::limitByQuery($sql, $page, $pageSize);
         } else {
-            $projectCollectionModel = new ProjectCollection();
-            $where[] = ['member_code', '=', $member['code']];
-            $list = $projectCollectionModel->_list($where);
+            $sql = "select * from {$prefix}project as pp join {$prefix}project_collection as pc on pc.project_code = pp.code where pp.organization_code = '{$orgCode}' and pc.member_code = '{$memberCode}' group by pp.`code`";
+            $list = CommonModel::limitByQuery($sql, $page, $pageSize);
         }
         $newList = [];
         if ($list['list']) {
-            $currentMember = getCurrentMember();
             foreach ($list['list'] as $key => &$item) {
                 $delete = false;
-                $project = $this->model->where(['code' => $item->project_code])->find();
-                if (!$project) {
-                    $delete = true;
-                }
                 if ($type != 'other') {
-                    if ($project['deleted']) {
+                    if ($item['deleted']) {
                         $delete = true;
                     }
                 }
-                if (isset($data['archive']) && !$project['archive']) {
+                if (isset($data['archive']) && !$item['archive']) {
                     $delete = true;
                 }
-                if (isset($data['recycle']) && !$project['deleted']) {
+
+                if (isset($data['recycle']) && !$item['deleted']) {
                     $delete = true;
                 }
                 if ($delete) {
                     continue;
                 }
+
                 $item['collected'] = false;
                 $item['owner_name'] = '-';
-                if (isset($item['project_code'])) {
-                    $item['code'] = $item['project_code'];
-                    $item = $this->model->where(['code' => $item['code']])->find();
-                }
                 $collected = ProjectCollection::where(['project_code' => $item['code'], 'member_code' => $currentMember['code']])->field('id')->find();
                 if ($collected) {
                     $item['collected'] = true;
@@ -104,9 +103,9 @@ class Project extends BasicApi
 
     /**
      * 获取自己的项目
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function selfList()
     {
@@ -125,7 +124,7 @@ class Project extends BasicApi
         if (!$type) {
             $deleted = 0;
         }
-        $list = $this->model->getMemberProjects($member['code'], $deleted, $archive, Request::post('page'), Request::post('pageSize'));
+        $list = $this->model->getMemberProjects($member['code'], getCurrentOrganizationCode(), $deleted, $archive, Request::post('page'), Request::post('pageSize'));
         if ($list['list']) {
             foreach ($list['list'] as $key => &$item) {
                 $item['collected'] = false;
@@ -178,7 +177,7 @@ class Project extends BasicApi
      *
      * @param Request $request
      * @return void
-     * @throws \think\Exception\DbException
+     * @throws DbException
      */
     public function read(Request $request)
     {
@@ -233,7 +232,9 @@ class Project extends BasicApi
     public function getLogBySelfProject()
     {
         $projectCode = Request::param('projectCode', '');
+        $orgCode = getCurrentOrganizationCode();
         $member = getCurrentMember();
+        $memberCode = $member['code'];
         if (!$member) {
             $this->success('', []);
         }
@@ -242,10 +243,13 @@ class Project extends BasicApi
             $where = [];
             $where[] = ['member_code', '=', $member['code']];
             $projectCodes = ProjectMember::where($where)->column('project_code');
+            $sql = "select pp.code from {$prefix}project as pp join {$prefix}project_member as pm on pm.project_code = pp.code where pp.organization_code = '{$orgCode}' and (pm.member_code = '{$memberCode}') group by pp.`code`";
+            $projectCodes = Db::query($sql);
             if (!$projectCodes) {
                 $this->success('', []);
             }
             foreach ($projectCodes as &$projectCode) {
+                $projectCode = $projectCode['code'];
                 $projectCode = "'{$projectCode}'";
             }
             $projectCodes = implode(',', $projectCodes);

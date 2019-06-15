@@ -41,7 +41,7 @@ class Notify extends BasicApi
 
     public function noReads()
     {
-        $projectId = $this->model->gecurrentOrganizationCode();
+        $projectId = getCurrentOrganizationCode();
         $list = $this->model->listTypeFormat(['is_read' => 0, 'to' => 0], 5);
         $this->success('', $list);
     }

@@ -15,7 +15,7 @@ class Notify extends BasicApi
         if (!$this->model) {
             $this->model = new \app\common\Model\Notify();
         }
-        $this->session = $this->model->getMemberSession();
+        $this->session = getCurrentMember();
     }
 
     /**

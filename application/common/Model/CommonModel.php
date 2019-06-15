@@ -2,9 +2,9 @@
 
 namespace app\common\Model;
 
-use app\shop\Model\ShopGoods;
 use service\FileService;
 use service\ToolsService;
+use think\Db;
 use think\facade\Request;
 use think\File;
 use think\Model;
@@ -21,6 +21,20 @@ class CommonModel extends Model
     protected function error($msg, $data = [], $code = 400)
     {
         ToolsService::error($msg, $data, $code);
+    }
+
+    public static function limitByQuery($sql, $page = 1, $pageSize = 10)
+    {
+        if ($page < 1) {
+            $page = 1;
+        }
+        $offset = ($page - 1) * $pageSize;
+        $limit = $pageSize;
+        $total = Db::query($sql);
+        $total = count($total);
+        $sql .= " limit {$offset},{$limit}";
+        $list = Db::query($sql);
+        return ['total' => $total, 'list' => $list, 'page' => $page];
     }
 
     /**
@@ -88,7 +102,7 @@ class CommonModel extends Model
 
     public function _edit($data, $where = [])
     {
-        return $this->isUpdate(true)->save($data,$where);
+        return $this->isUpdate(true)->save($data, $where);
     }
 
     public function _add($data)
@@ -131,21 +145,4 @@ class CommonModel extends Model
         }
         return false;
     }
-
-    /*
-     * 获取当前organization id
-     * */
-    public function gecurrentOrganizationCode(){
-        $currentOrganizationCode = session('currentOrganizationCode');
-        return $currentOrganizationCode;
-    }
-
-    /*
-    * 获取当前member session
-    * */
-    public function getMemberSession(){
-        $member_session = session('member');
-        return $member_session;
-    }
-
 }
