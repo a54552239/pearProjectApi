@@ -5,6 +5,7 @@ namespace app\project\controller;
 use app\common\Model\InviteLink;
 use app\common\Model\Member;
 use app\common\Model\MemberAccount;
+use app\common\Model\Organization;
 use controller\BasicApi;
 use think\facade\Request;
 
@@ -122,7 +123,19 @@ class ProjectMember extends BasicApi
                 $this->error($e->getMessage(), $e->getCode());
             }
         }
-        $this->success('');
+        $currentOrganization = null;
+        $list = MemberAccount::where(['member_code' => getCurrentMember()['code']])->order('id asc')->select()->toArray();
+        $organizationList = [];
+        if ($list) {
+            foreach ($list as $item) {
+                $organization = Organization::where(['code' => $item['organization_code']])->find();
+                if ($organization) {
+                    $organizationList[] = $organization;
+                }
+                $item['organization_code'] == $project['organization_code'] && $currentOrganization = $organization;
+            }
+        }
+        $this->success('', ['organizationList' => $organizationList, 'currentOrganization' => $currentOrganization]);
     }
 
     /**

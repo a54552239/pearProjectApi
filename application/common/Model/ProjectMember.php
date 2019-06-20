@@ -39,6 +39,7 @@ class ProjectMember extends CommonModel
             'join_time' => nowTime()
         ];
         $result = self::create($data);
+        MemberAccount::inviteMember(getCurrentMember()['code'], $project['organization_code']);
         Project::projectHook(getCurrentMember()['code'], $projectCode, 'inviteMember', $memberCode);
         return $result;
     }

@@ -38,11 +38,11 @@ class MemberAccount extends CommonModel
     {
         $hasJoined = MemberAccount::where(['member_code' => $memberCode, 'organization_code' => $organizationCode])->find();
         if ($hasJoined) {
-            throw new \Exception('已加入该组织', 3);
+            return error(3, '已加入该组织');
         }
         $memberDate = Member::where(['code' => $memberCode])->find();
         if (!$memberDate) {
-            throw new \Exception('该用户不存在', 4);
+            return error(4, '该用户不存在');
         }
         $auth = ProjectAuth::where(['organization_code' => $organizationCode, 'is_default' => 1])->field('id')->find();
         $authId = '';

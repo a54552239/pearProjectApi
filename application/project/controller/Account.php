@@ -4,6 +4,7 @@ namespace app\project\controller;
 
 use app\common\Model\Member;
 use app\common\Model\MemberAccount;
+use app\common\Model\Organization;
 use app\common\Model\SystemConfig;
 use controller\BasicApi;
 use service\FileService;
@@ -153,13 +154,23 @@ class Account extends BasicApi
             if (!$organization) {
                 $this->error('该组织不存在');
             }
-            try {
-                MemberAccount::inviteMember(getCurrentMember()['code'], $organization['code']);
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
+            $result = MemberAccount::inviteMember(getCurrentMember()['code'], $organization['code']);
+            if (isError($result)) {
+                $this->error($result['msg'], $result['errno']);
             }
         }
-        $this->success('');
+        $currentOrganization = null;
+        $list = MemberAccount::where(['member_code' => getCurrentMember()['code']])->order('id asc')->select()->toArray();
+        $organizationList = [];
+        if ($list) {
+            foreach ($list as $item) {
+                $organizationInfo = Organization::where(['code' => $item['organization_code']])->find();
+                if ($organizationInfo) {
+                    $organizationList[] = $organizationInfo;
+                }
+            }
+        }
+        $this->success('', ['organizationList' => $organizationList, 'currentOrganization' => $organization]);
     }
 
     /**
