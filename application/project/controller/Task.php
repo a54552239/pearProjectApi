@@ -2,6 +2,7 @@
 
 namespace app\project\controller;
 
+use app\common\Model\CommonModel;
 use app\common\Model\Member;
 use app\common\Model\ProjectLog;
 use app\common\Model\TaskTag;
@@ -100,6 +101,26 @@ class Task extends BasicApi
             $list = $this->model->taskSources($code);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
+        }
+        $this->success('', $list);
+    }
+
+    public function getListByTaskTag()
+    {
+        $taskTagCode = Request::param('taskTagCode');
+        $page = Request::param('page', 1);
+        $pageSize = Request::param('pageSize', cookie('pageSize'));
+        $prefix = config('database.prefix');
+        $sql = "select *,t.id as id,t.code as code from {$prefix}task_to_tag as tt join {$prefix}task as t on tt.task_code = t.code where tt.tag_code = '{$taskTagCode}' order by t.id desc";
+        $list = CommonModel::limitByQuery($sql, $page, $pageSize);
+        if ($list['list']) {
+            foreach ($list['list'] as &$task) {
+                $task['tags'] = TaskToTag::where(['task_code' => $task['code']])->field('id', true)->order('id asc')->select()->toArray();
+                $task['executor'] = null;
+                if ($task['assign_to']) {
+                    $task['executor'] = Member::where(['code' => $task['assign_to']])->field('name,code,avatar')->find();
+                }
+            }
         }
         $this->success('', $list);
     }
