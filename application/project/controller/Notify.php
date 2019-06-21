@@ -85,6 +85,15 @@ class Notify extends BasicApi
     }
 
     /**
+     * 清空所有消息
+     */
+    public function _clearAll()
+    {
+        \app\common\Model\Notify::update(['is_read' => 1, 'read_time' => nowTime()], ['to' => getCurrentMember()['code'], 'is_read' => 0]);
+        $this->success();
+    }
+
+    /**
      *  批量删除
      * @throws \Exception
      */
@@ -116,11 +125,10 @@ class Notify extends BasicApi
     }
 
 
-
     /**
      * 删除指定资源
      *
-     * @param  int $id
+     * @param int $id
      * @return \think\Response
      */
     public function delete($id = 0)
