@@ -425,6 +425,9 @@ class Task extends CommonModel
      * @param $stageCode string 移到的任务列表code
      * @param $codes array 经过排序的任务code列表
      * @return bool
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     public function sort($stageCode, $codes)
     {
@@ -432,8 +435,13 @@ class Task extends CommonModel
             return false;
         }
         if ($codes) {
+            $stage = TaskStages::where(['code' => $stageCode])->find();
             foreach ($codes as $key => $code) {
+                $task = self::where(['code' => $code])->find();
                 self::update(['sort' => $key, 'stage_code' => $stageCode], ['code' => $code]);
+                if ($task['stage_code'] != $stageCode) {
+                    self::taskHook(getCurrentMember()['code'], $code, 'move', '', '', '', '', '', ['stageName' => $stage['name']]);
+                }
             }
             return true;
         }

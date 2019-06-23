@@ -57,6 +57,11 @@ class Task
                 $remark = '更新了内容 ';
                 $content = $task['name'];
                 break;
+            case 'move':
+                $icon = 'drag';
+                $remark = '将任务移动到 ' . $data['data']['stageName'];
+                $content = $task['name'];
+                break;
             case 'content':
                 $icon = 'file-text';
                 $remark = '更新了备注 ';
