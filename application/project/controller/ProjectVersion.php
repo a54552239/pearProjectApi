@@ -151,14 +151,15 @@ class ProjectVersion extends BasicApi
         $code = Request::post('versionCode');
         $version = $this->model->where(['code' => $code])->field('id', true)->find();
         if ($version) {
-            $version['featureName'] = \app\common\Model\ProjectFeatures::where(['code' => $version['features_code']])->find();
-            $version['featureName'] && $version['featureName'] = $version['featureName']['name'];
+            $feature = \app\common\Model\ProjectFeatures::where(['code' => $version['features_code']])->find();
+            $feature && $version['featureName'] = $feature['name'];
+            $version['projectCode'] = $feature['project_code'];
         }
         $this->success('', $version);
     }
 
     /**
-     * 关联任务
+     * 关联任务列表
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
@@ -166,28 +167,62 @@ class ProjectVersion extends BasicApi
     public function _getVersionTask()
     {
         $code = Request::post('versionCode');
-        $taskList = \app\common\Model\Task::where(['version_code' => $code, 'deleted' => 0])->field('id', true)->select();
+        $taskList = \app\common\Model\Task::where(['version_code' => $code, 'deleted' => 0])->order('id desc')->field('id', true)->select();
+        if ($taskList) {
+            foreach ($taskList as &$task) {
+                $task['executor'] = Member::where(['code' => $task['assign_to']])->field('name,avatar')->find();
+            }
+        }
         $this->success('', $taskList);
     }
 
     /**
+     * 关联任务
+     */
+    public function addVersionTask()
+    {
+        $taskCodeList = Request::post('taskCodeList');
+        $versionCode = Request::post('versionCode');
+        $taskCodeList && $taskCodeList = json_decode($taskCodeList);
+        $successTotal = 0;
+        $successTaskList = [];
+        if ($taskCodeList) {
+            foreach ($taskCodeList as $taskCode) {
+                $result = $this->model->addVersionTask($taskCode, $versionCode);
+                if (!isError($result)) {
+                    $successTotal++;
+                    $successTaskList[] = $result['name'];
+                }
+            }
+        }
+        if ($successTotal) {
+            \app\common\Model\ProjectVersion::versionHook(getCurrentMember()['code'], $versionCode, 'addVersionTask', '', '', $successTaskList);
+
+        }
+        $this->success('', ['successTotal' => $successTotal]);
+    }
+
+    /**
+     * 移除发布内容
+     */
+    public function removeVersionTask()
+    {
+        $taskCode = Request::post('taskCode');
+        $result = $this->model->removeVersionTask($taskCode);
+        if (isError($result)) {
+            $this->error($result['msg'], $result['errno']);
+        }
+        $this->success();
+    }
+
+    /**
+     * 版本日志
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
     public function _getVersionLog()
     {
-//        $code = Request::post('versionCode');
-//        $logList = ProjectVersionLog::where(['source_code' => $code])->field('id', true)->select();
-//        if ($logList) {
-//            foreach ($logList as &$item) {
-//                $member = Member::where(['code' => $item['member_code']])->field('id,name,avatar,code')->find();
-//                !$member && $member = [];
-//                $item['member'] = $member;
-//            }
-//        }
-//        $this->success('', $logList);
-
         $code = Request::post('versionCode');
         $showAll = Request::post('all', 0);
         $where = [];

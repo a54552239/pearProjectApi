@@ -2,6 +2,7 @@
 
 namespace app\common\Model;
 
+use PDOStatement;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\Exception;
@@ -93,6 +94,68 @@ class ProjectVersion extends CommonModel
         self::update($updateData, ['code' => $versionCode]);
         ProjectVersion::versionHook(getCurrentMember()['code'], $versionCode, $logType);
         return true;
+    }
+
+    public function addVersionTask($taskCode, $versionCode)
+    {
+        $task = Task::where(['code' => $taskCode])->field('id,version_code,name')->find();
+        if (!$task) {
+            return error(1, '该任务已被失效');
+        }
+        if ($task['version_code']) {
+            return error(1, '该任务已被关联');
+        }
+        $version = ProjectVersion::where(['code' => $versionCode])->find();
+        if (!$version) {
+            return error(1, '该版本已被失效');
+        }
+        $task->version_code = $versionCode;
+        $task->features_code = $version['features_code'];
+        $task->save();
+        self::updateSchedule($versionCode);
+        return $task;
+    }
+
+    /**
+     * 移除发布内容
+     * @param $taskCode
+     * @return array|PDOStatement|string|\think\Model|null
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public function removeVersionTask($taskCode)
+    {
+        $task = Task::where(['code' => $taskCode])->field('id,version_code,name')->find();
+        if (!$task) {
+            return error(1, '该任务已被失效');
+        }
+        $versionCode = $task['version_code'];
+        if ($versionCode) {
+            $task->version_code = '';
+            $task->features_code = '';
+            $task->save();
+            ProjectVersion::versionHook(getCurrentMember()['code'], $versionCode, 'removeVersionTask', '', '', $task['name']);
+            self::updateSchedule($versionCode);
+        }
+        return $task;
+    }
+
+    public static function updateSchedule($versionCode)
+    {
+        $version = ProjectVersion::where(['code' => $versionCode])->find();
+        $taskList = Task::where(['version_code' => $versionCode, 'deleted' => 0])->field('id', true)->select();
+        $doneTotal = 0;
+        if ($taskList) {
+            foreach ($taskList as $task) {
+                if ($task['done']) {
+                    $doneTotal++;
+                }
+            }
+            $schedule = intval($doneTotal / count($taskList) * 100);
+            $version->schedule = $schedule;
+            $version->save();
+        }
     }
 
     public function getStatusTextAttr($value, $data)

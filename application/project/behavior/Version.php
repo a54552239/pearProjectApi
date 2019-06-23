@@ -34,7 +34,7 @@ class Version
      */
     public function run($data)
     {
-        Log::init(['path' => 'log/task']);
+        Log::init(['path' => 'log/version']);
         $logData = ['member_code' => $data['memberCode'], 'source_code' => $data['versionCode'], 'remark' => $data['remark'], 'type' => $data['type'], 'content' => $data['content'], 'create_time' => nowTime(), 'code' => createUniqueCode('projectVersionLog')];
         $version = ProjectVersion::where(['code' => $data['versionCode']])->find();
         $logData['features_code'] = $version['features_code'];
@@ -88,16 +88,16 @@ class Version
                 $icon = 'delete';
                 $remark = '删除了版本 ';
                 break;
-            case 'linkFile':
+            case 'addVersionTask':
+                $count = count($data['data']);
                 $icon = 'link';
-                $remark = ' 添加了 2 项发布内容 ';
-                $content = "<a target=\"_blank\" class=\"muted\" href=\"{$data['data']['url']} \">{$data['data']['title']}</a>";
-
+                $remark = "添加了 $count 项发布内容 ";
+                $content = implode('，', $data['data']);
                 break;
-            case 'unlinkFile':
+            case 'removeVersionTask':
                 $icon = 'disconnect';
                 $remark = '移除了发布内容';
-                $content = "<a target=\"_blank\" class=\"muted\" href=\"{$data['data']['url']} \">{$data['data']['title']}</a>";
+                $content = $data['data'];
                 break;
             default:
                 $icon = 'plus';

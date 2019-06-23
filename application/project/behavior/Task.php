@@ -12,6 +12,7 @@ namespace app\project\behavior;
 use app\common\Model\CommonModel;
 use app\common\Model\Member;
 use app\common\Model\ProjectLog;
+use app\common\Model\ProjectVersion;
 use app\common\Model\TaskMember;
 use app\common\Model\TaskStages;
 use service\MessageService;
@@ -68,10 +69,16 @@ class Task
             case 'done':
                 $icon = 'check';
                 $remark = '完成了任务 ';
+                if ($task['version_code']) {
+                    ProjectVersion::updateSchedule($task['version_code']);
+                }
                 break;
             case 'redo':
                 $icon = 'border';
                 $remark = '重做了任务 ';
+                if ($task['version_code']) {
+                    ProjectVersion::updateSchedule($task['version_code']);
+                }
                 break;
             case 'createChild':
                 $icon = 'bars';
