@@ -6,4 +6,7 @@ return [
     'project' => [
         'app\\project\\behavior\\Project'
     ],
+    'version' => [
+        'app\\project\\behavior\\Version'
+    ],
 ];

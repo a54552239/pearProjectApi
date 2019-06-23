@@ -3,6 +3,7 @@
 namespace app\project\controller;
 
 use app\common\Model\Member;
+use app\common\Model\ProjectLog;
 use app\common\Model\ProjectVersionLog;
 use controller\BasicApi;
 use think\db\exception\DataNotFoundException;
@@ -59,6 +60,7 @@ class ProjectVersion extends BasicApi
         }
         $result = $this->model->createData($data['featuresCode'], $data['name'], $data['description'], getCurrentOrganizationCode(), $data['startTime'], $data['planPublishTime']);
         if (!isError($result)) {
+            \app\common\Model\ProjectVersion::versionHook(getCurrentMember()['code'], $result['code'], 'create');
             $this->success('添加成功', $result);
         }
         $this->error($result['msg']);
@@ -94,6 +96,30 @@ class ProjectVersion extends BasicApi
         }
         $result = $this->model->_edit($data, ['code' => $versionCode]);
         if ($result) {
+            $member = getCurrentMember();
+            $type = 'name';
+            if (isset($data['name'])) {
+                $type = 'name';
+            }
+            if (isset($data['description'])) {
+                $type = 'content';
+                if (!$data['description']) {
+                    $type = 'clearContent';
+                }
+            }
+            if (isset($data['start_time'])) {
+                $type = 'setStartTime';
+                if (!$data['start_time']) {
+                    $type = 'clearStartTime';
+                }
+            }
+            if (isset($data['plan_publish_time'])) {
+                $type = 'setPlanPublishTime';
+                if (!$data['plan_publish_time']) {
+                    $type = 'clearPlanPublishTime';
+                }
+            }
+            \app\common\Model\ProjectVersion::versionHook($member['code'], $versionCode, $type);
             $this->success('');
         }
         $this->error("操作失败，请稍候再试！");
@@ -131,6 +157,12 @@ class ProjectVersion extends BasicApi
         $this->success('', $version);
     }
 
+    /**
+     * 关联任务
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
     public function _getVersionTask()
     {
         $code = Request::post('versionCode');
@@ -138,18 +170,47 @@ class ProjectVersion extends BasicApi
         $this->success('', $taskList);
     }
 
+    /**
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
     public function _getVersionLog()
     {
+//        $code = Request::post('versionCode');
+//        $logList = ProjectVersionLog::where(['source_code' => $code])->field('id', true)->select();
+//        if ($logList) {
+//            foreach ($logList as &$item) {
+//                $member = Member::where(['code' => $item['member_code']])->field('id,name,avatar,code')->find();
+//                !$member && $member = [];
+//                $item['member'] = $member;
+//            }
+//        }
+//        $this->success('', $logList);
+
         $code = Request::post('versionCode');
-        $logList = ProjectVersionLog::where(['source_code' => $code])->field('id', true)->select();
-        if ($logList) {
-            foreach ($logList as &$item) {
+        $showAll = Request::post('all', 0);
+        $where = [];
+        $where[] = ['source_code', '=', $code];
+        $projectVersionModel = new ProjectVersionLog();
+        if ($showAll) {
+            $list = [];
+            $list['list'] = $projectVersionModel->where($where)->order('id asc')->select()->toArray();
+            $list['total'] = count($list['list']);
+        } else {
+            $list = $projectVersionModel->_list($where, 'id desc');
+            if ($list['list']) {
+                $list['list'] = array_reverse($list['list']);
+            }
+        }
+        if ($list['list']) {
+            foreach ($list['list'] as &$item) {
                 $member = Member::where(['code' => $item['member_code']])->field('id,name,avatar,code')->find();
                 !$member && $member = [];
                 $item['member'] = $member;
             }
         }
-        $this->success('', $logList);
+        $this->success('', $list);
     }
 
     /**

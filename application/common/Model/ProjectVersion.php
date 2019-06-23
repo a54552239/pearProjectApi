@@ -7,6 +7,7 @@ use think\db\exception\ModelNotFoundException;
 use think\Exception;
 use think\exception\DbException;
 use think\exception\PDOException;
+use think\facade\Hook;
 
 /**
  * 版本
@@ -71,6 +72,7 @@ class ProjectVersion extends CommonModel
         if (!$versionCode) {
             return error(1, '请选择一个版本');
         }
+        ProjectVersion::versionHook(getCurrentMember()['code'], $versionCode, 'delete');
         self::where(['code' => $versionCode])->delete();
         Task::update(['features_code' => '', 'version_code' => ''], ['version_code' => $versionCode]);
         return true;
@@ -79,13 +81,17 @@ class ProjectVersion extends CommonModel
     public function changeStatus($versionCode, $status, $publishTime = '')
     {
         if (!$versionCode) {
+
             return error(1, '请选择一个版本');
         }
         $updateData = ['status' => $status];
+        $logType = 'status';
         if ($status == 3) {
             $updateData['publish_time'] = $publishTime;
+            $logType = 'publish';
         }
         self::update($updateData, ['code' => $versionCode]);
+        ProjectVersion::versionHook(getCurrentMember()['code'], $versionCode, $logType);
         return true;
     }
 
@@ -106,6 +112,23 @@ class ProjectVersion extends CommonModel
                 return '已发布';
 
         }
+    }
+
+    /**
+     * 版本变动钩子
+     * @param $memberCode
+     * @param $versionCode
+     * @param string $type
+     * @param string $remark
+     * @param string $content
+     * @param array $data
+     * @param string $tag
+     */
+    public static function versionHook($memberCode, $versionCode, $type = 'create', $remark = '', $content = '', $data = [], $tag = 'version')
+    {
+        $data = ['memberCode' => $memberCode, 'versionCode' => $versionCode, 'remark' => $remark, 'type' => $type, 'content' => $content, 'data' => $data, 'tag' => $tag];
+        Hook::listen($tag, $data);
 
     }
+
 }

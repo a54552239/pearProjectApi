@@ -29,7 +29,7 @@ class Task
     public function run($data)
     {
         Log::init(['path' => 'log/task']);
-        $logData = ['member_code' => $data['memberCode'], 'source_code' => $data['taskCode'], 'remark' => $data['remark'], 'type' => $data['type'], 'content' => $data['content'], 'is_comment' => $data['isComment'], 'to_member_code' => $data['toMemberCode'], 'create_time' => nowTime(), 'code' => createUniqueCode('collection'), 'action_type' => 'task'];
+        $logData = ['member_code' => $data['memberCode'], 'source_code' => $data['taskCode'], 'remark' => $data['remark'], 'type' => $data['type'], 'content' => $data['content'], 'is_comment' => $data['isComment'], 'to_member_code' => $data['toMemberCode'], 'create_time' => nowTime(), 'code' => createUniqueCode('projectLog'), 'action_type' => 'task'];
         $task = \app\common\Model\Task::where(['code' => $data['taskCode']])->find();
         $logData['project_code'] = $task['project_code'];
         $toMember = [];

@@ -28,7 +28,7 @@ class Project
     public function run($data)
     {
         Log::init(['path' => 'log/project']);
-        $logData = ['member_code' => $data['memberCode'], 'source_code' => $data['sourceCode'], 'remark' => $data['remark'], 'type' => $data['type'], 'content' => $data['content'], 'is_comment' => $data['isComment'], 'to_member_code' => $data['toMemberCode'], 'create_time' => nowTime(), 'code' => createUniqueCode('collection'), 'action_type' => 'project'];
+        $logData = ['member_code' => $data['memberCode'], 'source_code' => $data['sourceCode'], 'remark' => $data['remark'], 'type' => $data['type'], 'content' => $data['content'], 'is_comment' => $data['isComment'], 'to_member_code' => $data['toMemberCode'], 'create_time' => nowTime(), 'code' => createUniqueCode('projectLog'), 'action_type' => 'project'];
         $project = \app\common\Model\Project::where(['code' => $data['sourceCode']])->find();
         $logData['project_code'] = $project['code'];
         $toMember = [];
