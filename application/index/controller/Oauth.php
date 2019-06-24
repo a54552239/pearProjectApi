@@ -71,9 +71,13 @@ class Oauth extends BasicApi
         if (!$user['errcode']) {
             $result = $app->user->getUseridByUnionid($user['user_info']['unionid']);
             if (!$result['errcode']) {
-                $user['user_info']['avatar'] = $result['avatar'];
-                $user['user_info']['mobile'] = $result['mobile'];
-                $user['user_info']['email'] = $result['email'];
+                $userId = $result['userid'];
+                $userInfo = $app->user->get($userId, $lang = null);
+                if (!$user['errcode']) {
+                    $user['user_info']['avatar'] = $userInfo['avatar'];
+                    $user['user_info']['mobile'] = $userInfo['mobile'];
+                    $user['user_info']['email'] = $userInfo['email'];
+                }
             }
             Member::dingtalkLogin($user['user_info']);
         }else{
