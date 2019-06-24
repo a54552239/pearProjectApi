@@ -68,6 +68,12 @@ class Member extends CommonModel
                 unset($memberData['mobile']);
             }
         }
+        if (isset($memberData['email']) && $memberData['email']) {
+            $has = self::where(['email' => $memberData['email']])->find();
+            if ($has) {
+                unset($memberData['email']);
+            }
+        }
         $result = self::create($memberData);
 
 
