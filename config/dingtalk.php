@@ -72,7 +72,7 @@ return [
             'client_id' => 'ee',
             'client_secret' => 'ff',
             'scope' => 'snsapi_login',
-            'redirect' => 'https://gg.com',
+            'redirect' => 'https://你的域名/index.php/index/oauth/dingTalkOauthCallback',
         ],
         /*
         |-------------------------------------------
