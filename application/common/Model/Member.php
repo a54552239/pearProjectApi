@@ -62,6 +62,12 @@ class Member extends CommonModel
         !isset($memberData['status']) && $memberData['status'] = 1;
         !isset($memberData['code']) && $memberData['code'] = createUniqueCode('member');
         !isset($memberData['account']) && $memberData['account'] = RandomService::alnumLowercase();
+        if (isset($memberData['mobile']) && $memberData['mobile']) {
+            $has = self::where(['mobile' => $memberData['mobile']])->find();
+            if ($has) {
+                unset($memberData['mobile']);
+            }
+        }
         $result = self::create($memberData);
 
 
