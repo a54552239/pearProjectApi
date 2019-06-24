@@ -31,13 +31,13 @@ class Index extends BasicApi
     /**
      * @title 用户菜单
      * @description 获取用户菜单列表
-     * @author PearProject
-     * @url /project/index
-     * @method GET
      * @return void :名称
      * @throws DataNotFoundException
      * @throws ModelNotFoundException
      * @throws DbException
+     * @author PearProject
+     * @url /project/index
+     * @method GET
      */
     public function index()
     {
@@ -80,7 +80,6 @@ class Index extends BasicApi
         $this->success('', $configModel->info());
 
     }
-
 
     /**
      * 个人个信息

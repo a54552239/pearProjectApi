@@ -42,15 +42,15 @@ class Login extends BasicApi
     /**
      * @title 用户登录
      * @description 用户登录
-     * @author PearProject
-     * @url /project/login
-     * @method POST
      * @return void :名称
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      * @throws \think\Exception
      * @throws PDOException
+     * @author PearProject
+     * @url /project/login
+     * @method POST
      */
     public function index()
     {
@@ -92,34 +92,8 @@ class Login extends BasicApi
         if (!$mobile) {
             $member['password'] !== $data['password'] && $this->error('账号或密码错误', 201);
         }
-        // 更新登录信息
-        Db::name('Member')->where(['id' => $member['id']])->update([
-            'last_login_time' => Db::raw('now()'),
-        ]);
-        $list = MemberAccount::where(['member_code' => $member['code']])->order('id asc')->select()->toArray();
-        $organizationList = [];
-        if ($list) {
-            foreach ($list as $item) {
-                $organization = Organization::where(['code' => $item['organization_code']])->find();
-                if ($organization) {
-                    $organizationList[] = $organization;
-                }
-            }
-        }
-        $member['account_id'] = $list[0]['id'];
-        $member['is_owner'] = $list[0]['is_owner'];
-        $member['authorize'] = $list[0]['authorize'];
-        $member['position'] = $list[0]['position'];
-        $member['department'] = $list[0]['department'];
-
-        setCurrentMember($member);
-        !empty($member['authorize']) && NodeService::applyProjectAuthNode();
-        $member = getCurrentMember();
-        Log::write(json_encode($member), "member-login");
-        $tokenList = JwtService::initToken($member);
-        $accessTokenExp = JwtService::decodeToken($tokenList['accessToken'])->exp;
-        $tokenList['accessTokenExp'] = $accessTokenExp;
-        $this->success('', ['member' => $member, 'tokenList' => $tokenList, 'organizationList' => $organizationList]);
+        $result = Member::login($member);
+        $this->success('', $result);
     }
 
     /**
@@ -307,15 +281,23 @@ class Login extends BasicApi
 
     }
 
+    public function _checkLogin()
+    {
+        $loginInfo = session('loginInfo');
+        $this->success('', $loginInfo);
+    }
+
+
     /**
      * 退出登录
      */
-    public function out()
+    public function _out()
     {
-        session('user') && LogService::write('系统管理', '用户退出系统成功');
+        session('member') && LogService::write('系统管理', '用户退出系统成功');
         !empty($_SESSION) && $_SESSION = [];
         [session_unset(), session_destroy()];
-        $this->success('退出登录成功！');
+        session('loginInfo', null);
+        $this->success('');
     }
 
 }

@@ -65,7 +65,7 @@ class Organization extends CommonModel
             'create_time' => nowTime(),
             'avatar' => $memberData['avatar'],
             'name' => $memberData['name'],
-            'email' => $memberData['email'],
+            'email' => isset($memberData['email']) ? $memberData['email'] : '',
         ];
         MemberAccount::create($memberAccountData);
         return $organization;

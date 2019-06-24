@@ -37,33 +37,3 @@ function _uploadFile(File $file, $path_name = '', $saveName = false)
 
 
 
-function getCurrentMember()
-{
-    return session('member');
-}
-
-function setCurrentMember($data)
-{
-    return session('member', $data);
-}
-
-function getCurrentOrganizationCode()
-{
-    return session('currentOrganizationCode');
-}
-
-function setCurrentOrganizationCode($data)
-{
-    return session('currentOrganizationCode', $data);
-}
-
-function getCurrentOrganization()
-{
-    return session('organization');
-}
-
-function setCurrentOrganization($data)
-{
-    return session('organization', $data);
-}
-

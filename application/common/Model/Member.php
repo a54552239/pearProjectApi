@@ -2,6 +2,9 @@
 
 namespace app\common\Model;
 
+use service\JwtService;
+use service\NodeService;
+use service\RandomService;
 use think\Db;
 use think\File;
 
@@ -10,13 +13,38 @@ class Member extends CommonModel
 
     protected $append = [];
 
-    public function login($account)
+    public static function login($member)
     {
-        if ($account == 'admin') {
-            return [];
+        // 更新登录信息
+        Db::name('Member')->where(['id' => $member['id']])->update([
+            'last_login_time' => Db::raw('now()'),
+        ]);
+        $list = MemberAccount::where(['member_code' => $member['code']])->order('id asc')->select()->toArray();
+        $organizationList = [];
+        if ($list) {
+            foreach ($list as $item) {
+                $organization = Organization::where(['code' => $item['organization_code']])->find();
+                if ($organization) {
+                    $organizationList[] = $organization;
+                }
+            }
         }
-        $where[] = ['account', '=', $account];
-        return Db::name('member')->where($where)->find();
+        $member['account_id'] = $list[0]['id'];
+        $member['is_owner'] = $list[0]['is_owner'];
+        $member['authorize'] = $list[0]['authorize'];
+        $member['position'] = $list[0]['position'];
+        $member['department'] = $list[0]['department'];
+
+        setCurrentMember($member);
+        !empty($member['authorize']) && NodeService::applyProjectAuthNode();
+        $member = getCurrentMember();
+        $tokenList = JwtService::initToken($member);
+        $accessTokenExp = JwtService::decodeToken($tokenList['accessToken'])->exp;
+        $tokenList['accessTokenExp'] = $accessTokenExp;
+        $loginInfo = ['member' => $member, 'tokenList' => $tokenList, 'organizationList' => $organizationList];
+        session('loginInfo', $loginInfo);
+        logRecord($loginInfo, 'info', 'member/login');
+        return $loginInfo;
     }
 
     /**
@@ -30,6 +58,10 @@ class Member extends CommonModel
     {
         //需要创建的信息。1、用户 2、用户所属组织 3、组织权限 4、所属组织账号
         $memberData['create_time'] = nowTime();
+        (!isset($memberData['avatar']) || !$memberData['avatar']) && $memberData['avatar'] = 'https://static.vilson.xyz/cover.png';
+        !isset($memberData['status']) && $memberData['status'] = 1;
+        !isset($memberData['code']) && $memberData['code'] = createUniqueCode('member');
+        !isset($memberData['account']) && $memberData['account'] = RandomService::alnumLowercase();
         $result = self::create($memberData);
 
 
@@ -80,6 +112,25 @@ class Member extends CommonModel
         return $result;
     }
 
+    public static function dingtalkLogin($userInfo)
+    {
+        $unionid = $userInfo['unionid'];
+        $openid = $userInfo['openid'];
+        $member = self::where(['dingtalk_unionid' => $unionid])->find();
+        if (!$member) {
+            $memberData = [
+                'dingtalk_openid' => $openid,
+                'dingtalk_unionid' => $unionid,
+                'name' => $userInfo['nick'],
+                'avatar' => isset($userInfo['avatar']) ? $userInfo['avatar'] : '',
+                'mobile' => isset($userInfo['mobile']) ? $userInfo['mobile'] : '',
+                'email' => isset($userInfo['email']) ? $userInfo['email'] : '',
+            ];
+            $member = self::createMember($memberData);
+        }
+        self::login($member);
+        return $member;
+    }
 
     /**
      * @param File $file

@@ -5,12 +5,60 @@ use service\NodeService;
 use service\RandomService;
 use think\Db;
 use think\facade\Cache;
-use think\facade\Request;
+use think\facade\Log;
 
 
 function isDebug()
 {
     return config('app.app_debug');
+}
+
+/**
+ * 日志记录
+ * @param string|array $content 内容
+ * @param string $type 日志类型
+ * @param string $path 日志地址
+ */
+function logRecord($content, $type = 'info', $path = 'default')
+{
+    $path = 'log/' . $path;
+    Log::init(['path' => $path]);
+    if (is_array($content) || is_object($content)) {
+        $content = json_encode($content);
+    }
+    Log::write($content, $type);
+    Log::init();
+}
+
+
+function getCurrentMember()
+{
+    return session('member');
+}
+
+function setCurrentMember($data)
+{
+    return session('member', $data);
+}
+
+function getCurrentOrganizationCode()
+{
+    return session('currentOrganizationCode');
+}
+
+function setCurrentOrganizationCode($data)
+{
+    return session('currentOrganizationCode', $data);
+}
+
+function getCurrentOrganization()
+{
+    return session('organization');
+}
+
+function setCurrentOrganization($data)
+{
+    return session('organization', $data);
 }
 
 /**
@@ -180,8 +228,8 @@ function decode($string)
 
 /**
  * 获取锁
- * @param  String $key 锁标识
- * @param  Int $expire 锁过期时间
+ * @param String $key 锁标识
+ * @param Int $expire 锁过期时间
  * @return Boolean
  */
 function lock($key = '', $expire = 5)
@@ -197,7 +245,7 @@ function lock($key = '', $expire = 5)
 
 /**
  * 释放锁
- * @param  String $key 锁标识
+ * @param String $key 锁标识
  * @return Boolean
  */
 function unlock($key = '')
