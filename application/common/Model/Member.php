@@ -134,6 +134,7 @@ class Member extends CommonModel
                 'dingtalk_openid' => $openid,
                 'dingtalk_unionid' => $unionid,
                 'name' => $userInfo['nick'],
+                'dingtalk_userid' => isset($userInfo['userId']) ? $userInfo['userId'] : '',
                 'avatar' => isset($userInfo['avatar']) ? $userInfo['avatar'] : '',
                 'mobile' => isset($userInfo['mobile']) ? $userInfo['mobile'] : '',
                 'email' => isset($userInfo['email']) ? $userInfo['email'] : '',

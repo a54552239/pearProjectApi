@@ -11,11 +11,16 @@ namespace app\project\behavior;
 
 use app\common\Model\CommonModel;
 use app\common\Model\Member;
+use app\common\Model\Notify;
 use app\common\Model\ProjectLog;
 use app\common\Model\ProjectVersion;
 use app\common\Model\TaskMember;
 use app\common\Model\TaskStages;
+use message\DingTalk;
 use service\MessageService;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\facade\Log;
 
 class Task
@@ -23,9 +28,9 @@ class Task
     /**
      * 任务操作钩子
      * @param $data
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function run($data)
     {
@@ -178,7 +183,7 @@ class Task
         $notifyActions = ['done', 'redo', 'assign'];
         if (in_array($data['type'], $notifyActions)) {
             //todo 短信,消息推送
-            $notifyModel = new \app\common\Model\Notify();
+            $notifyModel = new Notify();
             $member = Member::where(['code' => $data['memberCode']])->find();
             $notifyData['title'] = $member['name'] . ' ' . $remark;
             $notifyData['content'] = $task['name'];
@@ -186,11 +191,26 @@ class Task
             $taskMembers = TaskMember::where(['task_code' => $task['code']])->select()->toArray();
             if ($taskMembers) {
                 $messageService = new MessageService();
+                $messageDingTalk = new DingTalk();
                 foreach ($taskMembers as $taskMember) {
                     if ($taskMember['member_code'] == $data['memberCode']) {
                         continue;//跳过产生者
                     }
+                    $member = Member::where(['code' => $taskMember['member_code']])->find();
                     $result = $notifyModel->add($notifyData['title'], $notifyData['content'], $notifyData['type'], $data['memberCode'], $taskMember['member_code'], $notifyData['action'], json_encode($task), $notifyData['terminal'], $notifyData['avatar']);
+                    if (isOpenDingTalkNoticePush()) {
+                        if ($member['dingtalk_userid']) {
+                            $params = [
+                                'msgtype' => "oa",
+                                'oa' => [
+                                    'message_url' => 'http://dingtalk.com',
+                                    'head' => ['bgcolor' => 'FFBBBBBB', 'text' => '任务动态'],
+                                    'body' => ['title' => $notifyData['title'], 'content' => $notifyData['content']],
+                                ]
+                            ];
+                            $messageDingTalk->sendCorporationMessage($member['dingtalk_userid'], $params);
+                        }
+                    }
                     if (isOpenNoticePush()) {
                         $messageService->sendToUid($taskMember['member_code'], ['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => getCurrentOrganizationCode()], 'notify' => $result], $notifyData['action']);
                     }

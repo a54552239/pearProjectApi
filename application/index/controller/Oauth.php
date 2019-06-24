@@ -24,6 +24,21 @@ class Oauth extends BasicApi
     public function index()
     {
         $app = new Application(config('dingtalk.'));
+        $msg = [
+            'msgtype' => "oa",
+            'oa' => [
+                'message_url' => 'http://dingtalk.com',
+                'head' => ['bgcolor' => 'FFBBBBBB', 'title' => '消息通知'],
+                'body' => ['title' => '888', 'content' => '666'],
+            ]
+        ];
+        $params = [
+            'agent_id'=> '271863764',
+            'userid_list' => 'manager9168',
+            'msg'=> json_encode($msg)
+        ];
+        $res = $app->conversation->sendCorporationMessage($params);
+        echo json_encode($res);die;
         $userId = $app->user->getUseridByUnionid('3CnKFHEE7mX1hayPIHvpCwiEiE');
 //        echo json_encode($userId);die;
         $userId = $userId['userid'];
@@ -36,6 +51,7 @@ class Oauth extends BasicApi
         $currentMember = getCurrentMember();
         if (!$currentMember) {
             $app = new Application(config('dingtalk.'));
+//            $response = $app->oauth->use('app-01')->redirect();
             $response = $app->oauth->use('app-01')->withQrConnect()->redirect();
             $redirect = $response->getTargetUrl();
             if ($redirect) {
@@ -77,6 +93,7 @@ class Oauth extends BasicApi
                     $user['user_info']['avatar'] = $userInfo['avatar'];
                     $user['user_info']['mobile'] = $userInfo['mobile'];
                     $user['user_info']['email'] = $userInfo['email'];
+                    $user['user_info']['userId'] = $userId;
                 }
             }
             Member::dingtalkLogin($user['user_info']);
