@@ -7,8 +7,9 @@ file_exists($session_path) || mkdir($session_path, 0755, true);
 /* 定义Session会话参数 */
 return [
     'id'             => '',
-    'type'           => '',
+    'type'           => 'redis',
     'prefix'         => 'ta',
+    'expire'         => 3600 * 24,
     'auto_start'     => true,
     'path'           => $session_path,
     'name'           => $session_name,
@@ -17,4 +18,12 @@ return [
 //    'use_trans_sid'  => 0,
 //    'httponly'       => true,
 //    'secure'         => true,
+
+
+    // redis主机
+    'host'       => '127.0.0.1',
+    // redis端口
+    'port'       => 6379,
+    // 密码
+    'password'   => '',
 ];
