@@ -229,6 +229,7 @@ class Login extends BasicApi
         $mailer = new Mail();
         try {
             $mail = $mailer->mail;
+            $mail->CharSet = 'utf-8';
             $mail->setFrom(config('mail.Username'), 'pearProject');
             $mail->addAddress($email, getCurrentMember()['name']);
             //Content
