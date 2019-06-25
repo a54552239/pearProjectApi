@@ -136,8 +136,8 @@ class Member extends CommonModel
     public static function dingtalkLogin($userInfo)
     {
         $currentMember = getCurrentMember();
-        $where = ['code' => $currentMember['code']];
         if ($currentMember) {
+            $where = ['code' => $currentMember['code']];
             $currentMember = self::where($where)->find();
         }
         $unionid = $userInfo['unionid'];
@@ -157,7 +157,7 @@ class Member extends CommonModel
                 $member = self::createMember($memberData);
             } else {
                 //已登录且未绑定，则绑定
-                if (!$currentMember['dingtalk_unionid']) {
+                if (!$currentMember['dingtalk_unionid'] || !$currentMember['dingtalk_userid']) {
                     self::update($memberData, $where);
                     $member = self::where($where)->find();
                 }
@@ -165,6 +165,9 @@ class Member extends CommonModel
         } else {
             if ($currentMember && $member['dingtalk_unionid'] != $currentMember['dingtalk_unionid']) {
                 return error('1', '您想要绑定的第三方帐号已经被绑定给其他帐号，请先用该第三方帐号登录后，解绑释放它，再切回当前帐号发起绑定');
+            }
+            if (!$member['dingtalk_userid']) {
+                self::update($memberData, ['code' => $member['code']]);
             }
         }
         self::login($member);

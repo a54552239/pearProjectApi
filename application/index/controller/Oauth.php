@@ -25,6 +25,27 @@ class Oauth extends BasicApi
 
     public function index()
     {
+        $app = new Application(config('dingtalk.'));
+        $msg = [
+            'msgtype' => "oa",
+            'oa' => [
+                'message_url' => 'http://dingtalk.com',
+                'head' => ['bgcolor' => 'FFBBBBBB', 'title' => '消息通知'],
+                'body' => ['title' => '888', 'content' => '666'],
+            ]
+        ];
+        $params = [
+            'agent_id'=> '271863764',
+            'userid_list' => 'manager9168',
+            'msg'=> json_encode($msg)
+        ];
+        $res = $app->conversation->sendCorporationMessage($params);
+        echo json_encode($res);die;
+        $userId = $app->user->getUseridByUnionid('3CnKFHEE7mX1hayPIHvpCwiEiE');
+//        echo json_encode($userId);die;
+        $userId = $userId['userid'];
+        $user = $app->user->get($userId, $lang = null);
+        echo json_encode($user);die;
     }
 
     /**
@@ -74,7 +95,7 @@ class Oauth extends BasicApi
                     'unionid' => $user['unionid'],
                     'openid' => $user['openId'],
                     'userId' => $user['userid'],
-                    'name' => $user['name'],
+                    'nick' => $user['name'],
                     'avatar' => $user['avatar'],
                     'mobile' => $user['mobile'],
                     'email' => $user['email'],
