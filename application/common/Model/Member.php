@@ -137,8 +137,9 @@ class Member extends CommonModel
     {
         $currentMember = getCurrentMember();
         $where = ['code' => $currentMember['code']];
-        $currentMember = self::where($where)->find();
-
+        if ($currentMember) {
+            $currentMember = self::where($where)->find();
+        }
         $unionid = $userInfo['unionid'];
         $openid = $userInfo['openid'];
         $member = self::where(['dingtalk_unionid' => $unionid])->find();
@@ -163,7 +164,7 @@ class Member extends CommonModel
                 }
             }
         } else {
-            if ($member['dingtalk_unionid'] != $currentMember['dingtalk_unionid']) {
+            if ($currentMember && $member['dingtalk_unionid'] != $currentMember['dingtalk_unionid']) {
                 return error('1', '您想要绑定的第三方帐号已经被绑定给其他帐号，请先用该第三方帐号登录后，解绑释放它，再切回当前帐号发起绑定');
             }
         }
