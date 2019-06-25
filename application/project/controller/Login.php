@@ -257,6 +257,31 @@ class Login extends BasicApi
     }
 
     /**
+     * 解绑钉钉
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public function _unbindDingtalk()
+    {
+        $currentMember = getCurrentMember();
+        $memberCode = $currentMember['code'];
+        $member = Member::where(['code' => $memberCode])->find();
+        if (!$member['mobile'] && !$member['email']) {
+            $this->error('您未绑定手机或邮箱，无法解绑 ');
+        }
+        $member->dingtalk_openid = '';
+        $member->dingtalk_unionid = '';
+        $member->dingtalk_userid = '';
+        $member->save();
+        $currentMember['dingtalk_openid'] = '';
+        $currentMember['dingtalk_unionid'] = '';
+        $currentMember['dingtalk_userid'] = '';
+        setCurrentMember($currentMember);
+        $this->success('解除绑定成功', $currentMember);
+    }
+
+    /**
      * 验证绑定邮箱
      * @throws DataNotFoundException
      * @throws DbException
@@ -281,10 +306,21 @@ class Login extends BasicApi
 
     }
 
+    /**
+     * 检测登陆信息
+     */
     public function _checkLogin()
     {
         $loginInfo = session('loginInfo');
         $this->success('', $loginInfo);
+    }
+
+    /*
+     * 获取当前用户信息
+     */
+    public function _currentMember()
+    {
+        $this->success('', getCurrentMember());
     }
 
 
@@ -293,10 +329,7 @@ class Login extends BasicApi
      */
     public function _out()
     {
-        session('member') && LogService::write('系统管理', '用户退出系统成功');
-        !empty($_SESSION) && $_SESSION = [];
-        [session_unset(), session_destroy()];
-        session('loginInfo', null);
+        Member::logout();
         $this->success('');
     }
 

@@ -13,6 +13,9 @@ use app\common\Model\Member;
 use controller\BasicApi;
 use EasyDingTalk\Application;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\facade\Log;
 use think\facade\Request;
 use think\response\Redirect;
@@ -24,20 +27,24 @@ class Oauth extends BasicApi
     {
     }
 
+    /**
+     * 获取钉钉登录授权
+     * @return Redirect
+     */
     public function dingTalkOauth()
     {
+        $redirectPath = Request::param('redirectPath', '');
+        $bindDingtalk = Request::param('bindDingtalk', '');
         $currentMember = getCurrentMember();
-        if (!$currentMember) {
+        if (!$currentMember || $bindDingtalk) {
             $app = new Application(config('dingtalk.'));
 //            $response = $app->oauth->use('app-01')->redirect();
             $response = $app->oauth->use('app-01')->withQrConnect()->redirect();
             $redirect = $response->getTargetUrl();
-            if ($redirect) {
-                if ($redirect == 'undefined') {
-                    $redirect = '/';
-                }
-                $_SESSION['target_url'] = $redirect;
+            if ($redirectPath) {
+                session('redirectPath', $redirectPath);
             }
+            $redirectPath && $redirect .= '&$redirectPath=' . $redirectPath;
             return redirect($redirect);
         } else {
             //已登录跳转
@@ -45,10 +52,47 @@ class Oauth extends BasicApi
         }
     }
 
+    /**
+     * 钉钉应用内免密登录
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
+     */
+    public function dingTalkLoginByCode()
+    {
+        $code = Request::param('code');
+        logRecord($code);
+        $app = new Application(config('dingtalk.'));
+        $result = $app->user->getUserByCode($code);
+        logRecord($result);
+        if (!$result['errcode']) {
+            $userId = $result['userid'];
+            $user = $app->user->get($userId, $lang = null);
+            logRecord($user);
+            if (!$user['errcode']) {
+                $userInfo = [
+                    'unionid' => $user['unionid'],
+                    'openid' => $user['openId'],
+                    'userId' => $user['userid'],
+                    'name' => $user['name'],
+                    'avatar' => $user['avatar'],
+                    'mobile' => $user['mobile'],
+                    'email' => $user['email'],
+                ];
+                Member::dingtalkLogin($userInfo);
+                $loginInfo = session('loginInfo');
+                $this->success('', $loginInfo);
+            }
+        }
+        $this->error($result['errmsg']);
+    }
 
     /**
-     * 获取钉钉授权
+     * 钉钉授权回调
      * @return RedirectResponse|Redirect
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function dingTalkOauthCallback()
     {
@@ -60,8 +104,17 @@ class Oauth extends BasicApi
         $redirect = $response->getTargetUrl();
         logRecord($redirect);
         logRecord($user);
-        //用户注册/绑定微信
-        $targetUrl = '/index.html#/member/login?logged=1';
+        //用户注册/绑定钉钉
+        $redirectPath = session('redirectPath');
+        $targetUrl = '/index.html#/member/login';
+        if ($redirectPath) {
+            $targetUrl = '/index.html#' . $redirectPath;
+        }
+        if (strpos($targetUrl, '?') === false) {
+            $targetUrl .= '?logged=1';
+        } else {
+            $targetUrl .= '&logged=1';
+        }
         if (!$user['errcode']) {
             $result = $app->user->getUseridByUnionid($user['user_info']['unionid']);
             if (!$result['errcode']) {
@@ -74,8 +127,15 @@ class Oauth extends BasicApi
                     $user['user_info']['userId'] = $userId;
                 }
             }
-            Member::dingtalkLogin($user['user_info']);
-        }else{
+            $result = Member::dingtalkLogin($user['user_info']);
+            //跳转地址携带message可以在应用内展示通知消息
+            //logged=1表示业务处理成功
+            if (isError($result)) {
+                Member::logout();
+                $targetUrl .= '&message=' . $result['msg'];
+//                $targetUrl = '/index.html#/member/login?logged=0&message='.$result['msg'];
+            }
+        } else {
             $targetUrl = '/index.html#/member/login?logged=0&message=钉钉登录失败，请重试';
         }
         // 登录成功跳转

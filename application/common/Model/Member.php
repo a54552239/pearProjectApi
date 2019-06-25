@@ -2,6 +2,7 @@
 
 namespace app\common\Model;
 
+use PDOStatement;
 use service\JwtService;
 use service\NodeService;
 use service\RandomService;
@@ -124,25 +125,58 @@ class Member extends CommonModel
         return $result;
     }
 
+    /**
+     * 钉钉登录
+     * @param $userInfo
+     * @return Member|array|PDOStatement|string|\think\Model|null
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public static function dingtalkLogin($userInfo)
     {
+        $currentMember = getCurrentMember();
+        $where = ['code' => $currentMember['code']];
+        $currentMember = self::where($where)->find();
+
         $unionid = $userInfo['unionid'];
         $openid = $userInfo['openid'];
         $member = self::where(['dingtalk_unionid' => $unionid])->find();
+        $memberData = [
+            'dingtalk_openid' => $openid,
+            'dingtalk_unionid' => $unionid,
+            'dingtalk_userid' => isset($userInfo['userId']) ? $userInfo['userId'] : '',
+        ];
         if (!$member) {
-            $memberData = [
-                'dingtalk_openid' => $openid,
-                'dingtalk_unionid' => $unionid,
-                'name' => $userInfo['nick'],
-                'dingtalk_userid' => isset($userInfo['userId']) ? $userInfo['userId'] : '',
-                'avatar' => isset($userInfo['avatar']) ? $userInfo['avatar'] : '',
-                'mobile' => isset($userInfo['mobile']) ? $userInfo['mobile'] : '',
-                'email' => isset($userInfo['email']) ? $userInfo['email'] : '',
-            ];
-            $member = self::createMember($memberData);
+            $memberData['name'] = $userInfo['nick'];
+            $memberData['avatar'] = isset($userInfo['avatar']) ? $userInfo['avatar'] : '';
+            $memberData['mobile'] = isset($userInfo['mobile']) ? $userInfo['mobile'] : '';
+            $memberData['email'] = isset($userInfo['email']) ? $userInfo['email'] : '';
+            if (!$currentMember) {
+                $member = self::createMember($memberData);
+            } else {
+                //已登录
+                $member = $currentMember;
+                //且未绑定，则绑定
+                if (!$member['dingtalk_unionid']) {
+                    self::update($memberData, $where);
+                }
+            }
+        } else {
+            if ($member['dingtalk_unionid'] != $currentMember['dingtalk_unionid']) {
+                return error('1', '您想要绑定的第三方帐号已经被绑定给其他帐号，请先用该第三方帐号登录后，解绑释放它，再切回当前帐号发起绑定');
+            }
         }
         self::login($member);
         return $member;
+    }
+
+    public static function logout()
+    {
+        !empty($_SESSION) && $_SESSION = [];
+        [session_unset(), session_destroy()];
+        setCurrentMember(null);
+        session('loginInfo', null);
     }
 
     /**
