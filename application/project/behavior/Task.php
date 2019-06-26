@@ -16,6 +16,7 @@ use app\common\Model\ProjectLog;
 use app\common\Model\ProjectVersion;
 use app\common\Model\TaskMember;
 use app\common\Model\TaskStages;
+use app\common\Model\TaskWorkflowRule;
 use message\DingTalk;
 use service\MessageService;
 use think\db\exception\DataNotFoundException;
@@ -35,7 +36,10 @@ class Task
     public function run($data)
     {
         Log::init(['path' => 'log/task']);
-        $logData = ['member_code' => $data['memberCode'], 'source_code' => $data['taskCode'], 'remark' => $data['remark'], 'type' => $data['type'], 'content' => $data['content'], 'is_comment' => $data['isComment'], 'to_member_code' => $data['toMemberCode'], 'create_time' => nowTime(), 'code' => createUniqueCode('projectLog'), 'action_type' => 'task'];
+        $isRobot = (isset($data['data']) && isset($data['data']['is_robot']) && $data['data']['is_robot']) ? 1 : 0;
+        logRecord($isRobot,'robot');
+        $logData = ['member_code' => $data['memberCode'], 'source_code' => $data['taskCode'], 'remark' => $data['remark'], 'type' => $data['type'], 'content' => $data['content'], 'is_comment' => $data['isComment'], 'to_member_code' => $data['toMemberCode'], 'create_time' => nowTime(), 'code' => createUniqueCode('projectLog'), 'action_type' => 'task', 'is_robot' => $isRobot];
+        logRecord($data);
         $task = \app\common\Model\Task::where(['code' => $data['taskCode']])->find();
         $logData['project_code'] = $task['project_code'];
         $toMember = [];
@@ -172,6 +176,9 @@ class Task
                 break;
         }
         $logData['icon'] = $icon;
+        if ($logData['is_robot']) {
+            $logData['icon'] = 'alert';
+        }
         if (!$data['remark']) {
             $logData['remark'] = $remark;
         }
@@ -179,6 +186,34 @@ class Task
             $logData['content'] = $content;
         }
         ProjectLog::create($logData);
+        //工作流事件
+        $workflowActions = ['create', 'move', 'done', 'redo', 'assign', 'setEndTime', 'pri'];
+        if (in_array($data['type'], $workflowActions)) {
+            $taskStageCode = $task['stage_code'];
+            $action = TaskWorkflowRule::getActionByTaskType($data['type']);
+            $taskWorkflowRule = TaskWorkflowRule::where(['object_code' => $taskStageCode, 'sort' => 1])->order('id asc')->find();
+            if ($taskWorkflowRule) {
+                $taskWorkflowRuleList = TaskWorkflowRule::where(['workflow_code' => $taskWorkflowRule['workflow_code']])->order('sort asc')->select();
+                if ($taskWorkflowRuleList) {
+                    $condition = $taskWorkflowRuleList[1];
+                    if ($condition['action'] == $action) {
+                        $goon = true;
+                        if ($action == 3) {
+                            //设置执行人
+                            $toMemberCode = $toMember['code'];
+                            if ($toMemberCode != $condition['object_code']) {
+                                $goon = false;
+                            }
+                        }
+                        if ($goon) {
+                            $do = $taskWorkflowRuleList[2];
+                            TaskWorkflowRule::doAction($task, $do);
+                        }
+                    }
+                }
+
+            }
+        }
         //触发推送的事件
         $notifyActions = ['done', 'redo', 'assign'];
         if (in_array($data['type'], $notifyActions)) {

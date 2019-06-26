@@ -451,6 +451,10 @@ class Task extends BasicApi
         }
         if ($list['list']) {
             foreach ($list['list'] as &$item) {
+                if ($item['is_robot'] && $item['type'] != 'claim') {
+                    $item['member'] = ['name' => 'PP Robot'];
+                    continue;
+                }
                 $member = Member::where(['code' => $item['member_code']])->field('id,name,avatar,code')->find();
                 !$member && $member = [];
                 $item['member'] = $member;

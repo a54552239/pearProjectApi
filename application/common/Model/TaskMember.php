@@ -19,12 +19,14 @@ class TaskMember extends CommonModel
      * @param $taskCode
      * @param int $isExecutor
      * @param int $isOwner
+     * @param bool $fromCreate
+     * @param bool $isRobot 是否机器人
      * @return TaskMember|bool
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function inviteMember($memberCode, $taskCode, $isExecutor = 0, $isOwner = 0, $fromCreate = false)
+    public static function inviteMember($memberCode, $taskCode, $isExecutor = 0, $isOwner = 0, $fromCreate = false, $isRobot = false)
     {
         !$memberCode && $memberCode = '';
         $task = Task::where(['code' => $taskCode, 'deleted' => 0])->find();
@@ -47,7 +49,7 @@ class TaskMember extends CommonModel
                 if ($memberCode == $currentMember['code']) {
                     $logType = 'claim';
                 }
-                Task::taskHook($currentMember['code'], $taskCode, $logType, $memberCode);
+                Task::taskHook($currentMember['code'], $taskCode, $logType, $memberCode, 0, '', '', '', ['is_robot' => $isRobot]);
 //            throw new \Exception('该成员已参与任务', 2);
                 return true;
             }
@@ -57,7 +59,7 @@ class TaskMember extends CommonModel
             Task::update(['assign_to' => $memberCode], ['code' => $taskCode]);
             if (!$fromCreate) {
                 if ($taskExecutor) {
-                    Task::taskHook($currentMember['code'], $taskCode, 'removeExecutor', $taskExecutor['member_code']);
+                    Task::taskHook($currentMember['code'], $taskCode, 'removeExecutor', $taskExecutor['member_code'], 0, '', '', '', ['is_robot' => $isRobot]);
                 }
             }
             return true;
@@ -75,9 +77,9 @@ class TaskMember extends CommonModel
         if ($isExecutor) {
             Task::update(['assign_to' => $memberCode], ['code' => $taskCode]);
             if ($memberCode == $currentMember['code']) {
-                Task::taskHook($currentMember['code'], $taskCode, 'claim');
+                Task::taskHook($currentMember['code'], $taskCode, 'claim','',0, '', '', '', ['is_robot' => $isRobot]);
             } else {
-                Task::taskHook($currentMember['code'], $taskCode, 'assign', $memberCode);
+                Task::taskHook($currentMember['code'], $taskCode, 'assign', $memberCode,0, '', '', '', ['is_robot' => $isRobot]);
             }
         }
         if ($memberCode) {
