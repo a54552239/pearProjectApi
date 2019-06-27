@@ -166,6 +166,8 @@ class Task extends BasicApi
                 if ($parentTask['deleted']) {
                     throw new \Exception('父任务在回收站中无法编辑', 6);
                 }
+                $data['project_code'] = $parentTask['project_code'];
+                $data['stage_code'] = $parentTask['stage_code'];
             }
             $result = $this->model->createTask($data['stage_code'], $data['project_code'], $data['name'], $member['code'], $data['assign_to'], $data['pcode']);
         } catch (\Exception $e) {
