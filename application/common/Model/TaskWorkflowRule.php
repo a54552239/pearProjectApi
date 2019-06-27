@@ -11,6 +11,35 @@ class TaskWorkflowRule extends CommonModel
 {
     protected $append = [];
 
+    /**
+     * 保存规则
+     * @param $workflowCode
+     * @param $taskWorkflowRules Object
+     */
+    public static function saveRules($workflowCode, $taskWorkflowRules)
+    {
+        TaskWorkflowRule::createData($workflowCode, 1, $taskWorkflowRules->firstObj);
+        TaskWorkflowRule::createData($workflowCode, 2, $taskWorkflowRules->firstAction->value, $taskWorkflowRules->firstAction->action);
+        TaskWorkflowRule::createData($workflowCode, 3, $taskWorkflowRules->firstResult->value, $taskWorkflowRules->firstResult->action);
+        if ($taskWorkflowRules->lastResult->value) {
+            TaskWorkflowRule::createData($workflowCode, 4, $taskWorkflowRules->lastResult->value, $taskWorkflowRules->lastResult->action);
+        }
+    }
+
+    public static function createData($workflowCode, $sort, $objectCode = '', $action = 0, $type = 0)
+    {
+        $data = [
+            'create_time' => nowTime(),
+            'code' => createUniqueCode('TaskWorkflowRule'),
+            'type' => $type,
+            'object_code' => $objectCode,
+            'action' => $action,
+            'sort' => $sort,
+            'workflow_code' => $workflowCode,
+        ];
+        return self::create($data);
+    }
+
     public static function getActionByTaskType($type)
     {
         switch ($type) {
@@ -50,7 +79,7 @@ class TaskWorkflowRule extends CommonModel
                 $stage = TaskStages::where(['code' => $toStageCode])->find();
                 Task::taskHook(getCurrentMember()['code'], $task['code'], 'move', '', '', '', '', '', ['stageName' => $stage['name'], 'is_robot' => true]);
             }
-        } elseif ($do['action'] == 1) {
+        } elseif ($do['action'] == 3) {
             //指派给
             try {
                 TaskMember::inviteMember($do['object_code'], $task['code'], 1, 0, false, true);

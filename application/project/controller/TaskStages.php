@@ -45,6 +45,18 @@ class TaskStages extends BasicApi
         $this->success('', $list);
     }
 
+    public function _getAll()
+    {
+        $where = [];
+        $code = Request::post('projectCode');
+        if (!$code) {
+            $this->error("请选择一个项目");
+        }
+        $where[] = ['project_code', '=', $code];
+        $list = $this->model->where($where)->select();
+        $this->success('', $list);
+    }
+
     /**
      * 显示资源列表
      * @return void

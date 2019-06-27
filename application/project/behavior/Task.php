@@ -190,26 +190,31 @@ class Task
             if (in_array($data['type'], $workflowActions)) {
                 $taskStageCode = $task['stage_code'];
                 $action = TaskWorkflowRule::getActionByTaskType($data['type']);
-                $taskWorkflowRule = TaskWorkflowRule::where(['object_code' => $taskStageCode, 'sort' => 1])->order('id asc')->find();
-                if ($taskWorkflowRule) {
-                    $nextTaskWorkflowRule = TaskWorkflowRule::where(['workflow_code' => $taskWorkflowRule['workflow_code'], 'sort' => 2])->find();
-                    if ($nextTaskWorkflowRule) {
-                        if ($nextTaskWorkflowRule['action'] == $action) {
-                            $goon = true;
-                            if ($action == 3) {
-                                //设置执行人
-                                $toMemberCode = $toMember['code'];
-                                if ($toMemberCode != $nextTaskWorkflowRule['object_code']) {
-                                    $goon = false;
+                $taskWorkflowRules = TaskWorkflowRule::where(['object_code' => $taskStageCode, 'sort' => 1])->order('id asc')->select();
+                logRecord($taskWorkflowRules);
+                if ($taskWorkflowRules) {
+                    foreach ($taskWorkflowRules as $taskWorkflowRule) {
+//                        $taskWorkflowRule = TaskWorkflowRule::where(['object_code' => $taskStageCode, 'sort' => 1])->order('id asc')->find();
+                        if ($taskWorkflowRule) {
+                            $nextTaskWorkflowRule = TaskWorkflowRule::where(['workflow_code' => $taskWorkflowRule['workflow_code'], 'sort' => 2])->find();
+                            if ($nextTaskWorkflowRule) {
+                                if ($nextTaskWorkflowRule['action'] == $action) {
+                                    $goon = true;
+                                    if ($action == 3) {
+                                        //设置执行人
+                                        $toMemberCode = $toMember['code'];
+                                        if ($toMemberCode != $nextTaskWorkflowRule['object_code']) {
+                                            $goon = false;
+                                        }
+                                    }
+                                    if ($goon) {
+                                        $doTaskWorkflowRule = TaskWorkflowRule::where(['workflow_code' => $taskWorkflowRule['workflow_code'], 'sort' => 3])->find();
+                                        $doTaskWorkflowRule && TaskWorkflowRule::doAction($task, $doTaskWorkflowRule);
+                                    }
                                 }
-                            }
-                            if ($goon) {
-                                $doTaskWorkflowRule = TaskWorkflowRule::where(['workflow_code' => $taskWorkflowRule['workflow_code'], 'sort' => 3])->find();
-                                $doTaskWorkflowRule && TaskWorkflowRule::doAction($task, $doTaskWorkflowRule);
                             }
                         }
                     }
-
                 }
             }
         }
