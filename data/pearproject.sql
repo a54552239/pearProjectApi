@@ -11,7 +11,7 @@
  Target Server Version : 50642
  File Encoding         : 65001
 
- Date: 26/06/2019 18:04:55
+ Date: 27/06/2019 14:55:36
 */
 
 SET NAMES utf8mb4;
@@ -390,7 +390,7 @@ CREATE TABLE `pear_project`  (
 INSERT INTO `pear_project` VALUES (1, 'https://beta.vilson.xyz/static/upload//20190103/f9ad4e304ea0be7609e3236188f7547d.png', 'iView', 'a8mpr6tvbndk10hj2lwcqzuo', '那是一种内在的东西， 他们到达不了，也无法触及的', 'private', NULL, NULL, 0, '10', 39.00, '2018-04-30 22:29:18', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'default');
 INSERT INTO `pear_project` VALUES (2, 'https://beta.vilson.xyz/static/upload//20190103/aaacec0e2001580b44dffbb967804349.png', 'Alipay', '8rlqyh56smzpoc1wef7390t2', '城镇中有那么多的酒馆，她却偏偏走进了我的酒馆', 'open', NULL, NULL, 0, '10', 75.00, '2018-05-01 09:28:36', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'default');
 INSERT INTO `pear_project` VALUES (3, 'https://beta.vilson.xyz/static/upload//20190103/9ba2134d72cc3cec58f61024b89eb798.png', 'Vue', 'nkp4gulsb6oxqyi80fhead39', '生命就像一盒巧克力，结果往往出人意料', 'open', NULL, NULL, 0, '10', 63.00, '2018-05-01 09:33:43', '6v7be19pwman2fird04gqu53', '2019-01-03 22:20:10', 1, '', 0, 0, NULL, 0, 0, 'default');
-INSERT INTO `pear_project` VALUES (4, 'https://beta.vilson.xyz/static/upload//20190103/6fc14133651ee1c6ee1abaafcea76d01.png', 'Angular', 'sbklfvyouc0qpmwhitn47j5z', '希望是一个好东西，也许是最好的，好东西是不会消亡的', 'private', NULL, NULL, 0, '13', 100.00, '2018-05-01 09:36:05', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'simple');
+INSERT INTO `pear_project` VALUES (4, 'https://beta.vilson.xyz/static/upload//20190103/6fc14133651ee1c6ee1abaafcea76d01.png', 'Recruitment', 'sbklfvyouc0qpmwhitn47j5z', '希望是一个好东西，也许是最好的，好东西是不会消亡的', 'private', NULL, NULL, 0, '13', 100.00, '2018-05-01 09:36:05', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'simple');
 INSERT INTO `pear_project` VALUES (5, 'https://beta.vilson.xyz/static/upload//20190103/5d2a6e2d2cb235bb6888b884331bb516.png', 'EasyUI', 'n5opgqevrz1l03h48uwx67d2', '那时候我只会想自己想要什么，从不想自己拥有什么', 'open', NULL, NULL, 1, '0', 0.00, '2018-12-22 10:52:25', '6v7be19pwman2fird04gqu53', '2019-01-03 22:19:50', 1, '', 0, 0, NULL, 0, 0, 'default');
 INSERT INTO `pear_project` VALUES (1302, 'https://beta.vilson.xyz/static/upload//20190103/271ec382566f0d2ca187740330b19a17.png', 'Ant Motion', 'ibag9hw3o1tusd5qlpxrk782', '如果我真的存在，也是因为你需要我', 'open', NULL, 0, 1, '0', 50.00, '2018-12-23 09:53:25', '6v7be19pwman2fird04gqu53', '2019-01-04 21:48:33', 0, '', 0, 0, '2019-01-02 21:01:12', 0, 0, 'default');
 INSERT INTO `pear_project` VALUES (1303, 'https://beta.vilson.xyz/static/upload//20190103/30bdd62b610f5a4e3f788ec37e6c4a5b.png', 'Material UI', 'elqa703jyvfhpt1dsxkzi8on', '这个项目你不是项目成员，将不能进行操作（只读）', 'open', NULL, 0, 0, '0', 35.00, '2018-12-23 09:33:46', '6v7be19pwman2fird04gqu53', NULL, 0, '', 0, 0, NULL, 0, 0, 'default');
@@ -1263,7 +1263,7 @@ CREATE TABLE `pear_project_log`  (
   `icon` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `is_robot` tinyint(1) NULL DEFAULT 0 COMMENT '是否机器人',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4466 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目日志表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 4468 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目日志表' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pear_project_log
@@ -1857,6 +1857,8 @@ INSERT INTO `pear_project_log` VALUES (4462, 'sgi79r02adzc5exhoby4qmtn', '6v7be1
 INSERT INTO `pear_project_log` VALUES (4463, 'nfq2txjrzlogde3khv01m8wu', '6v7be19pwman2fird04gqu53', '', '认领了任务 ', 'claim', '2019-06-26 14:41:01', 'pvt5nm7u49hi3ckr0a1zqgbe', 'task', '', 0, 'sbklfvyouc0qpmwhitn47j5z', 'user', 0);
 INSERT INTO `pear_project_log` VALUES (4464, 'kfvo0g84ceb2my6zjt7dhxlu', '6v7be19pwman2fird04gqu53', '应聘者 张艳', '创建了任务 ', 'create', '2019-06-26 18:03:42', '1z3s0rkvpnxfc6t4hi2ueowa', 'task', '', 0, 'sbklfvyouc0qpmwhitn47j5z', 'plus', 0);
 INSERT INTO `pear_project_log` VALUES (4465, 'cgz5q1e2idy4kbn9uxhow0fr', '6v7be19pwman2fird04gqu53', '', '认领了任务 ', 'claim', '2019-06-26 18:03:42', '1z3s0rkvpnxfc6t4hi2ueowa', 'task', '', 0, 'sbklfvyouc0qpmwhitn47j5z', 'user', 0);
+INSERT INTO `pear_project_log` VALUES (4466, 's19uj8xpfiw3hz64vr70y2ck', '6v7be19pwman2fird04gqu53', '招聘流程', '编辑了项目 ', 'edit', '2019-06-27 14:51:10', 'sbklfvyouc0qpmwhitn47j5z', 'project', '', 0, 'sbklfvyouc0qpmwhitn47j5z', 'edit', 0);
+INSERT INTO `pear_project_log` VALUES (4467, 'zgsd6wehl72pmfqc85nuyoxv', '6v7be19pwman2fird04gqu53', 'Recruitment', '编辑了项目 ', 'edit', '2019-06-27 14:51:43', 'sbklfvyouc0qpmwhitn47j5z', 'project', '', 0, 'sbklfvyouc0qpmwhitn47j5z', 'edit', 0);
 
 -- ----------------------------
 -- Table structure for pear_project_member
@@ -2883,10 +2885,10 @@ CREATE TABLE `pear_task_workflow`  (
 -- ----------------------------
 -- Records of pear_task_workflow
 -- ----------------------------
-INSERT INTO `pear_task_workflow` VALUES (3, 'sbklfvyouc0qpmwhitn47j5z', '面试邀约规则', NULL, NULL, '6v7be19pwman2fird04gqu53', 'sbklfvyouc0qpmwhitn47j5z');
-INSERT INTO `pear_task_workflow` VALUES (4, 'sbklfvyouc0qpmwhitn47j51', '面试确认规则', NULL, NULL, '6v7be19pwman2fird04gqu53', 'sbklfvyouc0qpmwhitn47j5z');
-INSERT INTO `pear_task_workflow` VALUES (5, 'sbklfvyouc0qpmwhitn47j52', '确认入职规则', NULL, NULL, '6v7be19pwman2fird04gqu53', 'sbklfvyouc0qpmwhitn47j5z');
-INSERT INTO `pear_task_workflow` VALUES (6, 'sbklfvyouc0qpmwhitn47j53', 'Offer发放规则', NULL, NULL, '6v7be19pwman2fird04gqu53', 'sbklfvyouc0qpmwhitn47j5z');
+INSERT INTO `pear_task_workflow` VALUES (3, 'sbklfvyouc0qpmwhitn47j5z', '面试邀约', NULL, NULL, '6v7be19pwman2fird04gqu53', 'sbklfvyouc0qpmwhitn47j5z');
+INSERT INTO `pear_task_workflow` VALUES (4, 'sbklfvyouc0qpmwhitn47j51', '面试确认', NULL, NULL, '6v7be19pwman2fird04gqu53', 'sbklfvyouc0qpmwhitn47j5z');
+INSERT INTO `pear_task_workflow` VALUES (5, 'sbklfvyouc0qpmwhitn47j52', '确认入职', NULL, NULL, '6v7be19pwman2fird04gqu53', 'sbklfvyouc0qpmwhitn47j5z');
+INSERT INTO `pear_task_workflow` VALUES (6, 'sbklfvyouc0qpmwhitn47j53', 'Offer发放', NULL, NULL, '6v7be19pwman2fird04gqu53', 'sbklfvyouc0qpmwhitn47j5z');
 
 -- ----------------------------
 -- Table structure for pear_task_workflow_rule
