@@ -185,7 +185,7 @@ class Task
         }
         ProjectLog::create($logData);
         //工作流事件
-        if (!$isRobot) {
+        if (!$isRobot && !$task['pcode']) {//子任务不触发
             $workflowActions = ['create', 'move', 'done', 'redo', 'assign', 'setEndTime', 'pri'];
             if (in_array($data['type'], $workflowActions)) {
                 $taskStageCode = $task['stage_code'];
