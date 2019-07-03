@@ -35,7 +35,6 @@ class Task
      */
     public function run($data)
     {
-        Log::init(['path' => 'log/task']);
         $isRobot = (isset($data['data']) && isset($data['data']['is_robot']) && $data['data']['is_robot']) ? 1 : 0;
         $logData = ['member_code' => $data['memberCode'], 'source_code' => $data['taskCode'], 'remark' => $data['remark'], 'type' => $data['type'], 'content' => $data['content'], 'is_comment' => $data['isComment'], 'to_member_code' => $data['toMemberCode'], 'create_time' => nowTime(), 'code' => createUniqueCode('projectLog'), 'action_type' => 'task', 'is_robot' => $isRobot];
         $task = \app\common\Model\Task::where(['code' => $data['taskCode']])->find();

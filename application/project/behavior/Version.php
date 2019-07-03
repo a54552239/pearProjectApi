@@ -34,7 +34,6 @@ class Version
      */
     public function run($data)
     {
-        Log::init(['path' => 'log/version']);
         $logData = ['member_code' => $data['memberCode'], 'source_code' => $data['versionCode'], 'remark' => $data['remark'], 'type' => $data['type'], 'content' => $data['content'], 'create_time' => nowTime(), 'code' => createUniqueCode('projectVersionLog')];
         $version = ProjectVersion::where(['code' => $data['versionCode']])->find();
         $logData['features_code'] = $version['features_code'];
