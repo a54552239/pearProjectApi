@@ -97,7 +97,7 @@ class Task extends CommonModel
         }
         $result = self::update($data, ['code' => $code]);
         $member = getCurrentMember();
-        $type = 'name';
+        $type = '';
         if (isset($data['name'])) {
             $type = 'name';
         }
@@ -122,7 +122,7 @@ class Task extends CommonModel
                 $type = 'clearEndTime';
             }
         }
-        self::taskHook($member['code'], $code, $type);
+        $type && self::taskHook($member['code'], $code, $type);
         //TODO 任务动态
         return $result;
     }
