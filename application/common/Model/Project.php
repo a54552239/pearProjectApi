@@ -65,6 +65,7 @@ class Project extends CommonModel
                 'name' => $name,
                 'description' => $description,
                 'organization_code' => $orgCode,
+                'task_board_theme' => 'simple',
                 'cover' => FileService::getFilePrefix() . 'static/image/default/project-cover.png'
             ];
             $result = self::create($project);

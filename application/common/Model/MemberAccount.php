@@ -2,8 +2,13 @@
 
 namespace app\common\Model;
 
+use Exception;
 use service\NodeService;
 use think\Db;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
+use think\exception\PDOException;
 use think\File;
 
 class MemberAccount extends CommonModel
@@ -13,9 +18,9 @@ class MemberAccount extends CommonModel
 
     /**
      * 获取当前用户菜单
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public static function getAuthMenuList()
     {
@@ -29,12 +34,16 @@ class MemberAccount extends CommonModel
      * 邀请成员
      * @param $memberCode
      * @param $organizationCode
+     * @param string $position
+     * @param string $mobile
+     * @param string $department
+     * @param string $description
      * @return MemberAccount
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
-    public static function inviteMember($memberCode, $organizationCode)
+    public static function inviteMember($memberCode, $organizationCode, $position = '', $mobile = '', $department = '', $description = '')
     {
         $hasJoined = MemberAccount::where(['member_code' => $memberCode, 'organization_code' => $organizationCode])->find();
         if ($hasJoined) {
@@ -50,8 +59,9 @@ class MemberAccount extends CommonModel
             $authId = $auth['id'];//权限id
         }
         $data = [
-            'position' => '资深工程师',
-            'department' => '某某公司－某某某事业群－某某平台部－某某技术部',
+            'position' => $position,
+            'department' => $department ?? '某某公司－某某某事业群－某某平台部－某某技术部',
+            'description' => $description ?? '',
             'code' => createUniqueCode('memberAccount'),
             'member_code' => $memberCode,
             'organization_code' => $organizationCode,
@@ -60,6 +70,7 @@ class MemberAccount extends CommonModel
             'status' => 1,
             'create_time' => nowTime(),
             'name' => $memberDate['name'],
+            'mobile' => $mobile,
             'email' => $memberDate['email'],
         ];
         return MemberAccount::create($data);
@@ -69,8 +80,8 @@ class MemberAccount extends CommonModel
      * @param File $file
      * @return array|bool
      * @throws \think\Exception
-     * @throws \think\exception\PDOException
-     * @throws \Exception
+     * @throws PDOException
+     * @throws Exception
      */
     public function uploadImg(File $file)
     {
@@ -100,7 +111,7 @@ class MemberAccount extends CommonModel
     /**
      * @param $accountCode
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function del($accountCode)
     {
@@ -116,9 +127,9 @@ class MemberAccount extends CommonModel
                 DepartmentMember::where(['account_code' => $accountCode, 'organization_code' => $orgCode])->delete();
             }
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollback();
-            throw new \Exception($e->getMessage(), 201);
+            throw new Exception($e->getMessage(), 201);
         }
         return true;
     }

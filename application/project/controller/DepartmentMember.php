@@ -5,7 +5,12 @@ namespace app\project\controller;
 use app\common\Model\Member;
 use app\common\Model\MemberAccount;
 use controller\BasicApi;
+use Exception;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\facade\Request;
+use think\response\Download;
 
 /**
  * 部门成员
@@ -21,7 +26,7 @@ class DepartmentMember extends BasicApi
     }
 
     /**
-     * @throws \think\exception\DbException
+     * @throws DbException
      */
     public function index()
     {
@@ -46,9 +51,9 @@ class DepartmentMember extends BasicApi
 
     /**
      * 邀请成员查询
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function searchInviteMember()
     {
@@ -119,7 +124,7 @@ class DepartmentMember extends BasicApi
         }
         try {
             $this->model->inviteMember($data['accountCode'], $data['departmentCode']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error($e->getMessage(), $e->getCode());;
         }
         $this->success('');
@@ -136,9 +141,31 @@ class DepartmentMember extends BasicApi
         }
         try {
             $this->model->removeMember($data['accountCode'], $data['departmentCode']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error($e->getMessage(), $e->getCode());;
         }
         $this->success('');
     }
+
+    /**
+     * 下载导入成员模板
+     * @return Download
+     */
+    public function _downloadTemplate()
+    {
+        return download(env('root_path') . 'data/template/importMember.xlsx', '批量导入成员模板.xlsx');
+    }
+
+    /**
+     * 上传文件
+     */
+    public function uploadFile()
+    {
+        $count = $this->model->uploadFile(Request::file('file'));
+        if (isError($count)) {
+            $this->error($count['msg']);
+        }
+        $this->success('', $count);
+    }
+
 }
