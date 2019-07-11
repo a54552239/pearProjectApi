@@ -3,6 +3,7 @@
 namespace app\project\controller;
 
 use app\common\Model\CommonModel;
+use app\common\Model\Department;
 use app\common\Model\Member;
 use app\common\Model\MemberAccount;
 use app\common\Model\Notify;
@@ -58,6 +59,18 @@ class Index extends BasicApi
             $member = getCurrentMember();
             $memberAccount = MemberAccount::where(['member_code' => $member['code'], 'organization_code' => $organizationCode])->find();
             $member = Member::where(['account' => $member['account']])->order('id asc')->find()->toArray();
+
+            $departments = '';
+            $departmentCodes = $memberAccount['department_code'];
+            if ($departmentCodes) {
+                $departmentCodes = explode(',', $departmentCodes);
+                foreach ($departmentCodes as $departmentCode) {
+                    $department = Department::where(['code' => $departmentCode])->field('name')->find();
+                    $departments .= "{$department['name']} ";
+                }
+            }
+            $member['position'] = $memberAccount['position'];
+            $member['department'] = $departments;
             $member['account_id'] = $memberAccount['id'];
             $member['is_owner'] = $memberAccount['is_owner'];
             $member['authorize'] = $memberAccount['authorize'];
@@ -66,7 +79,7 @@ class Index extends BasicApi
             setCurrentOrganizationCode($organizationCode);
 
             $list = MemberAccount::getAuthMenuList();
-            $this->success('', $list);
+            $this->success('', ['menuList' => $list, 'member' => $member]);
         }
         $this->error('请选择组织');
     }
@@ -101,6 +114,10 @@ class Index extends BasicApi
         $params = Request::only('mobile,mail,idcard,name,realname,avatar,id');
         $memberModel = new Member();
         $result = $memberModel->_edit($params, ['id' => Request::post('id')]);
+        if (isset($params['avatar'])) {
+            $member = Member::get($params['id']);
+            MemberAccount::update(['avatar' => $params['avatar']], ['member_code' => $member['code']]);
+        }
         if ($result) {
             $this->success('基本信息更新成功');
         }
@@ -114,6 +131,9 @@ class Index extends BasicApi
      */
     public function editPassword()
     {
+        var_dump(11);
+        die;
+
         $memberModel = new Member();
         $params = Request::only('password,newPassword,confirmPassword,id');
         $member = $memberModel->field('password')->get($params['id'])->toArray();

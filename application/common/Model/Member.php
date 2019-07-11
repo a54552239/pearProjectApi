@@ -2,12 +2,18 @@
 
 namespace app\common\Model;
 
+use Exception;
 use PDOStatement;
 use service\JwtService;
 use service\NodeService;
 use service\RandomService;
 use think\Db;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
+use think\exception\PDOException;
 use think\File;
+use think\Model;
 
 class Member extends CommonModel
 {
@@ -23,7 +29,17 @@ class Member extends CommonModel
         $list = MemberAccount::where(['member_code' => $member['code']])->order('id asc')->select()->toArray();
         $organizationList = [];
         if ($list) {
-            foreach ($list as $item) {
+            foreach ($list as &$item) {
+                $departments = '';
+                $departmentCodes = $item['department_code'];
+                if ($departmentCodes) {
+                    $departmentCodes = explode(',', $departmentCodes);
+                    foreach ($departmentCodes as $departmentCode) {
+                        $department = Department::where(['code' => $departmentCode])->field('name')->find();
+                        $departments .= "{$department['name']} ";
+                    }
+                }
+                $item['department'] = $departments;
                 $organization = Organization::where(['code' => $item['organization_code']])->find();
                 if ($organization) {
                     $organizationList[] = $organization;
@@ -51,9 +67,9 @@ class Member extends CommonModel
     /**
      * @param $memberData
      * @return Member
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public static function createMember($memberData)
     {
@@ -128,10 +144,10 @@ class Member extends CommonModel
     /**
      * 钉钉登录
      * @param $userInfo
-     * @return Member|array|PDOStatement|string|\think\Model|null
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @return Member|array|PDOStatement|string|Model|null
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public static function dingtalkLogin($userInfo)
     {
@@ -186,8 +202,8 @@ class Member extends CommonModel
      * @param File $file
      * @return array|bool
      * @throws \think\Exception
-     * @throws \think\exception\PDOException
-     * @throws \Exception
+     * @throws PDOException
+     * @throws Exception
      */
     public function uploadImg(File $file)
     {
