@@ -86,7 +86,6 @@ class TaskWorkflow extends BasicApi
         $taskWorkflowCode = Request::param('taskWorkflowCode');
         $taskWorkflowName = Request::param('taskWorkflowName');
         $taskWorkflowRules = Request::param('taskWorkflowRules', '');
-        $this->success('');
 
         if (!trim($taskWorkflowName)) {
             $this->error("请填写规则名称");
