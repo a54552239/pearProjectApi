@@ -118,6 +118,9 @@ class DepartmentMember extends CommonModel
                     $mobile = trim($item['E']);
                     $password = trim($item['F']);
                     $description = trim($item['G']);
+                    if (!$name || !$email) {
+                        continue;
+                    }
                     $member = Member::where(['email' => $email])->find();
                     if (!$member) {
                         //注册新账号
