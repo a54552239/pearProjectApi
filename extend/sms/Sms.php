@@ -18,7 +18,6 @@ class Sms extends EasySms
     public function __construct()
     {
         parent::__construct(config('sms.'));
-        Log::init(['path' => 'log/sms']);
     }
 
     /**
@@ -42,7 +41,7 @@ class Sms extends EasySms
 //            Log::write($e->getResults(), "sms-exception");
             return error(1);
         }
-        Log::write($result, "sms");
+        logRecord($result, 'info', 'sms');
         return $result;
     }
 }
