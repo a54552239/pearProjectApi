@@ -131,9 +131,6 @@ class Index extends BasicApi
      */
     public function editPassword()
     {
-        var_dump(11);
-        die;
-
         $memberModel = new Member();
         $params = Request::only('password,newPassword,confirmPassword,id');
         $member = $memberModel->field('password')->get($params['id'])->toArray();
