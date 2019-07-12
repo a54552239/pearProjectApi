@@ -22,6 +22,7 @@ use app\common\Model\TaskLike;
 use app\common\Model\TaskMember;
 use app\common\Model\TaskStages;
 use app\common\Model\Notify;
+use app\common\Model\TaskWorkflowRule;
 use controller\BasicApi;
 use Exception;
 use Firebase\JWT\JWT;
@@ -236,7 +237,7 @@ class Index extends BasicApi
         }
         $messageService = new MessageService();
         $messageService->bindUid($clientId, $uid);
-        $messageService->joinGroup($clientId, 'project');
+        $messageService->joinGroup($clientId, getCurrentOrganizationCode());
         $this->success('', $uid);
     }
 

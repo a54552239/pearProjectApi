@@ -227,9 +227,11 @@ class Task
             $notifyData['content'] = $task['name'];
             $notifyData['avatar'] = $member['avatar'];
             $taskMembers = TaskMember::where(['task_code' => $task['code']])->select()->toArray();
+            $socketMessage = $socketGroupMessage = ['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => getCurrentOrganizationCode(), 'projectCode' => $task['project_code'], 'taskCode' => $task['code']]];
+            $socketAction = $notifyData['action'];
+            $messageService = new MessageService();
+            $messageDingTalk = new DingTalk();
             if ($taskMembers) {
-                $messageService = new MessageService();
-                $messageDingTalk = new DingTalk();
                 foreach ($taskMembers as $taskMember) {
                     if ($taskMember['member_code'] == $data['memberCode']) {
                         continue;//跳过产生者
@@ -250,10 +252,14 @@ class Task
                         }
                     }
                     if (isOpenNoticePush()) {
-                        $messageService->sendToUid($taskMember['member_code'], ['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => getCurrentOrganizationCode(), 'projectCode' => $task['project_code'], 'taskCode' => $task['code']], 'notify' => $result], $notifyData['action']);
+                        $socketMessage['notify'] = $result;
+                        $messageService->sendToUid($taskMember['member_code'], $socketMessage, $socketAction);
                     }
                 }
             }
+            //通知所有组织内的成员
+            $project = \app\common\Model\Project::where(['code' => $task['project_code']])->field('organization_code')->find();
+            $messageService->sendToGroup($project['organization_code'], $socketGroupMessage, 'organization:task');
         }
     }
 }
