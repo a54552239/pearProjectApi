@@ -250,7 +250,7 @@ class Task
                         }
                     }
                     if (isOpenNoticePush()) {
-                        $messageService->sendToUid($taskMember['member_code'], ['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => getCurrentOrganizationCode()], 'notify' => $result], $notifyData['action']);
+                        $messageService->sendToUid($taskMember['member_code'], ['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => getCurrentOrganizationCode(), 'projectCode' => $task['project_code'], 'taskCode' => $task['code']], 'notify' => $result], $notifyData['action']);
                     }
                 }
             }
