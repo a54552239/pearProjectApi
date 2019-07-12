@@ -218,26 +218,27 @@ class Task
             }
         }
         //触发推送的事件
+        $messageService = new MessageService();
+        $messageDingTalk = new DingTalk();
         $notifyActions = ['done', 'redo', 'assign'];
+        $notifyModel = new Notify();
+        $member = Member::where(['code' => $data['memberCode']])->find();
+        $notifyData['title'] = $member['name'] . ' ' . $remark;
+        $notifyData['content'] = $task['name'];
+        $notifyData['avatar'] = $member['avatar'];
+        $socketMessage = $socketGroupMessage = ['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => getCurrentOrganizationCode(), 'projectCode' => $task['project_code'], 'taskCode' => $task['code']]];
+        $socketAction = $notifyData['action'];
         if (in_array($data['type'], $notifyActions)) {
-            //todo 短信,消息推送
-            $notifyModel = new Notify();
-            $member = Member::where(['code' => $data['memberCode']])->find();
-            $notifyData['title'] = $member['name'] . ' ' . $remark;
-            $notifyData['content'] = $task['name'];
-            $notifyData['avatar'] = $member['avatar'];
             $taskMembers = TaskMember::where(['task_code' => $task['code']])->select()->toArray();
-            $socketMessage = $socketGroupMessage = ['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => getCurrentOrganizationCode(), 'projectCode' => $task['project_code'], 'taskCode' => $task['code']]];
-            $socketAction = $notifyData['action'];
-            $messageService = new MessageService();
-            $messageDingTalk = new DingTalk();
+            //todo 短信,消息推送
             if ($taskMembers) {
                 foreach ($taskMembers as $taskMember) {
                     if ($taskMember['member_code'] == $data['memberCode']) {
                         continue;//跳过产生者
                     }
                     $member = Member::where(['code' => $taskMember['member_code']])->find();
-                    $result = $notifyModel->add($notifyData['title'], $notifyData['content'], $notifyData['type'], $data['memberCode'], $taskMember['member_code'], $notifyData['action'], json_encode($task), $notifyData['terminal'], $notifyData['avatar']);
+                    //json_encode($task)
+                    $result = $notifyModel->add($notifyData['title'], $notifyData['content'], $notifyData['type'], $data['memberCode'], $taskMember['member_code'], $notifyData['action'], [], $notifyData['terminal'], $notifyData['avatar']);
                     if (isOpenDingTalkNoticePush()) {
                         if ($member['dingtalk_userid']) {
                             $params = [
@@ -257,9 +258,9 @@ class Task
                     }
                 }
             }
-            //通知所有组织内的成员
-            $project = \app\common\Model\Project::where(['code' => $task['project_code']])->field('organization_code')->find();
-            $messageService->sendToGroup($project['organization_code'], $socketGroupMessage, 'organization:task');
         }
+        //通知所有组织内的成员
+        $project = \app\common\Model\Project::where(['code' => $task['project_code']])->field('organization_code')->find();
+        $messageService->sendToGroup($project['organization_code'], $socketGroupMessage, 'organization:task');
     }
 }
