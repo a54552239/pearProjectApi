@@ -2,8 +2,10 @@
 
 namespace app\common\Model;
 
+use Exception;
 use function GuzzleHttp\Promise\task;
 use service\DateService;
+use service\RandomService;
 use think\Db;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
@@ -22,11 +24,11 @@ class Task extends CommonModel
     public function read($code)
     {
         if (!$code) {
-            throw new \Exception('请选择任务', 1);
+            throw new Exception('请选择任务', 1);
         }
         $task = self::where(['code' => $code])->field('id', true)->find();
         if (!$task) {
-            throw new \Exception('该任务已失效', 404);
+            throw new Exception('该任务已失效', 404);
         }
         $project = Project::where(['code' => $task['project_code']])->field('name,open_begin_time')->find();
         $stage = TaskStages::where(['code' => $task['stage_code']])->field('name')->find();
@@ -58,7 +60,7 @@ class Task extends CommonModel
     /**
      * @param $projectCode
      * @param $deleted
-     * @throws \think\exception\DbException
+     * @throws DbException
      */
     public function listForProject($projectCode, $deleted)
     {
@@ -86,11 +88,11 @@ class Task extends CommonModel
     {
 
         if (!$code) {
-            throw new \Exception('请选择任务', 1);
+            throw new Exception('请选择任务', 1);
         }
         $task = self::where(['code' => $code, 'deleted' => 0])->field('id', true)->find();
         if (!$task) {
-            throw new \Exception('该任务在回收站中无法编辑', 1);
+            throw new Exception('该任务在回收站中无法编辑', 1);
         }
         if (isset($data['description']) && $data['description'] == '<p><br></p>') {
             $data['description'] = "";
@@ -130,11 +132,11 @@ class Task extends CommonModel
     public function taskSources($code)
     {
         if (!$code) {
-            throw new \Exception('请选择任务', 1);
+            throw new Exception('请选择任务', 1);
         }
         $task = self::where(['code' => $code])->field('id', true)->find();
         if (!$task) {
-            throw new \Exception('该任务不存在', 2);
+            throw new Exception('该任务不存在', 2);
         }
         $sources = SourceLink::where(['link_code' => $code, 'link_type' => 'task'])->field('id', true)->order('id desc')->select()->toArray();
         if ($sources) {
@@ -150,18 +152,18 @@ class Task extends CommonModel
      * @param bool $like
      * @return bool
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function like($code, $like = true)
     {
         if (!$code) {
-            throw new \Exception('请选择任务', 1);
+            throw new Exception('请选择任务', 1);
         }
         $task = self::where(['code' => $code, 'deleted' => 0])->field('id', true)->find();
         if (!$task) {
-            throw new \Exception('该任务在回收站中不能点赞', 1);
+            throw new Exception('该任务在回收站中不能点赞', 1);
         }
         if ($like) {
             $result = self::where(['code' => $code])->setInc('like');
@@ -178,18 +180,18 @@ class Task extends CommonModel
      * @param bool $star
      * @return bool
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function star($code, $star = true)
     {
         if (!$code) {
-            throw new \Exception('请选择任务', 1);
+            throw new Exception('请选择任务', 1);
         }
         $task = self::where(['code' => $code, 'deleted' => 0])->field('id', true)->find();
         if (!$task) {
-            throw new \Exception('该任务在回收站中不能收藏', 1);
+            throw new Exception('该任务在回收站中不能收藏', 1);
         }
         if ($star) {
             $result = self::where(['code' => $code])->setInc('star');
@@ -209,40 +211,43 @@ class Task extends CommonModel
      * @param $memberCode
      * @param string $assignTo
      * @param string $parentCode
+     * @param string $pri
+     * @param string $description
+     * @param array $tagCodes
      * @return Task
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
-    public function createTask($stageCode, $projectCode, $name, $memberCode, $assignTo = '', $parentCode = '')
+    public function createTask($stageCode, $projectCode, $name, $memberCode, $assignTo = '', $parentCode = '', $pri = '', $description = '', $tagCodes = [], $beginTime = '', $endTime = '')
     {
         if (!$name) {
-            throw new \Exception('请填写任务标题', 1);
+            return error(1, '请填写任务标题');
         }
         $stage = TaskStages::where(['code' => $stageCode])->field('id')->find();
         if (!$stage) {
-            throw new \Exception('该任务列表无效', 2);
+            return error(2, '该任务列表无效');
         }
         $project = Project::where(['code' => $projectCode, 'deleted' => 0])->field('id,open_task_private')->find();
         if (!$project) {
-            throw new \Exception('该项目已失效', 3);
+            return error(3, '该项目已失效');
         }
         if ($parentCode) {
             $parentTask = self::where(['code' => $parentCode])->find();
             if (!$parentTask) {
-                throw new \Exception('父任务无效', 5);
+                return error(5, '父任务无效');
             }
             if ($parentTask['deleted']) {
-                throw new \Exception('父任务在回收站中无法编辑', 6);
+                return error(6, '父任务在回收站中无法编辑');
             }
             if ($parentTask['done']) {
-                throw new \Exception('父任务已完成，无法添加新的子任务', 7);
+                return error(7, '父任务已完成，无法添加新的子任务');
             }
         }
         if ($assignTo) {
             $assignMember = Member::where(['code' => $assignTo])->field('id')->find();
             if (!$assignMember) {
-                throw new \Exception('任务执行人有误', 4);
+                return error(4, '任务执行人有误');
             }
         }
 
@@ -272,6 +277,10 @@ class Task extends CommonModel
                     'pcode' => $parentCode,
                     'path' => $path,
                     'stage_code' => $stageCode,
+                    'pri' => $pri,
+                    'description' => $description,
+                    'begin_time' => $beginTime,
+                    'end_time' => $endTime,
                     'private' => $project['open_task_private'] ? 1 : 0,
                     'name' => trim($taskTitle),
                 ];
@@ -294,13 +303,19 @@ class Task extends CommonModel
                 if (!$assignTo || !$isExecutor) {
                     TaskMember::inviteMember($memberCode, $data['code'], 0, 1);
                 }
+                if ($tagCodes) {
+                    foreach ($tagCodes as $tagCode) {
+                        TaskTag::setTag($tagCode, $data['code']);
+                    }
+                }
             }
+
             //todo 添加任务动态
 
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollback();
-            throw new \Exception($e->getMessage());
+            return error(9, $e->getMessage());
         }
         return $this->read($result['code']);
     }
@@ -308,20 +323,20 @@ class Task extends CommonModel
     public function taskDone($taskCode, $done)
     {
         if (!$taskCode) {
-            throw new \Exception('请选择任务', 1);
+            throw new Exception('请选择任务', 1);
         }
         $task = self::where(['code' => $taskCode])->find();
         if (!$task) {
-            throw new \Exception('任务已失效', 2);
+            throw new Exception('任务已失效', 2);
         }
         if ($task['deleted']) {
-            throw new \Exception('任务在回收站中无法进行编辑', 3);
+            throw new Exception('任务在回收站中无法进行编辑', 3);
         }
         if ($task['pcode'] && $task['parentDone']) {
-            throw new \Exception('父任务已完成，无法重做子任务', 4);
+            throw new Exception('父任务已完成，无法重做子任务', 4);
         }
         if ($task['hasUnDone']) {
-            throw new \Exception('子任务尚未全部完成，无法完成父任务', 5);
+            throw new Exception('子任务尚未全部完成，无法完成父任务', 5);
         }
 
         Db::startTrans();
@@ -329,9 +344,9 @@ class Task extends CommonModel
             $result = self::update(['done' => $done], ['code' => $taskCode]);
             //todo 添加任务动态，编辑权限检测
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollback();
-            throw new \Exception($e->getMessage());
+            throw new Exception($e->getMessage());
         }
         $member = getCurrentMember();
         $done ? $type = 'done' : $type = 'redo';
@@ -348,30 +363,30 @@ class Task extends CommonModel
      * @param $taskCode
      * @param $executorCode
      * @return TaskMember|bool
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function assignTask($taskCode, $executorCode)
     {
         if (!$taskCode) {
-            throw new \Exception('请选择任务', 1);
+            throw new Exception('请选择任务', 1);
         }
         $task = self::where(['code' => $taskCode])->find();
         if (!$task) {
-            throw new \Exception('任务已失效', 2);
+            throw new Exception('任务已失效', 2);
         }
         if ($task['deleted']) {
-            throw new \Exception('任务在回收站中无法进行指派', 3);
+            throw new Exception('任务在回收站中无法进行指派', 3);
         }
         Db::startTrans();
         try {
             $result = TaskMember::inviteMember($executorCode, $taskCode, 1);
             //todo 添加任务动态，编辑权限检测
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollback();
-            throw new \Exception($e->getMessage());
+            throw new Exception($e->getMessage());
         }
         return $result;
     }
@@ -383,7 +398,7 @@ class Task extends CommonModel
                 foreach ($taskCodes as $taskCode) {
                     $this->assignTask($taskCode, $executorCode);
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return error(201, $e->getMessage());
             }
         }
@@ -394,18 +409,18 @@ class Task extends CommonModel
      * @param $taskCode
      * @param $comment
      * @return ProjectLog
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function createComment($taskCode, $comment)
     {
         if (!$taskCode) {
-            throw new \Exception('请选择任务', 1);
+            throw new Exception('请选择任务', 1);
         }
         $task = self::where(['code' => $taskCode])->find();
         if (!$task) {
-            throw new \Exception('任务已失效', 2);
+            throw new Exception('任务已失效', 2);
         }
         $data = [
             'member_code' => getCurrentMember()['code'],
@@ -471,19 +486,114 @@ class Task extends CommonModel
         return ['list' => $list, 'total' => $total];
     }
 
+
+    /**
+     * 导入成员
+     * @param \think\File $file
+     * @return bool
+     * @throws Exception
+     */
+    public function uploadFile(\think\File $file, $projectCode, $memberCode)
+    {
+        try {
+            $data = importExcel($file->getInfo()['tmp_name']);
+        } catch (Exception $e) {
+            return error('201', $e->getMessage());
+        }
+        $count = 0;
+        if ($data) {
+            foreach ($data as $key => $item) {
+                if ($key > 2) {
+                    $name = trim($item['A']);
+                    $pTaskName = trim($item['B']);
+                    $taskStageName = trim($item['C']);
+                    $executorName = trim($item['D']);
+                    $beginTime = trim($item['E']);
+                    $endTime = trim($item['F']);
+                    $description = trim($item['G']);
+                    $priName = trim($item['H']);
+                    $tagNameList = trim($item['I']);
+
+                    if (!$name || !$taskStageName) {
+                        continue;
+                    }
+                    $taskStage = TaskStages::where(['name' => $taskStageName, 'project_code' => $projectCode])->field('code')->find();
+                    if (!$taskStage) {
+                        continue;
+                    }
+                    $taskStageCode = $taskStage['code'];
+
+                    switch ($priName) {
+                        case '紧急':
+                            $pri = 1;
+                            break;
+                        case '非常紧急':
+                            $pri = 2;
+                            break;
+                        default:
+                            $pri = 0;
+                    }
+
+                    $tagCodes = [];
+                    if ($tagNameList) {
+                        $tagNameList = explode(';', $tagNameList);
+                        foreach ($tagNameList as $tagName) {
+                            $tag = TaskTag::where(['name' => $tagName, 'project_code' => $projectCode])->field('code')->find();
+                            if ($tag) {
+                                $tagCodes[] = $tag['code'];
+                            }
+                        }
+                    }
+
+                    if ($pTaskName) {
+                        if (!isset($parentCode) || !$parentCode) {
+                            $pTask = self::where(['name' => $pTaskName, 'project_code' => $projectCode])->field('code')->order('id desc')->find();
+                            if ($pTask) {
+                                $parentCode = $pTask['code'];
+                            } else {
+                                $parentCode = '';
+                            }
+                        }
+                    } else {
+                        $parentCode = '';
+                    }
+
+                    $executorCode = '';
+                    if ($executorName) {
+                        $prefix = config('database.prefix');
+                        $sql = "select m.code as code from {$prefix}project_member as pm join {$prefix}member as m on pm.member_code = m.code where m.name = '{$executorName}'";
+                        $executor = Db::query($sql);
+                        if ($executor) {
+                            $executorCode = $executor[0]['code'];
+                        }
+                    }
+
+                    $beginTime = DateService::checkDateIsValid($beginTime) ? $beginTime : '';
+                    $endTime = DateService::checkDateIsValid($endTime) ? $endTime : '';
+                    $task = $this->createTask($taskStageCode, $projectCode, $name, $memberCode, $executorCode, $parentCode, $pri, $description, $tagCodes, $beginTime, $endTime);
+                    if ($task) {
+                        $count++;
+                    }
+                }
+
+            }
+        }
+        return $count;
+    }
+
     /**
      * 批量放入回收站
      * @param $stageCode
      * @return Task
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function recycleBatch($stageCode)
     {
         $stage = TaskStages::where(['code' => $stageCode])->find();
         if (!$stage) {
-            throw new \Exception('任务列表不存在', 1);
+            throw new Exception('任务列表不存在', 1);
         }
         $where = ['stage_code' => $stageCode, 'deleted' => 0];
         $taskCodes = self::where($where)->column('code');
@@ -501,18 +611,18 @@ class Task extends CommonModel
      * 放入回收站
      * @param $code
      * @return Project
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function recycle($code)
     {
         $info = self::where(['code' => $code])->find();
         if (!$info) {
-            throw new \Exception('任务不存在', 1);
+            throw new Exception('任务不存在', 1);
         }
         if ($info['deleted']) {
-            throw new \Exception('任务已在回收站', 2);
+            throw new Exception('任务已在回收站', 2);
         }
         $result = self::update(['deleted' => 1, 'deleted_time' => nowTime()], ['code' => $code]);
         self::taskHook(getCurrentMember()['code'], $code, 'recycle');
@@ -523,18 +633,18 @@ class Task extends CommonModel
      * 恢复任务
      * @param $code
      * @return Project
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function recovery($code)
     {
         $info = self::where(['code' => $code])->find();
         if (!$info) {
-            throw new \Exception('任务不存在', 1);
+            throw new Exception('任务不存在', 1);
         }
         if (!$info['deleted']) {
-            throw new \Exception('任务已恢复', 2);
+            throw new Exception('任务已恢复', 2);
         }
         $result = self::update(['deleted' => 0], ['code' => $code]);
         self::taskHook(getCurrentMember()['code'], $code, 'recovery');
@@ -546,7 +656,7 @@ class Task extends CommonModel
         //权限判断
         $info = self::where(['code' => $code])->find();
         if (!$info) {
-            throw new \Exception('任务不存在', 1);
+            throw new Exception('任务不存在', 1);
         }
         Db::startTrans();
         try {
@@ -556,9 +666,9 @@ class Task extends CommonModel
             TaskLike::where(['task_code' => $code])->delete();
             ProjectLog::where(['source_code' => $code, 'action_type' => 'task'])->delete();
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollback();
-            throw new \Exception($e->getMessage());
+            throw new Exception($e->getMessage());
         }
         return true;
     }
@@ -653,9 +763,9 @@ class Task extends CommonModel
      * @param $value
      * @param $data
      * @return bool
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function getCanReadAttr($value, $data)
     {

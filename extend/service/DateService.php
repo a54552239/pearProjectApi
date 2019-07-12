@@ -23,9 +23,9 @@ class DateService
      * [!!] A list of time zones that PHP supports can be found at
      * <http://php.net/timezones>.
      *
-     * @param   string $remote timezone that to find the offset of
-     * @param   string $local timezone used as the baseline
-     * @param   mixed $now UNIX timestamp or date string
+     * @param string $remote timezone that to find the offset of
+     * @param string $local timezone used as the baseline
+     * @param mixed $now UNIX timestamp or date string
      * @return  integer
      */
     public static function offset($remote, $local = NULL, $now = NULL)
@@ -55,9 +55,9 @@ class DateService
      * $span = self::span(60, 182, 'minutes,seconds'); // array('minutes' => 2, 'seconds' => 2)
      * $span = self::span(60, 182, 'minutes'); // 2
      *
-     * @param   int $remote timestamp to find the span of
-     * @param   int $local timestamp to use as the baseline
-     * @param   string $output formatting string
+     * @param int $remote timestamp to find the span of
+     * @param int $local timestamp to use as the baseline
+     * @param string $output formatting string
      * @return  string   when only a single output is requested
      * @return  array    associative list of all outputs requested
      * @from https://github.com/kohana/ohanzee-helpers/blob/master/src/Date.php
@@ -115,8 +115,8 @@ class DateService
     /**
      * 格式化 UNIX 时间戳为人易读的字符串
      *
-     * @param    int    Unix 时间戳
-     * @param    mixed $local 本地时间
+     * @param int    Unix 时间戳
+     * @param mixed $local 本地时间
      *
      * @return    string    格式化的日期字符串
      */
@@ -200,8 +200,8 @@ class DateService
 
     /**
      * 获取指定日期段内每一天的日期
-     * @param  string $startDate 开始日期
-     * @param  string $endDate 结束日期
+     * @param string $startDate 开始日期
+     * @param string $endDate 结束日期
      * @return array
      */
     public static function getDateFromRange($startDate, $endDate)
@@ -241,5 +241,27 @@ class DateService
         return $mondays;
     }
 
+    /**
+     * 校验日期格式是否正确
+     *
+     * @param string $date 日期
+     * @param string $formats 需要检验的格式数组
+     * @return boolean
+     */
+    public static function checkDateIsValid($date, $formats = array("Y-m-d H:i", "Y-m-d H:i:s"))
+    {
+        $unixTime = strtotime($date);
+        if (!$unixTime) { //strtotime转换不对，日期格式显然不对。
+            return false;
+        }
+        //校验日期的有效性，只要满足其中一个格式就OK
+        foreach ($formats as $format) {
+            if (date($format, $unixTime) == $date) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }
