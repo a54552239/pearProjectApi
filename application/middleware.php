@@ -1,5 +1,8 @@
 <?php
+
+use app\common\middleware\CORS;
+
 return [
     // 跨域处理
-    \app\common\middleware\CORS::class,
+    CORS::class,
 ];
