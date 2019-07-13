@@ -106,6 +106,7 @@ class File extends BasicApi
             'file_type' => $info->getInfo()['type'],
         ];
         $result = [];
+        $type = empty($file_storage) ? sysconf('storage_type') : $file_storage;
         if ($chunkNumber == $totalChunks) {
             $fileList = [];
             $blob = '';
@@ -118,7 +119,7 @@ class File extends BasicApi
                 $fileList[] = env('root_path') . $fileUrl;
             }
             $path = config('upload.base_path') . config('upload.file') . "/{$orgCode}/{$memberCode}/$date/$ticket-$orgFileName";
-            $result = FileService::local($path, $blob);
+            $result = FileService::$type($path, $blob);
             $fileData['size'] = $data['totalSize'];
             $fileData['path_name'] = $result['key'];
             $fileData['file_url'] = $result['url'];
@@ -126,6 +127,7 @@ class File extends BasicApi
             $fileData['size'] = $data['totalSize'];
             !isset($data['taskCode']) && $data['taskCode'] = '';
             $fileResult = \app\common\Model\File::createFile($data['projectCode'], $fileData);
+            //文件碎片移除
             foreach ($fileList as $file) {
                 @unlink($file);
             }
