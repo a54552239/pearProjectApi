@@ -78,16 +78,16 @@ class Account extends BasicApi
                 if ($memberInfo) {
                     $item['avatar'] = $memberInfo['avatar'];
                 }
-                $departments = '';
+                $departments = [];
                 $departmentCodes = $item['department_code'];
                 if ($departmentCodes) {
                     $departmentCodes = explode(',', $departmentCodes);
                     foreach ($departmentCodes as $departmentCode) {
                         $department = \app\common\Model\Department::where(['code' => $departmentCode])->field('name')->find();
-                        $departments .= "{$department['name']} ";
+                        $departments[] = $department['name'];
                     }
                 }
-                $item['departments'] = $departments;
+                $item['departments'] = implode(' - ', $departments);
             }
             unset($item);
         }
@@ -103,16 +103,16 @@ class Account extends BasicApi
         }
         $memberAccount = $this->model->where(['code' => $code])->field('id', true)->find();
         if ($memberAccount) {
-            $departments = '';
+            $departments = [];
             $departmentCodes = $memberAccount['department_code'];
             if ($departmentCodes) {
                 $departmentCodes = explode(',', $departmentCodes);
                 foreach ($departmentCodes as $departmentCode) {
                     $department = \app\common\Model\Department::where(['code' => $departmentCode])->field('name')->find();
-                    $departments .= "{$department['name']} ";
+                    $departments[] = $department['name'];
                 }
             }
-            $memberAccount['departments'] = $departments;
+            $memberAccount['departments'] = implode(' - ', $departments);
         }
         $this->success('', $memberAccount);
     }

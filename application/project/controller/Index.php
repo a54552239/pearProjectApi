@@ -60,17 +60,17 @@ class Index extends BasicApi
             $memberAccount = MemberAccount::where(['member_code' => $member['code'], 'organization_code' => $organizationCode])->find();
             $member = Member::where(['account' => $member['account']])->order('id asc')->find()->toArray();
 
-            $departments = '';
+            $departments = [];
             $departmentCodes = $memberAccount['department_code'];
             if ($departmentCodes) {
                 $departmentCodes = explode(',', $departmentCodes);
                 foreach ($departmentCodes as $departmentCode) {
                     $department = Department::where(['code' => $departmentCode])->field('name')->find();
-                    $departments .= "{$department['name']} ";
+                    $departments[] = $department['name'];
                 }
             }
             $member['position'] = $memberAccount['position'];
-            $member['department'] = $departments;
+            $member['department'] = implode(' - ', $departments);
             $member['account_id'] = $memberAccount['id'];
             $member['is_owner'] = $memberAccount['is_owner'];
             $member['authorize'] = $memberAccount['authorize'];

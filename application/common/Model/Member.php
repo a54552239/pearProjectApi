@@ -30,16 +30,16 @@ class Member extends CommonModel
         $organizationList = [];
         if ($list) {
             foreach ($list as &$item) {
-                $departments = '';
+                $departments = [];
                 $departmentCodes = $item['department_code'];
                 if ($departmentCodes) {
                     $departmentCodes = explode(',', $departmentCodes);
                     foreach ($departmentCodes as $departmentCode) {
                         $department = Department::where(['code' => $departmentCode])->field('name')->find();
-                        $departments .= "{$department['name']} ";
+                        $departments[] = $department['name'];
                     }
                 }
-                $item['department'] = $departments;
+                $item['department'] = implode(' - ', $departments);
                 $organization = Organization::where(['code' => $item['organization_code']])->find();
                 if ($organization) {
                     $organizationList[] = $organization;
@@ -50,7 +50,7 @@ class Member extends CommonModel
         $member['is_owner'] = $list[0]['is_owner'];
         $member['authorize'] = $list[0]['authorize'];
         $member['position'] = $list[0]['position'];
-        $member['department'] = $list[0]['department'];
+        $member['department'] = implode(' - ', $list[0]['department']);
 
         setCurrentMember($member);
         !empty($member['authorize']) && NodeService::applyProjectAuthNode();
