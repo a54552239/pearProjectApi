@@ -39,7 +39,7 @@ class Member extends CommonModel
                         $departments[] = $department['name'];
                     }
                 }
-                $item['department'] = implode(' - ', $departments);
+                $item['department'] = $departments ? implode(' - ', $departments) : '';
                 $organization = Organization::where(['code' => $item['organization_code']])->find();
                 if ($organization) {
                     $organizationList[] = $organization;
@@ -50,7 +50,7 @@ class Member extends CommonModel
         $member['is_owner'] = $list[0]['is_owner'];
         $member['authorize'] = $list[0]['authorize'];
         $member['position'] = $list[0]['position'];
-        $member['department'] = implode(' - ', $list[0]['department']);
+        $member['department'] = $list[0]['department'];
 
         setCurrentMember($member);
         !empty($member['authorize']) && NodeService::applyProjectAuthNode();

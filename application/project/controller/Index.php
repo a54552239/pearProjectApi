@@ -70,7 +70,7 @@ class Index extends BasicApi
                 }
             }
             $member['position'] = $memberAccount['position'];
-            $member['department'] = implode(' - ', $departments);
+            $member['department'] = $departments ? implode(' - ', $departments) : '';
             $member['account_id'] = $memberAccount['id'];
             $member['is_owner'] = $memberAccount['is_owner'];
             $member['authorize'] = $memberAccount['authorize'];

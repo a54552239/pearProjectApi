@@ -87,7 +87,7 @@ class Account extends BasicApi
                         $departments[] = $department['name'];
                     }
                 }
-                $item['departments'] = implode(' - ', $departments);
+                $item['departments'] = $departments ? implode(' - ', $departments) : '';
             }
             unset($item);
         }
@@ -112,7 +112,7 @@ class Account extends BasicApi
                     $departments[] = $department['name'];
                 }
             }
-            $memberAccount['departments'] = implode(' - ', $departments);
+            $memberAccount['departments'] = $departments ? implode(' - ', $departments) : '';
         }
         $this->success('', $memberAccount);
     }
