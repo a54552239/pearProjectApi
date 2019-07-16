@@ -156,6 +156,10 @@ class Task
                 $icon = 'undo';
                 $remark = '恢复了任务 ';
                 break;
+            case 'setWorkTime':
+                $icon = 'clock-circle';
+                $remark = '更新预估工时为 ' .$task['work_time'];
+                break;
             case 'linkFile':
                 $icon = 'link';
                 $remark = '关联了文件 ';

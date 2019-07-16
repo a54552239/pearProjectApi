@@ -7,6 +7,7 @@ use app\common\Model\Member;
 use app\common\Model\MemberAccount;
 use app\common\Model\Notify;
 use app\common\Model\ProjectCollection;
+use app\common\Model\ProjectLog;
 use app\common\Model\ProjectMember;
 use app\common\Model\SystemConfig;
 use controller\BasicApi;
@@ -212,7 +213,7 @@ class Project extends BasicApi
      */
     public function edit(Request $request)
     {
-        $data = $request::only('name,description,cover,private,prefix,open_prefix,schedule,open_begin_time,open_task_private,task_board_theme');
+        $data = $request::only('name,description,cover,private,prefix,open_prefix,schedule,open_begin_time,open_task_private,task_board_theme,begin_time,end_time');
         $code = $request::param('projectCode');
         try {
             $result = $this->model->edit($code, $data);
@@ -284,6 +285,60 @@ class Project extends BasicApi
             $list = ['total' => $total, 'list' => $list];
         }
         $this->success('', $list);
+    }
+
+    /**
+     * 概览报表
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public function _projectStats()
+    {
+        $projectCode = Request::param('projectCode');
+        if (!$projectCode) {
+            $this->error('项目已失效');
+        }
+        $project = \app\common\Model\Project::where(['code' => $projectCode])->find();
+        if (!$project) {
+            $this->error('项目已失效');
+        }
+        $taskStats = [
+            'total' => 0,
+            'unDone' => 0,
+            'done' => 0,
+            'overdue' => 0,
+            'toBeAssign' => 0,
+            'expireToday' => 0,
+            'doneOverdue' => 0,
+        ];
+        $taskList = \app\common\Model\Task::where(['project_code' => $projectCode, 'deleted' => 0])->select()->toArray();
+        $taskStats['total'] = count($taskList);
+        if ($taskList) {
+            $today = date('Y-m-d 00:00', time());
+            $tomorrow = date('Y-m-d 00:00', strtotime($today) + 3600 * 24);
+            foreach ($taskList as $item) {
+                !$item['assign_to'] && $taskStats['toBeAssign']++;
+                $item['done'] && $taskStats['done']++;
+                !$item['done'] && $taskStats['unDone']++;
+                if ($item['end_time']) {
+                    if (!$item['done']) {
+                        $item['end_time'] < nowTime() && $taskStats['overdue']++;
+                        if ($item['end_time'] >= $today && $item['end_time'] < $tomorrow) {
+                            $taskStats['doneOverdue']++;
+                        }
+                    } else {
+                        $log = ProjectLog::where(['action_type' => 'task', 'source_code' => $item['code'], 'type' => 'done'])->order('id desc')->find();
+                        if ($log && $log['create_time'] > $item['end_time']) {
+                            $taskStats['doneOverdue']++;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        $this->success('', $taskStats);
     }
 
     /**

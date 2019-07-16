@@ -124,6 +124,9 @@ class Task extends CommonModel
                 $type = 'clearEndTime';
             }
         }
+        if (isset($data['work_time'])) {
+            $type = 'setWorkTime';
+        }
         $type && self::taskHook($member['code'], $code, $type);
         //TODO 任务动态
         return $result;

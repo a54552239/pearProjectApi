@@ -7,6 +7,7 @@ use app\common\Model\Member;
 use app\common\Model\ProjectLog;
 use app\common\Model\TaskTag;
 use app\common\Model\TaskToTag;
+use app\common\Model\TaskWorkTime;
 use controller\BasicApi;
 use Exception;
 use think\db\exception\DataNotFoundException;
@@ -287,7 +288,7 @@ class Task extends BasicApi
      */
     public function edit(Request $request)
     {
-        $data = $request::only('name,sort,end_time,begin_time,pri,description');
+        $data = $request::only('name,sort,end_time,begin_time,pri,description,work_time');
         $code = $request::post('taskCode');
         if (!$code) {
             $this->error("请选择一个任务");
@@ -463,6 +464,60 @@ class Task extends BasicApi
         $this->success('', $list);
     }
 
+    public function _taskWorkTimeList()
+    {
+        $taskCode = Request::param('taskCode');
+        $workTimeList = TaskWorkTime::where(['task_code' => $taskCode])->select()->toArray();
+        if ($workTimeList) {
+            foreach ($workTimeList as &$workTime) {
+                $member = Member::where(['code' => $workTime['member_code']])->field('avatar,name')->find();
+                $workTime['member'] = $member;
+            }
+        }
+        $this->success('', $workTimeList);
+    }
+
+    public function saveTaskWorkTime()
+    {
+        $param = Request::only('beginTime,num,content,taskCode');
+        $result = TaskWorkTime::createData($param['taskCode'], getCurrentMember()['code'], $param['num'], $param['beginTime'], $param['content']);
+        if (isError($result)) {
+            $this->error($result['msg'], $result['errno']);
+        }
+        $this->success();
+    }
+
+    public function editTaskWorkTime()
+    {
+        $param = Request::only('beginTime,num,content');
+        $code = Request::param('code');
+        if ($code) {
+            $workTime = TaskWorkTime::where(['code' => $code])->find();
+            if (!$workTime) {
+                return error(1, '该记录已失效');
+            }
+        }
+        if (isset($param['beginTime'])) {
+            $param['begin_time'] = $param['beginTime'];
+            unset($param['beginTime']);
+        }
+        $result = TaskWorkTime::update($param, ['code' => $code]);
+        $this->success();
+    }
+
+    public function delTaskWorkTime()
+    {
+        $code = Request::param('code');
+        if ($code) {
+            $workTime = TaskWorkTime::where(['code' => $code])->find();
+            if (!$workTime) {
+                return error(1, '该记录已失效');
+            }
+        }
+        $result = TaskWorkTime::destroy(['code' => $code]);
+        $this->success();
+    }
+
 
     /**
      * 下载导入任务模板
@@ -478,7 +533,7 @@ class Task extends BasicApi
     public function uploadFile()
     {
         $projectCode = Request::param('projectCode');
-        $count = $this->model->uploadFile(Request::file('file'), $projectCode,getCurrentMember()['code']);
+        $count = $this->model->uploadFile(Request::file('file'), $projectCode, getCurrentMember()['code']);
         if (isError($count)) {
             $this->error($count['msg']);
         }
