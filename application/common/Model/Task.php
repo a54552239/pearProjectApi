@@ -238,7 +238,7 @@ class Task extends CommonModel
         if ($parentCode) {
             $parentTask = self::where(['code' => $parentCode])->find();
             if (!$parentTask) {
-                return error(5, '父任务无效');
+                return error(8, '父任务无效');
             }
             if ($parentTask['deleted']) {
                 return error(6, '父任务在回收站中无法编辑');

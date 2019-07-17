@@ -42,8 +42,8 @@ class TaskWorkTime extends CommonModel
         if (!$beginTime) {
             return error(4, '请选择开始时间');
         }
-        if (!$num || !is_numeric($num)) {
-            return error(5, '请输入有效工时');
+        if (!$num || $num < 0 || !is_numeric($num)) {
+            return error(6, '请输入有效工时');
         }
         $data = [
             'create_time' => nowTime(),

@@ -464,6 +464,12 @@ class Task extends BasicApi
         $this->success('', $list);
     }
 
+    /**
+     * 工时间录
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
     public function _taskWorkTimeList()
     {
         $taskCode = Request::param('taskCode');
@@ -477,6 +483,12 @@ class Task extends BasicApi
         $this->success('', $workTimeList);
     }
 
+    /**
+     * 记录工时
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
     public function saveTaskWorkTime()
     {
         $param = Request::only('beginTime,num,content,taskCode');
@@ -487,6 +499,13 @@ class Task extends BasicApi
         $this->success();
     }
 
+    /**
+     * 修改工时
+     * @return array
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
     public function editTaskWorkTime()
     {
         $param = Request::only('beginTime,num,content');
@@ -505,6 +524,13 @@ class Task extends BasicApi
         $this->success();
     }
 
+    /**
+     * 删除工时
+     * @return array
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
     public function delTaskWorkTime()
     {
         $code = Request::param('code');
