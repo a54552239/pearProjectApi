@@ -24,7 +24,7 @@
     'expire' => 0,
 ];*/
 return [
-    'type'  =>  'complex',
+    'type'  =>  'redis',
     // 默认使用的缓存
     'default'   =>  [
         // 驱动方式

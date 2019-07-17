@@ -55,7 +55,7 @@ class Member extends CommonModel
         setCurrentMember($member);
         !empty($member['authorize']) && NodeService::applyProjectAuthNode();
         $member = getCurrentMember();
-        $tokenList = JwtService::initToken($member);
+        $tokenList = JwtService::initToken(['code' => $member['code']]);
         $accessTokenExp = JwtService::decodeToken($tokenList['accessToken'])->exp;
         $tokenList['accessTokenExp'] = $accessTokenExp;
         $loginInfo = ['member' => $member, 'tokenList' => $tokenList, 'organizationList' => $organizationList];

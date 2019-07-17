@@ -9,6 +9,7 @@ use service\NodeService;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\exception\DbException;
+use think\facade\Cache;
 use think\Request;
 
 /**
@@ -51,10 +52,15 @@ class Auth
                     $msg = ['code' => 401, 'msg' => 'accessToken过期'];
                     return json($msg);
                 }
-                $msg = ['code' => 401, 'msg' => 'token过期，请重新登录'];
+                $msg = ['code' => 401, 'msg' => '登录超时，请重新登录'];
                 return json($msg);
             }
-            setCurrentMember(get_object_vars($data->data));
+            $member = Cache::get('member:info:' . $data->data->code);
+            if (!$member) {
+                $msg = ['code' => 401, 'msg' => '登录超时，请重新登录'];
+                return json($msg);
+            }
+            setCurrentMember($member);
         }
         // 访问权限检查
         if (!empty($access['is_auth']) && !auth($node, 'project')) {
