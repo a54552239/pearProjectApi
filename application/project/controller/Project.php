@@ -9,6 +9,7 @@ use app\common\Model\Notify;
 use app\common\Model\ProjectCollection;
 use app\common\Model\ProjectLog;
 use app\common\Model\ProjectMember;
+use app\common\Model\ProjectReport;
 use app\common\Model\SystemConfig;
 use controller\BasicApi;
 use OSS\Core\OssException;
@@ -285,6 +286,19 @@ class Project extends BasicApi
             $list = ['total' => $total, 'list' => $list];
         }
         $this->success('', $list);
+    }
+
+    /**
+     * 项目情况统计
+     */
+    public function _setDayilyProejctReport()
+    {
+        logRecord(nowTime(), 'setDayilyProejctReportBegin');
+        debug('begin');
+        $result = ProjectReport::setDayilyProejctReport();
+        debug('end');
+        logRecord(debug('begin','end') * 1000 . 'ms', 'setDayilyProejctReportSuccess');
+        echo 'success_at ' . nowTime();
     }
 
     /**

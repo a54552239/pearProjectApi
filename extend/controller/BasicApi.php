@@ -73,7 +73,7 @@ class BasicApi
      * 返回资源不存在
      * @param integer $code 返回代码
      */
-    protected function notFound($code = 404)
+    protected function notFound($code = 4041)
     {
         ToolsService::error('', [], $code);
     }
