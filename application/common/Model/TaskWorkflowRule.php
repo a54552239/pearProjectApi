@@ -23,6 +23,13 @@ class TaskWorkflowRule extends CommonModel
         TaskWorkflowRule::createData($workflowCode, 3, $taskWorkflowRules->firstResult->value, $taskWorkflowRules->firstResult->action);
         if ($taskWorkflowRules->lastResult->value) {
             TaskWorkflowRule::createData($workflowCode, 4, $taskWorkflowRules->lastResult->value, $taskWorkflowRules->lastResult->action);
+            if ($taskWorkflowRules->state->value) {
+                TaskWorkflowRule::createData($workflowCode, 5, '', $taskWorkflowRules->state->value);
+            }
+        } else {
+            if ($taskWorkflowRules->state->value) {
+                TaskWorkflowRule::createData($workflowCode, 4, '', $taskWorkflowRules->state->value);
+            }
         }
     }
 
@@ -85,6 +92,14 @@ class TaskWorkflowRule extends CommonModel
                 TaskMember::inviteMember($do['object_code'], $task['code'], 1, 0, false, true);
             } catch (\Exception $exception) {
             }
+        } elseif ($do['action'] == 1) {
+            //完成
+            $task->done = 1;
+            $task->save();
+        } elseif ($do['action'] == 2) {
+            //重做
+            $task->done = 0;
+            $task->save();
         }
         $next = self::where(['workflow_code' => $do['workflow_code'], 'sort' => $do['sort'] + 1])->find();
         if ($next) {
