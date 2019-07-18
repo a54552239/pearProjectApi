@@ -264,7 +264,9 @@ class Task
             }
         }
         //通知所有组织内的成员
-        $project = \app\common\Model\Project::where(['code' => $task['project_code']])->field('organization_code')->find();
-        $messageService->sendToGroup($project['organization_code'], $socketGroupMessage, 'organization:task');
+        if (isOpenNoticePush()) {
+            $project = \app\common\Model\Project::where(['code' => $task['project_code']])->field('organization_code')->find();
+            $messageService->sendToGroup($project['organization_code'], $socketGroupMessage, 'organization:task');
+        }
     }
 }
