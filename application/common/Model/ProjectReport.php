@@ -31,6 +31,9 @@ class ProjectReport extends CommonModel
                     $projectList[$projectCode] = [];
                 }
                 @$projectList[$projectCode]['task']++;
+                if (!isset($projectList[$projectCode]['task:undone'])) {
+                    $projectList[$projectCode]['task:undone'] = 0;
+                }
                 !$task['done'] && @$projectList[$projectCode]['task:undone']++;
             }
             if ($projectList) {
