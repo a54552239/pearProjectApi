@@ -642,15 +642,24 @@ abstract class Rule
     protected function checkCrossDomain($request)
     {
         if (!empty($this->option['cross_domain'])) {
-
             $header = [
-                'Access-Control-Allow-Origin'  => '*',
-                'Access-Control-Allow-Methods' => 'GET, POST, PATCH, PUT, DELETE',
-                'Access-Control-Allow-Headers' => 'Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-Requested-With',
+                'Access-Control-Allow-Credentials' => 'true',
+                'Access-Control-Allow-Methods'     => 'GET, POST, PATCH, PUT, DELETE',
+                'Access-Control-Allow-Headers'     => 'Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-Requested-With',
             ];
 
             if (!empty($this->option['header'])) {
                 $header = array_merge($header, $this->option['header']);
+            }
+
+            if (!isset($header['Access-Control-Allow-Origin'])) {
+                $httpOrigin = $request->header('origin');
+
+                if ($httpOrigin && strpos(config('cookie.domain'), $httpOrigin)) {
+                    $header['Access-Control-Allow-Origin'] = $httpOrigin;
+                } else {
+                    $header['Access-Control-Allow-Origin'] = '*';
+                }
             }
 
             $this->option['header'] = $header;
@@ -722,13 +731,17 @@ abstract class Rule
 
         // 替换路由地址中的变量
         if (is_string($route) && !empty($matches)) {
-            foreach ($matches as $key => $val) {
-                if (false !== strpos($route, '<' . $key . '>')) {
-                    $route = str_replace('<' . $key . '>', $val, $route);
-                } elseif (false !== strpos($route, ':' . $key)) {
-                    $route = str_replace(':' . $key, $val, $route);
-                }
+            $search = $replace = [];
+
+            foreach ($matches as $key => $value) {
+                $search[]  = '<' . $key . '>';
+                $replace[] = $value;
+
+                $search[]  = ':' . $key;
+                $replace[] = $value;
             }
+
+            $route = str_replace($search, $replace, $route);
         }
 
         // 解析额外参数
@@ -997,7 +1010,7 @@ abstract class Rule
             }
         }
 
-        $regex = str_replace($match, $replace, $rule);
+        $regex = str_replace(array_unique($match), array_unique($replace), $rule);
         $regex = str_replace([')?/', ')/', ')?-', ')-', '\\\\/'], [')\/', ')\/', ')\-', ')\-', '\/'], $regex);
 
         if (isset($hasSlash)) {

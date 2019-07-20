@@ -20,7 +20,7 @@ use think\route\Dispatch;
  */
 class App extends Container
 {
-    const VERSION = '5.1.31 LTS';
+    const VERSION = '5.1.37 LTS';
 
     /**
      * 当前模块路径
@@ -179,6 +179,11 @@ class App extends Container
 
         $this->instance('app', $this);
 
+        // 加载环境变量配置文件
+        if (is_file($this->rootPath . '.env')) {
+            $this->env->load($this->rootPath . '.env');
+        }
+
         $this->configExt = $this->env->get('config_ext', '.php');
 
         // 加载惯例配置文件
@@ -195,11 +200,6 @@ class App extends Container
             'extend_path'  => $this->rootPath . 'extend' . DIRECTORY_SEPARATOR,
             'vendor_path'  => $this->rootPath . 'vendor' . DIRECTORY_SEPARATOR,
         ]);
-
-        // 加载环境变量配置文件
-        if (is_file($this->rootPath . '.env')) {
-            $this->env->load($this->rootPath . '.env');
-        }
 
         $this->namespace = $this->env->get('app_namespace', $this->namespace);
         $this->env->set('app_namespace', $this->namespace);
@@ -722,9 +722,9 @@ class App extends Container
         list($module, $class) = $this->parseModuleAndClass($name, $layer, $appendSuffix);
 
         if (class_exists($class)) {
-            return $this->__get($class);
+            return $this->make($class, true);
         } elseif ($empty && class_exists($emptyClass = $this->parseClass($module, $layer, $empty, $appendSuffix))) {
-            return $this->__get($emptyClass);
+            return $this->make($emptyClass, true);
         }
 
         throw new ClassNotFoundException('class not exists:' . $class, $class);

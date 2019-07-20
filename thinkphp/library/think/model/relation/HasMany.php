@@ -194,8 +194,8 @@ class HasMany extends Relation
             }
         }
 
-        return $this->query
-            ->whereExp($this->foreignKey, '=' . $this->parent->getTable() . '.' . $this->localKey)
+        return $this->query->alias($aggregate . '_table')
+            ->whereExp($aggregate . '_table.' . $this->foreignKey, '=' . $this->parent->getTable() . '.' . $this->localKey)
             ->fetchSql()
             ->$aggregate($field);
     }
@@ -241,9 +241,9 @@ class HasMany extends Relation
      */
     public function save($data, $replace = true)
     {
-        $model = $this->make($data);
+        $model = $this->make();
 
-        return $model->replace($replace)->save() ? $model : false;
+        return $model->replace($replace)->save($data) ? $model : false;
     }
 
     /**
@@ -266,11 +266,11 @@ class HasMany extends Relation
     /**
      * 批量保存当前关联数据对象
      * @access public
-     * @param  array $dataSet   数据集
+     * @param  array|\think\Collection $dataSet   数据集
      * @param  boolean $replace 是否自动识别更新和写入
      * @return array|false
      */
-    public function saveAll(array $dataSet, $replace = true)
+    public function saveAll($dataSet, $replace = true)
     {
         $result = [];
 

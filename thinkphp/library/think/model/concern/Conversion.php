@@ -130,34 +130,52 @@ trait Conversion
      */
     public function toArray()
     {
-        $item    = [];
-        $visible = [];
-        $hidden  = [];
+        $item       = [];
+        $hasVisible = false;
+
+        foreach ($this->visible as $key => $val) {
+            if (is_string($val)) {
+                if (strpos($val, '.')) {
+                    list($relation, $name)      = explode('.', $val);
+                    $this->visible[$relation][] = $name;
+                } else {
+                    $this->visible[$val] = true;
+                    $hasVisible          = true;
+                }
+                unset($this->visible[$key]);
+            }
+        }
+
+        foreach ($this->hidden as $key => $val) {
+            if (is_string($val)) {
+                if (strpos($val, '.')) {
+                    list($relation, $name)     = explode('.', $val);
+                    $this->hidden[$relation][] = $name;
+                } else {
+                    $this->hidden[$val] = true;
+                }
+                unset($this->hidden[$key]);
+            }
+        }
 
         // 合并关联数据
         $data = array_merge($this->data, $this->relation);
 
-        // 过滤属性
-        if (!empty($this->visible)) {
-            $array = $this->parseAttr($this->visible, $visible);
-            $data  = array_intersect_key($data, array_flip($array));
-        } elseif (!empty($this->hidden)) {
-            $array = $this->parseAttr($this->hidden, $hidden, false);
-            $data  = array_diff_key($data, array_flip($array));
-        }
-
         foreach ($data as $key => $val) {
             if ($val instanceof Model || $val instanceof ModelCollection) {
                 // 关联模型对象
-                if (isset($visible[$key])) {
-                    $val->visible($visible[$key]);
-                } elseif (isset($hidden[$key])) {
-                    $val->hidden($hidden[$key]);
+                if (isset($this->visible[$key]) && is_array($this->visible[$key])) {
+                    $val->visible($this->visible[$key]);
+                } elseif (isset($this->hidden[$key]) && is_array($this->hidden[$key])) {
+                    $val->hidden($this->hidden[$key]);
                 }
                 // 关联模型对象
-                $item[$key] = $val->toArray();
-            } else {
-                // 模型属性
+                if (!isset($this->hidden[$key]) || true !== $this->hidden[$key]) {
+                    $item[$key] = $val->toArray();
+                }
+            } elseif (isset($this->visible[$key])) {
+                $item[$key] = $this->getAttr($key);
+            } elseif (!isset($this->hidden[$key]) && !$hasVisible) {
                 $item[$key] = $this->getAttr($key);
             }
         }
@@ -187,10 +205,7 @@ trait Conversion
 
                     $item[$key] = $relation->append([$attr])->toArray();
                 } else {
-                    $value = $this->getAttr($name, $item);
-                    if (false !== $value) {
-                        $item[$name] = $value;
-                    }
+                    $item[$name] = $this->getAttr($name, $item);
                 }
             }
         }
@@ -251,38 +266,4 @@ trait Conversion
         return $collection;
     }
 
-    /**
-     * 解析隐藏及显示属性
-     * @access protected
-     * @param  array $attrs  属性
-     * @param  array $result 结果集
-     * @param  bool  $visible
-     * @return array
-     */
-    protected function parseAttr($attrs, &$result, $visible = true)
-    {
-        $array = [];
-
-        foreach ($attrs as $key => $val) {
-            if (is_array($val)) {
-                if ($visible) {
-                    $array[] = $key;
-                }
-
-                $result[$key] = $val;
-            } elseif (strpos($val, '.')) {
-                list($key, $name) = explode('.', $val);
-
-                if ($visible) {
-                    $array[] = $key;
-                }
-
-                $result[$key][] = $name;
-            } else {
-                $array[] = $val;
-            }
-        }
-
-        return $array;
-    }
 }
