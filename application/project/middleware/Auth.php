@@ -45,8 +45,7 @@ class Auth
                 $accessToken = explode(' ', $authorization)[1];
             }
             $data = JwtService::decodeToken($accessToken);
-            $isError = isError($data);
-            if ($isError) {
+            if (isError($data)) {
                 //TODO 启用refreshToken
                 if ($data['errno'] == 3) {
                     $msg = ['code' => 401, 'msg' => 'accessToken过期'];

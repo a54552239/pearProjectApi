@@ -115,8 +115,7 @@ class Login extends BasicApi
                 $this->error('系统繁忙');
             }
         }
-        cache('captcha', $code);
-        cache('captchaMobile', $mobile);
+        cache('captcha:' . $mobile, $code, 60 * 15);
         $this->success('', config('sms.debug') ? $code : '');
     }
 
@@ -151,12 +150,12 @@ class Login extends BasicApi
         if ($member) {
             $this->error('该手机已被注册', 202);
         }
-        if (cache('captcha') != $data['captcha']) {
+        if (cache('captcha:' . $data['mobile']) != $data['captcha']) {
             $this->error('验证码错误', 203);
         }
-        if (cache('captchaMobile') != $data['mobile']) {
-            $this->error('手机号与验证码不匹配', 203);
-        }
+//        if (cache('captchaMobile') != $data['mobile']) {
+//            $this->error('手机号与验证码不匹配', 203);
+//        }
         $memberData = [
             'email' => $data['email'],
             'name' => $data['name'],
@@ -187,12 +186,12 @@ class Login extends BasicApi
     public function _bindMobile()
     {
         $mobile = $this->request->post('mobile', '');
-        if (cache('captcha') != Request::param('captcha')) {
+        if (cache('captcha:' . $mobile) != Request::param('captcha')) {
             $this->error('验证码错误', 203);
         }
-        if (cache('captchaMobile') != $mobile) {
-            $this->error('手机号与验证码不匹配', 203);
-        }
+//        if (cache('captchaMobile') != $mobile) {
+//            $this->error('手机号与验证码不匹配', 203);
+//        }
         $member = getCurrentMember();
         if ($mobile && $member['mobile'] == $mobile) {
             $this->error('你已绑定该手机', 203);
@@ -210,6 +209,45 @@ class Login extends BasicApi
             $tokenList['accessTokenExp'] = $accessTokenExp;
             $this->success('绑定成功！', ['member' => $member, 'tokenList' => $tokenList]);
         }
+    }
+
+    /**
+     * 获取邮箱验证码
+     */
+    public function _getMailCaptcha()
+    {
+//        if (!config('mail.open')) {
+//            $this->error('系统尚未开启邮件服务');
+//        }
+        $email = $this->request->post('email', '');
+        $code = RandomService::numeric(6);
+        cache('captcha:' . $email, $code, 60 * 15);
+        $member = getCurrentMember();
+        if (config('mail.open')) {
+            $mailer = new Mail();
+            try {
+                $mail = $mailer->mail;
+                $mail->CharSet = 'utf-8';
+                $mail->setFrom(config('mail.Username'), 'pearProject');
+                $mail->addAddress($email, getCurrentMember()['name']);
+                //Content
+                $mail->isHTML(true);
+                $mail->Subject = '重置密码验证码：' . $code;
+//            $info = [
+//                'member_code' => $member['code'],
+//                'email' => $email,
+//            ];
+//            $accessToken = JwtService::getAccessToken($info);
+//            $link = Request::domain() . '/#/reset/email?token=' . $accessToken;
+                $mail->Body = '
+<p>系统检测到你正在尝试重置密码，验证码：' . $code . '。验证码15分钟内有效，请在重置页面输入验证码并进行下一步操作, 如非你本人操作，请忽略此邮件。</p>';
+                $mail->send();
+            } catch (Exception $e) {
+                ob_clean();
+                $this->error('发送失败 ');
+            }
+        }
+        $this->success('', !config('mail.open') ? $code : '');
     }
 
     /**
@@ -305,6 +343,43 @@ class Login extends BasicApi
         }
         $this->error('验证失败！');
 
+    }
+
+    /**
+     * 通过邮箱重置密码
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public function _resetPasswordByMail()
+    {
+        $data = Request::only('email,password,password2,mobile,captcha');
+        $validate = Validate::make([
+            'email' => 'require',
+            'password' => 'require|min:6',
+            'password2' => 'require|min:6',
+            'captcha' => 'require|min:6',
+        ], [
+            'email.require' => '邮箱账号不能为空！',
+            'password.require' => '登陆密码不能为空！',
+            'password.min' => '登录密码长度不能少于6位有效字符！',
+            'password2.require' => '确认密码不能为空！',
+            'password2.min' => '确认密码长度不能少于6位有效字符！',
+            'captcha.require' => '验证码不能为空！',
+            'captcha.min' => '验证码格式有误',
+        ]);
+        $validate->check($data) || $this->error($validate->getError());
+        $email = $this->request->post('email', '');
+        if (cache('captcha:' . $email) != Request::param('captcha')) {
+            $this->error('验证码错误', 203);
+        }
+        $member = Member::where(['email' => $email])->find();
+        if (!$member) {
+            $this->error('该邮箱账号不存在', 203);
+        }
+        $member->password = $data['password'];
+        $member->save();
+            $this->success('重置密码成功，请登录');
     }
 
     /**

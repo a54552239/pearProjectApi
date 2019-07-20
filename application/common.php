@@ -48,7 +48,13 @@ function getCurrentMember()
 
 function setCurrentMember($data)
 {
-    Cache::set('member:info:' . $data['code'], $data);
+
+    $key = 'member:info:' . $data['code'];
+    if (!$data) {
+        Cache::rm($key);
+    }else{
+        Cache::set($key, $data);
+    }
     return session('member', $data);
 }
 
