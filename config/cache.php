@@ -24,25 +24,16 @@
     'expire' => 0,
 ];*/
 return [
-    'type'  =>  'redis',
-    // 默认使用的缓存
-    'default'   =>  [
-        // 驱动方式
-        'type'   => 'file',
-        // 缓存保存目录
-        'path'   => './runtime/default',
-    ],
-    // redis缓存
-    'redis'   =>  [
-        // 驱动方式
-        'type'   => 'redis',
-        // 服务器地址
-        'host'       => '127.0.0.1',
-        // 端口
-        'port'       => '6379',
-        // 缓存保存目录
-        'path'   => './runtime/cache',
-        // 全局缓存有效期（0为永久有效）
-        'expire'=>  0,
-    ],
+    // 驱动方式
+    'type' => 'redis',
+    // 服务器地址
+    'host' => '127.0.0.1',
+    // 密码
+    'password' => '',
+    // 端口
+    'port' => '6379',
+    // 缓存保存目录
+    'path' => './runtime/cache',
+    // 全局缓存有效期（0为永久有效）
+    'expire' => 0,
 ];

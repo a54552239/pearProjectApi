@@ -11,3 +11,5 @@
 /static/upload
 !composer.json
 /composer.lock
+/config/dingtalk.php
+/config/mail.php
