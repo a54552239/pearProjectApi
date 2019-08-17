@@ -19,6 +19,7 @@ use app\common\Model\TaskStages;
 use app\common\Model\TaskWorkflowRule;
 use message\DingTalk;
 use service\MessageService;
+use think\Db;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\exception\DbException;
@@ -49,6 +50,7 @@ class Task
             'type' => 'message',
             'action' => 'task',
             'terminal' => 'project',
+            'source_code' => $task['code'],
         ];
         $remark = '';
         $content = '';
@@ -171,6 +173,11 @@ class Task
                 $remark = '取消关联文件';
                 $content = "<a target=\"_blank\" class=\"muted\" href=\"{$data['data']['url']} \">{$data['data']['title']}</a>";
                 break;
+            case 'comment':
+                $icon = 'file-text';
+                $remark = $data['content'];
+                $content = $data['content'];
+                break;
             default:
                 $icon = 'plus';
                 $remark = ' 创建了任务 ';
@@ -224,16 +231,32 @@ class Task
         //触发推送的事件
         $messageService = new MessageService();
         $messageDingTalk = new DingTalk();
-        $notifyActions = ['done', 'redo', 'assign'];
+        $notifyActions = ['done', 'redo', 'assign', 'comment'];
         $notifyModel = new Notify();
         $member = Member::where(['code' => $data['memberCode']])->find();
-        $notifyData['title'] = $member['name'] . ' ' . $remark;
+        $notifyData['title'] = $member['name'] . ': ' . $remark;
         $notifyData['content'] = $task['name'];
         $notifyData['avatar'] = $member['avatar'];
         $socketMessage = $socketGroupMessage = ['content' => $notifyData['content'], 'title' => $notifyData['title'], 'data' => ['organizationCode' => getCurrentOrganizationCode(), 'projectCode' => $task['project_code'], 'taskCode' => $task['code']]];
         $socketAction = $notifyData['action'];
         if (in_array($data['type'], $notifyActions)) {
-            $taskMembers = TaskMember::where(['task_code' => $task['code']])->select()->toArray();
+            if ($data['type'] == 'comment') {
+                $taskMembers = [];
+                $notifyData['type'] = 'notice';
+                if ($data['data']) {
+                    $prefix = config('database.prefix');
+                    $taskCode = $task['code'];
+                    foreach ($data['data'] as $item) {
+                        $sql = "select tm.member_code from {$prefix}task_member as tm join {$prefix}member as m on tm.member_code = m.code where tm.task_code = '{$taskCode}' and name = '{$item}'";
+                        $memberCurr = Db::query($sql);
+                        if ($memberCurr) {
+                            $taskMembers[] = $memberCurr[0];
+                        }
+                    }
+                }
+            }else{
+                $taskMembers = TaskMember::where(['task_code' => $task['code']])->select()->toArray();
+            }
             //todo 短信,消息推送
             if ($taskMembers) {
                 foreach ($taskMembers as $taskMember) {

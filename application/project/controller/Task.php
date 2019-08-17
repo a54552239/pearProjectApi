@@ -263,12 +263,15 @@ class Task extends BasicApi
      */
     public function createComment(Request $request)
     {
-        $data = $request::only('taskCode,comment');
+        $data = $request::only('taskCode,comment,mentions');
         if (!$request::post('taskCode')) {
             $this->error("请选择任务");
         }
+        if (isset($data['mentions'])) {
+            $data['mentions'] = json_decode($data['mentions']);
+        }
         try {
-            $result = $this->model->createComment($data['taskCode'], $data['comment']);
+            $result = $this->model->createComment($data['taskCode'], $data['comment'], $data['mentions']);
         } catch (Exception $e) {
             $this->error($e->getMessage(), $e->getCode());;
         }

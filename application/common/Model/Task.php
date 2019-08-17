@@ -411,12 +411,13 @@ class Task extends CommonModel
     /**
      * @param $taskCode
      * @param $comment
-     * @return ProjectLog
+     * @param $mentions
+     * @return bool
      * @throws DataNotFoundException
-     * @throws ModelNotFoundException
      * @throws DbException
+     * @throws ModelNotFoundException
      */
-    public function createComment($taskCode, $comment)
+    public function createComment($taskCode, $comment, $mentions = [])
     {
         if (!$taskCode) {
             throw new Exception('请选择任务', 1);
@@ -425,17 +426,19 @@ class Task extends CommonModel
         if (!$task) {
             throw new Exception('任务已失效', 2);
         }
-        $data = [
-            'member_code' => getCurrentMember()['code'],
-            'source_code' => $taskCode,
-            'action_type' => 'task',
-            'code' => createUniqueCode('projectLog'),
-            'create_time' => nowTime(),
-            'is_comment' => 1,
-            'content' => $comment,
-            'type' => 'comment'
-        ];
-        return ProjectLog::create($data);
+//        $data = [
+//            'member_code' => getCurrentMember()['code'],
+//            'source_code' => $taskCode,
+//            'action_type' => 'task',
+//            'code' => createUniqueCode('projectLog'),
+//            'create_time' => nowTime(),
+//            'is_comment' => 1,
+//            'content' => $comment,
+//            'type' => 'comment'
+//        ];
+        self::taskHook(getCurrentMember()['code'], $taskCode, 'comment', '', 1, '', $comment, '', $mentions);
+        return true;
+//        return ProjectLog::create($data);
     }
 
     /**
