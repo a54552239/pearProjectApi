@@ -245,7 +245,7 @@ class Project extends BasicApi
             $where = [];
             $where[] = ['member_code', '=', $member['code']];
             $projectCodes = ProjectMember::where($where)->column('project_code');
-            $sql = "select pp.code from {$prefix}project as pp join {$prefix}project_member as pm on pm.project_code = pp.code where pp.organization_code = '{$orgCode}' and (pm.member_code = '{$memberCode}') group by pp.`code`";
+            $sql = "select pp.code from {$prefix}project as pp join {$prefix}project_member as pm on pm.project_code = pp.code where pp.organization_code = '{$orgCode}' and (pm.member_code = '{$memberCode}') and pp.deleted = 0 group by pp.`code`";
             $projectCodes = Db::query($sql);
             if (!$projectCodes) {
                 $this->success('', []);
