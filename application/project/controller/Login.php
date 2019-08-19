@@ -76,12 +76,12 @@ class Login extends BasicApi
         // 用户信息验证
         $mobile = $this->request->post('mobile', '');
         if ($mobile) {
-            if (cache('captcha') != Request::param('captcha')) {
+            if (cache('captcha:' . $mobile) != Request::param('captcha')) {
                 $this->error('验证码错误', 203);
             }
-            if (cache('captchaMobile') != $mobile) {
-                $this->error('手机号与验证码不匹配', 203);
-            }
+//            if (cache('captchaMobile') != $mobile) {
+//                $this->error('手机号与验证码不匹配', 203);
+//            }
             $member = Member::where(['mobile' => $mobile])->order('id asc')->find();
         } else {
             $member = Member::where(['account' => $data['account']])->whereOr(['email' => $data['account']])->order('id asc')->find();
@@ -379,7 +379,7 @@ class Login extends BasicApi
         }
         $member->password = $data['password'];
         $member->save();
-            $this->success('重置密码成功，请登录');
+        $this->success('重置密码成功，请登录');
     }
 
     /**
