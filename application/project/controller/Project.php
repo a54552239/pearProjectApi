@@ -326,7 +326,8 @@ class Project extends BasicApi
             'expireToday' => 0,
             'doneOverdue' => 0,
         ];
-        $taskList = \app\common\Model\Task::where(['project_code' => $projectCode, 'deleted' => 0])->select()->toArray();
+//        $taskList = \app\common\Model\Task::where(['project_code' => $projectCode, 'deleted' => 0])->field('id,assign_to,done,end_time,create_time,code')->hidden(['childCount,hasUnDone,parentDone,hasComment,hasSource,canRead'])->select()->toArray();
+        $taskList = Db::name('task')->where(['project_code' => $projectCode, 'deleted' => 0])->field('id,assign_to,done,end_time,create_time,code')->select();
         $taskStats['total'] = count($taskList);
         if ($taskList) {
             $today = date('Y-m-d 00:00', time());
@@ -348,7 +349,6 @@ class Project extends BasicApi
                         }
                     }
                 }
-
             }
         }
 
