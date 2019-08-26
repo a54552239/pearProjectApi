@@ -172,6 +172,8 @@ class DepartmentMember extends CommonModel
                                 }
                             }
                         }
+                    } else {
+                        $this->inviteMember($memberAccount['code'], '');
                     }
                 }
 
