@@ -71,7 +71,7 @@ class Account extends BasicApi
             list($start, $end) = explode('~', $params['date']);
             $where[] = ['last_login_time', 'between', ["{$start} 00:00:00", "{$end} 23:59:59"]];
         }
-        $list = $this->model->_list($where, 'id desc');
+        $list = $this->model->_list($where, 'id asc');
         if ($list['list']) {
             foreach ($list['list'] as &$item) {
                 $memberInfo = Member::where(['code' => $item['member_code']])->field('id', true)->find();
