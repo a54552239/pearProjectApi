@@ -48,6 +48,20 @@ class DepartmentMember extends BasicApi
         $this->success('', $list);
     }
 
+    /**
+     * 成员详情
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public function detail()
+    {
+        $code = Request::param('code');
+        $organization = Request::param('organization');
+        $member = MemberAccount::alias('m')->join('projectAuth a', 'a.id = m.authorize')->join('member mb','mb.code = m.member_code')->where(['m.member_code' => $code,'m.organization_code'=>$organization])->field('*,m.member_code as code,m.name as name')->find();
+        $this->success('', $member);
+    }
+
 
     /**
      * 邀请成员查询

@@ -73,11 +73,14 @@ class Account extends BasicApi
         }
         $list = $this->model->_list($where, 'id asc');
         if ($list['list']) {
+            $organizaionCode = getCurrentOrganizationCode();
             foreach ($list['list'] as &$item) {
                 $memberInfo = Member::where(['code' => $item['member_code']])->field('id', true)->find();
                 if ($memberInfo) {
                     $item['avatar'] = $memberInfo['avatar'];
                 }
+                $memberAccount = MemberAccount::where(['member_code' => $memberInfo['code'], 'organization_code' => $organizaionCode])->field('code,status,authorize')->find();
+                $item['membar_account_code'] = $memberAccount ? $memberAccount['code'] : '';
                 $departments = [];
                 $departmentCodes = $item['department_code'];
                 if ($departmentCodes) {
