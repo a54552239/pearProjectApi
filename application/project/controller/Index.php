@@ -107,12 +107,12 @@ class Index extends BasicApi
      */
     public function editPersonal()
     {
-        $params = Request::only('mobile,mail,idcard,name,realname,avatar,id');
+        $params = Request::only('mobile,mail,idcard,name,realname,avatar,code');
         $memberModel = new Member();
-        $result = $memberModel->_edit($params, ['id' => Request::post('id')]);
+        $result = $memberModel->_edit($params, ['code' => $params['code']]);
         if (isset($params['avatar'])) {
-            $member = Member::get($params['id']);
-            MemberAccount::update(['avatar' => $params['avatar']], ['member_code' => $member['code']]);
+//            $member = Member::get($params['id']);
+            MemberAccount::update(['avatar' => $params['avatar']], ['member_code' => $params['code']]);
         }
         if ($result) {
             $this->success('基本信息更新成功');
@@ -179,6 +179,10 @@ class Index extends BasicApi
         $accountModel = new MemberAccount();
         try {
             $file = $accountModel->uploadImg(Request::file('avatar'));
+            $code = Request::param('code');
+            $update = ['avatar' => $file['url']];
+            Member::update($update, ['code' => $code]);
+            MemberAccount::update($update, ['member_code' => $code]);
         } catch (Exception $e) {
             $this->error($e->getMessage(), $e->getCode());;
         }

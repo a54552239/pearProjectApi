@@ -3,15 +3,15 @@
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 50726
+ Source Server Version : 80012
  Source Host           : localhost:3306
  Source Schema         : pearproject
 
  Target Server Type    : MySQL
- Target Server Version : 50726
+ Target Server Version : 80012
  File Encoding         : 65001
 
- Date: 19/08/2019 10:02:58
+ Date: 02/09/2019 15:30:46
 */
 
 SET NAMES utf8mb4;
@@ -218,8 +218,8 @@ CREATE TABLE `pear_member`  (
   `dingtalk_unionid` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '钉钉unionid',
   `dingtalk_userid` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '钉钉用户id',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `username`(`account`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  INDEX `username`(`account`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 589 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户表' ROW_FORMAT = Compact;
 
 -- ----------------------------
@@ -392,8 +392,8 @@ CREATE TABLE `pear_project`  (
   `begin_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '项目开始日期',
   `end_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '项目截止日期',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `project`(`order`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  INDEX `project`(`order`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 13043 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目表' ROW_FORMAT = Compact;
 
 -- ----------------------------

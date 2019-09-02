@@ -347,6 +347,18 @@ class Task extends CommonModel
             $result = self::update(['done' => $done], ['code' => $taskCode]);
             //todo 添加任务动态，编辑权限检测
             Db::commit();
+            $project = Project::where(['code' => $task['project_code']])->field('auto_update_schedule,schedule')->find();
+            if ($project['auto_update_schedule']) {
+                $taskCount = \app\common\Model\Task::where(['project_code' => $task['project_code']])->count('code');
+                if ($taskCount) {
+                    $doneTaskCount = \app\common\Model\Task::where(['project_code' => $task['project_code'], 'done' => 1])->count('code');
+                    $schedule = $doneTaskCount / $taskCount * 100;
+                    $project->schedule = $schedule;
+                    $project->save();
+                }
+
+            }
+            $projectAutoUpdateSchedule = 1;
         } catch (Exception $e) {
             Db::rollback();
             throw new Exception($e->getMessage());

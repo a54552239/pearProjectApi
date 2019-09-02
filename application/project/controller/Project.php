@@ -81,11 +81,11 @@ class Project extends BasicApi
                     continue;
                 }
 
-                $item['collected'] = false;
+                $item['collected'] = 0;
                 $item['owner_name'] = '-';
                 $collected = ProjectCollection::where(['project_code' => $item['code'], 'member_code' => $currentMember['code']])->field('id')->find();
                 if ($collected) {
-                    $item['collected'] = true;
+                    $item['collected'] = 1;
                 }
 
                 $owner = ProjectMember::where(['project_code' => $item['code'], 'is_owner' => 1])->field('member_code')->find();
@@ -129,21 +129,18 @@ class Project extends BasicApi
         $list = $this->model->getMemberProjects($member['code'], getCurrentOrganizationCode(), $deleted, $archive, Request::post('page'), Request::post('pageSize'));
         if ($list['list']) {
             foreach ($list['list'] as $key => &$item) {
-                $item['collected'] = false;
                 $item['owner_name'] = '-';
                 if (isset($item['project_code'])) {
                     $item['code'] = $item['project_code'];
                     $item = $this->model->where(['code' => $item['code']])->find();
                 }
                 $collected = ProjectCollection::where(['project_code' => $item['code'], 'member_code' => getCurrentMember()['code']])->field('id')->find();
-                if ($collected) {
-                    $item['collected'] = true;
-                }
-
+                $item['collected'] = $collected ? 1 : 0;
                 $owner = ProjectMember::where(['project_code' => $item['code'], 'is_owner' => 1])->field('member_code')->find();
                 $member = Member::where(['code' => $owner['member_code']])->field('name')->find();
                 $item['owner_name'] = $member['name'];
             }
+            unset($item);
         }
         $this->success('', $list);
     }
@@ -187,10 +184,10 @@ class Project extends BasicApi
         if (!$project) {
             $this->notFound();
         }
-        $project['collected'] = false;
+        $project['collected'] = 0;
         $collected = ProjectCollection::where(['project_code' => $project['code'], 'member_code' => getCurrentMember()['code']])->field('id')->find();
         if ($collected) {
-            $project['collected'] = true;
+            $project['collected'] = 1;
         }
         $item['owner_name'] = '';
         $item['owner_avatar'] = '';
@@ -214,7 +211,7 @@ class Project extends BasicApi
      */
     public function edit(Request $request)
     {
-        $data = $request::only('name,description,cover,private,prefix,open_prefix,schedule,open_begin_time,open_task_private,task_board_theme,begin_time,end_time');
+        $data = $request::only('name,description,cover,private,prefix,open_prefix,schedule,open_begin_time,open_task_private,task_board_theme,begin_time,end_time,auto_update_schedule');
         $code = $request::param('projectCode');
         try {
             $result = $this->model->edit($code, $data);
@@ -297,7 +294,7 @@ class Project extends BasicApi
         debug('begin');
         $result = ProjectReport::setDayilyProejctReport();
         debug('end');
-        logRecord(debug('begin','end') * 1000 . 'ms', 'setDayilyProejctReportSuccess');
+        logRecord(debug('begin', 'end') * 1000 . 'ms', 'setDayilyProejctReportSuccess');
         echo 'success_at ' . nowTime();
     }
 

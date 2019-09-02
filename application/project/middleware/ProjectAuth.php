@@ -5,6 +5,7 @@ namespace app\project\middleware;
 use app\common\Model\Project;
 use app\common\Model\ProjectMember;
 use app\common\Model\Task;
+use app\common\Model\TaskStages;
 use think\Request;
 
 /**
@@ -25,7 +26,7 @@ class ProjectAuth
         'Task/save',
         'Task/taskDone',
         'Task/assignTask',
-//        'Task/sort',
+        'Task/sort',
         'Task/edit',
         'Task/recycle',
         'Task/recovery',
@@ -114,6 +115,15 @@ class ProjectAuth
 
             if ($task) {
                 $code = $task['project_code'];
+            }
+        }
+        if (!$code) {
+            $taskStageCode = \think\facade\Request::param('stageCode');
+            if ($taskStageCode) {
+                $taskStage = TaskStages::where(['code' => $taskStageCode])->find();
+                if ($taskStage) {
+                    $code = $taskStage['project_code'];
+                }
             }
         }
         return $code;

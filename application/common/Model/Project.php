@@ -36,7 +36,7 @@ class Project extends CommonModel
         $offset = ($page - 1) * $page;
         $limit = $pageSize;
         $prefix = config('database.prefix');
-        $sql = "select *,p.id as id,p.name as name,p.code as code from {$prefix}project as p join {$prefix}project_member as pm on p.code = pm.project_code where pm.member_code = '{$memberCode}' and p.organization_code = '$organizationCode' and p.deleted = {$deleted} and p.archive = {$archive} order by p.id desc";
+        $sql = "select *,p.id as id,p.name as name,p.code as code from {$prefix}project as p join {$prefix}project_member as pm on p.code = pm.project_code left join {$prefix}project_collection as pc on p.code = pc.project_code where pm.member_code = '{$memberCode}' and p.organization_code = '$organizationCode' and p.deleted = {$deleted} and p.archive = {$archive} order by pc.id desc, p.id desc";
         $total = Db::query($sql);
         $total = count($total);
         $sql .= " limit {$offset},{$limit}";
