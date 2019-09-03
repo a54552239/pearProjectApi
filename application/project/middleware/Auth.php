@@ -37,29 +37,35 @@ class Auth
         if ($currentOrganizationCode) {
             setCurrentOrganizationCode($currentOrganizationCode);
         }
+        $authorization = $request->header('Authorization');
+        $logined = false;
+        $encodeData = '';
+        if ($authorization) {
+            $accessToken = explode(' ', $authorization)[1];
+            $encodeData = JwtService::decodeToken($accessToken);
+            if (!isError($encodeData)) {
+                $member = Cache::get('member:info:' . $encodeData->data->code);
+                if ($member) {
+                    setCurrentMember($member);
+                    $logined = true;
+                }
+            }
+        }
         // 登录状态检查
         if (!empty($access['is_login'])) {
-            $authorization = $request->header('Authorization');
-            $accessToken = '';
-            if ($authorization) {
-                $accessToken = explode(' ', $authorization)[1];
-            }
-            $data = JwtService::decodeToken($accessToken);
-            if (isError($data)) {
+            if (isError($encodeData)) {
                 //TODO 启用refreshToken
-                if ($data['errno'] == 3) {
+                if ($encodeData['errno'] == 3) {
                     $msg = ['code' => 401, 'msg' => 'accessToken过期'];
                     return json($msg);
                 }
                 $msg = ['code' => 401, 'msg' => '登录超时，请重新登录'];
                 return json($msg);
             }
-            $member = Cache::get('member:info:' . $data->data->code);
-            if (!$member) {
+            if (!$logined) {
                 $msg = ['code' => 401, 'msg' => '登录超时，请重新登录'];
                 return json($msg);
             }
-            setCurrentMember($member);
         }
         // 访问权限检查
         if (!empty($access['is_auth']) && !auth($node, 'project')) {
@@ -74,7 +80,7 @@ class Auth
                     foreach ($config as $itemKey => $item) {
                         sysconf($itemKey, $item);
                     }
-                }else{
+                } else {
                     sysconf($key, $config);
                 }
             }
