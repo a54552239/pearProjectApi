@@ -187,6 +187,14 @@ function isOpenDingTalkNoticePush()
 {
     return config('config.dingtalk_push');
 }
+/**
+ * 是否开启钉钉消息推送
+ * @return mixed
+ */
+function isOpenMailNoticePush()
+{
+    return config('config.mail_push');
+}
 
 /**
  * 日期格式标准输出
