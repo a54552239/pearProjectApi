@@ -2,6 +2,7 @@
 
 namespace app\project\controller;
 
+use app\common\Model\CommonModel;
 use app\common\Model\Member;
 use app\common\Model\MemberAccount;
 use app\common\Model\Notify;
@@ -37,17 +38,22 @@ class ProjectTemplate extends BasicApi
      */
     public function index()
     {
+        $prefix = config('database.prefix');
+        $page = Request::param('page', 1);
+        $pageSize = Request::param('pageSize', cookie('pageSize'));
         $orgCode = getCurrentOrganizationCode();
-        $where = [];
+        $sql = '';
         $viewType = Request::post('viewType', -1);
+        if ($viewType == -1) {
+            $sql = "select * from {$prefix}project_template as pt where pt.organization_code = '{$orgCode}' or pt.is_system = 1";
+        }
         if ($viewType == 1) {
-            $where[] = ['is_system', '=', $viewType];
+            $sql = "select * from {$prefix}project_template as pt where pt.is_system = 1";
         }
         if ($viewType == 0) {
-            $where[] = ['organization_code', '=', $orgCode];
-            $where[] = ['is_system', '=', 0];
+            $sql = "select * from {$prefix}project_template as pt where pt.organization_code = '{$orgCode}' and pt.is_system = 0";
         }
-        $list = $this->model->_list($where);
+        $list = CommonModel::limitByQuery($sql, $page, $pageSize);
         if ($list['list']) {
             foreach ($list['list'] as &$item) {
                 $item['task_stages'] = \app\common\Model\TaskStagesTemplate::where(['project_template_code' => $item['code']])->field('name')->order('sort desc,id asc')->select();
