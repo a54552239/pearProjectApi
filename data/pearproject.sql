@@ -11,7 +11,7 @@
  Target Server Version : 80012
  File Encoding         : 65001
 
- Date: 02/09/2019 15:30:46
+ Date: 13/09/2019 10:02:46
 */
 
 SET NAMES utf8mb4;
@@ -391,6 +391,7 @@ CREATE TABLE `pear_project`  (
   `task_board_theme` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'default' COMMENT '看板风格',
   `begin_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '项目开始日期',
   `end_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '项目截止日期',
+  `auto_update_schedule` tinyint(1) NULL DEFAULT 0 COMMENT '自动更新项目进度',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `code`(`code`) USING BTREE,
   INDEX `project`(`order`) USING BTREE
@@ -399,17 +400,17 @@ CREATE TABLE `pear_project`  (
 -- ----------------------------
 -- Records of pear_project
 -- ----------------------------
-INSERT INTO `pear_project` VALUES (1, 'https://beta.vilson.xyz/static/upload//20190103/f9ad4e304ea0be7609e3236188f7547d.png', 'iView', 'a8mpr6tvbndk10hj2lwcqzuo', '那是一种内在的东西， 他们到达不了，也无法触及的', 'private', NULL, NULL, 0, '10', 39.00, '2018-04-30 22:29:18', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL);
-INSERT INTO `pear_project` VALUES (2, 'https://beta.vilson.xyz/static/upload//20190103/aaacec0e2001580b44dffbb967804349.png', 'Alipay', '8rlqyh56smzpoc1wef7390t2', '城镇中有那么多的酒馆，她却偏偏走进了我的酒馆', 'open', NULL, NULL, 0, '10', 75.00, '2018-05-01 09:28:36', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL);
-INSERT INTO `pear_project` VALUES (3, 'https://beta.vilson.xyz/static/upload//20190103/9ba2134d72cc3cec58f61024b89eb798.png', 'Vue', 'nkp4gulsb6oxqyi80fhead39', '生命就像一盒巧克力，结果往往出人意料', 'open', NULL, NULL, 0, '10', 63.00, '2018-05-01 09:33:43', '6v7be19pwman2fird04gqu53', '2019-01-03 22:20:10', 1, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL);
-INSERT INTO `pear_project` VALUES (4, 'https://beta.vilson.xyz/static/upload//20190103/6fc14133651ee1c6ee1abaafcea76d01.png', 'Recruitment', 'sbklfvyouc0qpmwhitn47j5z', '希望是一个好东西，也许是最好的，好东西是不会消亡的', 'private', NULL, NULL, 0, '13', 100.00, '2018-05-01 09:36:05', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'simple', NULL, NULL);
-INSERT INTO `pear_project` VALUES (5, 'https://beta.vilson.xyz/static/upload//20190103/5d2a6e2d2cb235bb6888b884331bb516.png', 'EasyUI', 'n5opgqevrz1l03h48uwx67d2', '那时候我只会想自己想要什么，从不想自己拥有什么', 'open', NULL, NULL, 1, '0', 0.00, '2018-12-22 10:52:25', '6v7be19pwman2fird04gqu53', '2019-01-03 22:19:50', 1, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL);
-INSERT INTO `pear_project` VALUES (1302, 'https://beta.vilson.xyz/static/upload//20190103/271ec382566f0d2ca187740330b19a17.png', 'Ant Motion', 'ibag9hw3o1tusd5qlpxrk782', '如果我真的存在，也是因为你需要我', 'open', NULL, 0, 1, '0', 50.00, '2018-12-23 09:53:25', '6v7be19pwman2fird04gqu53', '2019-01-04 21:48:33', 0, '', 0, 0, '2019-01-02 21:01:12', 0, 0, 'default', NULL, NULL);
-INSERT INTO `pear_project` VALUES (1303, 'https://beta.vilson.xyz/static/upload//20190103/30bdd62b610f5a4e3f788ec37e6c4a5b.png', 'Material UI', 'elqa703jyvfhpt1dsxkzi8on', '这个项目你不是项目成员，将不能进行操作（只读）', 'open', NULL, 0, 0, '0', 35.00, '2018-12-23 09:33:46', '6v7be19pwman2fird04gqu53', NULL, 0, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL);
-INSERT INTO `pear_project` VALUES (1304, 'https://beta.vilson.xyz/static/upload//20190103/f5187655ceab8b52a335443664dffb3c.png', 'Vant', 'tnxpbov8kez6m4wl2hfjucd9', '现在的魏无羡，离开了蓝忘机就不行', 'open', NULL, 0, 0, '0', 50.00, '2018-12-23 08:31:53', '6v7be19pwman2fird04gqu53', '2019-01-04 11:33:02', 1, '', 0, 1, '2019-01-13 13:53:42', 0, 0, 'default', NULL, NULL);
-INSERT INTO `pear_project` VALUES (1305, 'https://beta.vilson.xyz/static/upload//20190103/d86b104c0e1131b2fbd06dce615470df.png', 'Ant Design', 'mo4uqwfb06dxv8ez2spkl3rg', '那时候我只会想自己想要什么，从不想自己拥有什么', 'open', NULL, 0, 0, '0', 24.00, '2018-12-25 07:20:36', '6v7be19pwman2fird04gqu53', '2019-01-02 22:06:02', 1, 'EP', 0, 0, '2019-01-02 20:59:09', 1, 0, 'simple', NULL, NULL);
-INSERT INTO `pear_project` VALUES (1307, 'https://beta.vilson.xyz/static/upload//20190103/271ec382566f0d2ca187740330b19a17.png', '测试', '8ulzfth64cd0k1x5peivowm2', '测试11', 'open', NULL, 0, 1, '', 0.00, '2019-01-03 09:15:11', '6v7be19pwman2fird04gqu53', '2019-01-03 22:18:30', 1, '', 0, 0, '2019-01-03 10:52:54', 0, 0, 'default', NULL, NULL);
-INSERT INTO `pear_project` VALUES (13042, 'http://easyproject.net/static/image/default/project-cover.png', 'OKR 管理', 'gbim9jpevkh7qr6ufa1t3wl4', 'OKR 管理', 'open', NULL, 0, 1, '', 0.00, '2019-01-05 21:57:31', '4ni58wts2egcybvodfh1kmaj', '2019-01-06 08:21:49', 1, NULL, 0, 0, NULL, 0, 0, 'default', NULL, NULL);
+INSERT INTO `pear_project` VALUES (1, 'https://beta.vilson.xyz/static/upload//20190103/f9ad4e304ea0be7609e3236188f7547d.png', 'iView', 'a8mpr6tvbndk10hj2lwcqzuo', '那是一种内在的东西， 他们到达不了，也无法触及的', 'private', NULL, NULL, 0, '10', 39.00, '2018-04-30 22:29:18', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (2, 'https://beta.vilson.xyz/static/upload//20190103/aaacec0e2001580b44dffbb967804349.png', 'Alipay', '8rlqyh56smzpoc1wef7390t2', '城镇中有那么多的酒馆，她却偏偏走进了我的酒馆', 'open', NULL, NULL, 0, '10', 75.00, '2018-05-01 09:28:36', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (3, 'https://beta.vilson.xyz/static/upload//20190103/9ba2134d72cc3cec58f61024b89eb798.png', 'Vue', 'nkp4gulsb6oxqyi80fhead39', '生命就像一盒巧克力，结果往往出人意料', 'open', NULL, NULL, 0, '10', 63.00, '2018-05-01 09:33:43', '6v7be19pwman2fird04gqu53', '2019-01-03 22:20:10', 1, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (4, 'https://beta.vilson.xyz/static/upload//20190103/6fc14133651ee1c6ee1abaafcea76d01.png', 'Recruitment', 'sbklfvyouc0qpmwhitn47j5z', '希望是一个好东西，也许是最好的，好东西是不会消亡的', 'private', NULL, NULL, 0, '13', 100.00, '2018-05-01 09:36:05', '6v7be19pwman2fird04gqu53', NULL, 1, '', 0, 0, NULL, 0, 0, 'simple', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (5, 'https://beta.vilson.xyz/static/upload//20190103/5d2a6e2d2cb235bb6888b884331bb516.png', 'EasyUI', 'n5opgqevrz1l03h48uwx67d2', '那时候我只会想自己想要什么，从不想自己拥有什么', 'open', NULL, NULL, 1, '0', 0.00, '2018-12-22 10:52:25', '6v7be19pwman2fird04gqu53', '2019-01-03 22:19:50', 1, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (1302, 'https://beta.vilson.xyz/static/upload//20190103/271ec382566f0d2ca187740330b19a17.png', 'Ant Motion', 'ibag9hw3o1tusd5qlpxrk782', '如果我真的存在，也是因为你需要我', 'open', NULL, 0, 1, '0', 50.00, '2018-12-23 09:53:25', '6v7be19pwman2fird04gqu53', '2019-01-04 21:48:33', 0, '', 0, 0, '2019-01-02 21:01:12', 0, 0, 'default', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (1303, 'https://beta.vilson.xyz/static/upload//20190103/30bdd62b610f5a4e3f788ec37e6c4a5b.png', 'Material UI', 'elqa703jyvfhpt1dsxkzi8on', '这个项目你不是项目成员，将不能进行操作（只读）', 'open', NULL, 0, 0, '0', 35.00, '2018-12-23 09:33:46', '6v7be19pwman2fird04gqu53', NULL, 0, '', 0, 0, NULL, 0, 0, 'default', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (1304, 'https://beta.vilson.xyz/static/upload//20190103/f5187655ceab8b52a335443664dffb3c.png', 'Vant', 'tnxpbov8kez6m4wl2hfjucd9', '现在的魏无羡，离开了蓝忘机就不行', 'open', NULL, 0, 0, '0', 50.00, '2018-12-23 08:31:53', '6v7be19pwman2fird04gqu53', '2019-01-04 11:33:02', 1, '', 0, 1, '2019-01-13 13:53:42', 0, 0, 'default', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (1305, 'https://beta.vilson.xyz/static/upload//20190103/d86b104c0e1131b2fbd06dce615470df.png', 'Ant Design', 'mo4uqwfb06dxv8ez2spkl3rg', '那时候我只会想自己想要什么，从不想自己拥有什么', 'open', NULL, 0, 0, '0', 24.00, '2018-12-25 07:20:36', '6v7be19pwman2fird04gqu53', '2019-01-02 22:06:02', 1, 'EP', 0, 0, '2019-01-02 20:59:09', 1, 0, 'simple', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (1307, 'https://beta.vilson.xyz/static/upload//20190103/271ec382566f0d2ca187740330b19a17.png', '测试', '8ulzfth64cd0k1x5peivowm2', '测试11', 'open', NULL, 0, 1, '', 0.00, '2019-01-03 09:15:11', '6v7be19pwman2fird04gqu53', '2019-01-03 22:18:30', 1, '', 0, 0, '2019-01-03 10:52:54', 0, 0, 'default', NULL, NULL, 0);
+INSERT INTO `pear_project` VALUES (13042, 'http://easyproject.net/static/image/default/project-cover.png', 'OKR 管理', 'gbim9jpevkh7qr6ufa1t3wl4', 'OKR 管理', 'open', NULL, 0, 1, '', 0.00, '2019-01-05 21:57:31', '4ni58wts2egcybvodfh1kmaj', '2019-01-06 08:21:49', 1, NULL, 0, 0, NULL, 0, 0, 'default', NULL, NULL, 0);
 
 -- ----------------------------
 -- Table structure for pear_project_auth
@@ -1252,7 +1253,9 @@ CREATE TABLE `pear_project_features`  (
   `organization_code` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '组织id',
   `project_code` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '项目id',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  INDEX `project_code`(`project_code`) USING BTREE,
+  INDEX `organization_code`(`organization_code`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '版本库表' ROW_FORMAT = Compact;
 
 -- ----------------------------
@@ -1280,7 +1283,9 @@ CREATE TABLE `pear_project_log`  (
   `icon` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `is_robot` tinyint(1) NULL DEFAULT 0 COMMENT '是否机器人',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  INDEX `member_code`(`member_code`) USING BTREE,
+  INDEX `source_code`(`source_code`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4468 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目日志表' ROW_FORMAT = Compact;
 
 -- ----------------------------
@@ -2233,7 +2238,9 @@ CREATE TABLE `pear_project_version`  (
   `plan_publish_time` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '预计发布时间',
   `features_code` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '版本库编号',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  INDEX `organization_code`(`organization_code`) USING BTREE,
+  INDEX `features_code`(`features_code`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目版本表' ROW_FORMAT = Compact;
 
 -- ----------------------------
@@ -2260,7 +2267,9 @@ CREATE TABLE `pear_project_version_log`  (
   `icon` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `features_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '版本库编号',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  INDEX `project_code`(`project_code`) USING BTREE,
+  INDEX `features_code`(`features_code`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '项目日志表' ROW_FORMAT = Compact;
 
 -- ----------------------------
@@ -2400,7 +2409,11 @@ CREATE TABLE `pear_task`  (
   `features_code` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '版本库id',
   `work_time` int(5) NULL DEFAULT 0 COMMENT '预估工时',
   PRIMARY KEY (`id`, `project_code`) USING BTREE,
-  UNIQUE INDEX `task`(`code`) USING BTREE
+  UNIQUE INDEX `task`(`code`) USING BTREE,
+  INDEX `stage_code`(`stage_code`) USING BTREE,
+  INDEX `project_code`(`project_code`) USING BTREE,
+  INDEX `pcode`(`pcode`) USING BTREE,
+  INDEX `sort`(`sort`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 12363 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '任务表' ROW_FORMAT = Compact;
 
 -- ----------------------------

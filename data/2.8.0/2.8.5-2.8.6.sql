@@ -6,7 +6,7 @@ ALTER TABLE `pearProject`.`pear_project_features` ADD INDEX `project_code`(`proj
 
 ALTER TABLE `pearProject`.`pear_project_features` ADD INDEX `organization_code`(`organization_code`) USING BTREE;
 
-ALTER TABLE `pearProject`.`pear_project_log` DROP INDEX `member_code`;
+ALTER TABLE `pearProject`.`pear_project_log` ADD INDEX `member_code`(`member_code`) USING BTREE;
 
 ALTER TABLE `pearProject`.`pear_project_log` ADD INDEX `source_code`(`source_code`) USING BTREE;
 
