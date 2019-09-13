@@ -11,7 +11,7 @@
  Target Server Version : 80012
  File Encoding         : 65001
 
- Date: 13/09/2019 10:02:46
+ Date: 13/09/2019 10:29:28
 */
 
 SET NAMES utf8mb4;
@@ -2175,6 +2175,12 @@ INSERT INTO `pear_project_node` VALUES (631, 'project/task_workflow/index', '任
 INSERT INTO `pear_project_node` VALUES (632, 'project/task_workflow/save', '添加任务流转', 0, 1, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (633, 'project/task_workflow/edit', '编辑任务流转', 0, 1, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (634, 'project/task_workflow/delete', '删除任务流转', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (635, 'project/department_member/detail', '部门成员详情', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (636, 'project/department_member/uploadfile', '上传头像', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (637, 'project/task/savetaskworktime', '保存任务流转', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (638, 'project/task/edittaskworktime', '编辑任务流转', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (639, 'project/task/deltaskworktime', '删除任务流转', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (640, 'project/task/uploadfile', '上传文件', 0, 1, 1, NULL);
 
 -- ----------------------------
 -- Table structure for pear_project_report
@@ -2339,25 +2345,26 @@ INSERT INTO `pear_system_config` VALUES (5, 'browser_icon', '');
 INSERT INTO `pear_system_config` VALUES (6, 'tongji_baidu_key', '');
 INSERT INTO `pear_system_config` VALUES (7, 'miitbeian', '粤ICP备16eeeee2号-2');
 INSERT INTO `pear_system_config` VALUES (8, 'storage_type', 'local');
-INSERT INTO `pear_system_config` VALUES (9, 'storage_local_exts', 'png,jpg,rar,doc,icon,mp4,zip,gif,jpeg,bmp,webp,mp4,m3u8,rmvb,avi,swf,3gp,mkv,flv,txt,docx,pages,epub,pdf,numbers,csv,xls,xlsx,keynote,ppt,pptx,mp3,wav,wma,ogg,aac,flac');
-INSERT INTO `pear_system_config` VALUES (10, 'storage_qiniu_bucket', '');
-INSERT INTO `pear_system_config` VALUES (11, 'storage_qiniu_domain', '');
-INSERT INTO `pear_system_config` VALUES (12, 'storage_qiniu_access_key', '');
-INSERT INTO `pear_system_config` VALUES (13, 'storage_qiniu_secret_key', '');
-INSERT INTO `pear_system_config` VALUES (14, 'storage_oss_bucket', 'cuci');
-INSERT INTO `pear_system_config` VALUES (15, 'storage_oss_endpoint', '');
-INSERT INTO `pear_system_config` VALUES (16, 'storage_oss_domain', '');
-INSERT INTO `pear_system_config` VALUES (17, 'storage_oss_keyid', '');
-INSERT INTO `pear_system_config` VALUES (18, 'storage_oss_secret', '');
+INSERT INTO `pear_system_config` VALUES (9, 'storage_local_exts', 'png,jpg,rar,doc,icon,mp4,zip,gif,jpeg,bmp,webp,mp4,m3u8,rmvb,avi,swf,3gp,mkv,flv,txt,docx,pages,epub,pdf,numbers,csv,xls,xlsx,keynote,ppt,pptx,mp3,wav,wma,ogg,aac,flac;');
+INSERT INTO `pear_system_config` VALUES (10, 'storage_qiniu_bucket', 'static');
+INSERT INTO `pear_system_config` VALUES (11, 'storage_qiniu_domain', 'example.xyz');
+INSERT INTO `pear_system_config` VALUES (12, 'storage_qiniu_access_key', 'example');
+INSERT INTO `pear_system_config` VALUES (13, 'storage_qiniu_secret_key', 'example');
+INSERT INTO `pear_system_config` VALUES (14, 'storage_oss_bucket', 'vilson-static');
+INSERT INTO `pear_system_config` VALUES (15, 'storage_oss_endpoint', 'oss-cn-shenzhen.aliyuncs.com');
+INSERT INTO `pear_system_config` VALUES (16, 'storage_oss_domain', 'example.xyz');
+INSERT INTO `pear_system_config` VALUES (17, 'storage_oss_keyid', 'example');
+INSERT INTO `pear_system_config` VALUES (18, 'storage_oss_secret', 'example');
 INSERT INTO `pear_system_config` VALUES (34, 'wechat_appid', '');
 INSERT INTO `pear_system_config` VALUES (35, 'wechat_appkey', '');
-INSERT INTO `pear_system_config` VALUES (36, 'storage_oss_is_https', 'http');
+INSERT INTO `pear_system_config` VALUES (36, 'storage_oss_is_https', 'https');
 INSERT INTO `pear_system_config` VALUES (37, 'wechat_type', 'thr');
 INSERT INTO `pear_system_config` VALUES (38, 'wechat_token', 'test');
 INSERT INTO `pear_system_config` VALUES (39, 'wechat_appsecret', '');
 INSERT INTO `pear_system_config` VALUES (40, 'wechat_encodingaeskey', '');
 INSERT INTO `pear_system_config` VALUES (41, 'wechat_thr_appid', '');
 INSERT INTO `pear_system_config` VALUES (42, 'wechat_thr_appkey', '');
+INSERT INTO `pear_system_config` VALUES (43, 'storage_qiniu_is_https', 'https');
 
 -- ----------------------------
 -- Table structure for pear_system_log
