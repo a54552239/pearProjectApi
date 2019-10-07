@@ -174,6 +174,12 @@ class Member extends CommonModel
             } else {
                 //已登录且未绑定，则绑定
                 if (!$currentMember['dingtalk_unionid'] || !$currentMember['dingtalk_userid']) {
+                    if ($currentMember['mobile']) {
+                        unset($memberData['mobile']);
+                    }
+                    if ($currentMember['email']) {
+                        unset($memberData['email']);
+                    }
                     self::update($memberData, $where);
                     $member = self::where($where)->find();
                 }
