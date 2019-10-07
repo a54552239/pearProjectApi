@@ -176,9 +176,19 @@ class Member extends CommonModel
                 if (!$currentMember['dingtalk_unionid'] || !$currentMember['dingtalk_userid']) {
                     if ($currentMember['mobile']) {
                         unset($memberData['mobile']);
+                    }else{
+                        $has = self::where(['mobile' => $memberData['mobile']])->find();
+                        if ($has) {
+                            return error('1', '您想要绑定的手机号码已经被绑定给其他帐号，请先用该手机号码登录后进行重置，再切回当前帐号发起绑定');
+                        }
                     }
                     if ($currentMember['email']) {
                         unset($memberData['email']);
+                    }else{
+                        $has = self::where(['email' => $memberData['email']])->find();
+                        if ($has) {
+                            return error('1', '您想要绑定的邮箱已经被绑定给其他帐号，请先用该邮箱登录后进行重置，再切回当前帐号发起绑定');
+                        }
                     }
                     self::update($memberData, $where);
                     $member = self::where($where)->find();
