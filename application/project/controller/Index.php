@@ -86,7 +86,15 @@ class Index extends BasicApi
     public function systemConfig()
     {
         $configModel = new SystemConfig();
-        $this->success('', $configModel->info());
+        $config = $configModel->info();
+        $info = [
+            'app_name' => $config['app_name'],
+            'app_version' => $config['app_version'],
+            'miitbeian' => $config['miitbeian'],
+            'site_copy' => $config['site_copy'],
+            'site_name' => $config['site_name'],
+        ];
+        $this->success('', $info);
 
     }
 
