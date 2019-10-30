@@ -248,6 +248,7 @@ class Task
                     $prefix = config('database.prefix');
                     $taskCode = $task['code'];
                     foreach ($data['data'] as $item) {
+                        $item = explode(' ', $item)[0];
                         $sql = "select tm.member_code from {$prefix}task_member as tm join {$prefix}member as m on tm.member_code = m.code where tm.task_code = '{$taskCode}' and name = '{$item}'";
                         $memberCurr = Db::query($sql);
                         if ($memberCurr) {
