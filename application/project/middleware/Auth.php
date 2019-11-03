@@ -71,17 +71,19 @@ class Auth
         if (!empty($access['is_auth']) && !auth($node, 'project')) {
             return json(['code' => 403, 'msg' => '无权限操作资源，访问被拒绝']);
         }
-
         //第三资源初始化
         $storageConfig = config('storage.');
-        if ($storageConfig) {
-            foreach ($storageConfig as $key => $config) {
-                if ($key == 'qiniu' || $key == 'oss') {
-                    foreach ($config as $itemKey => $item) {
-                        sysconf($itemKey, $item);
+        if ($storageConfig['init']) {
+            unset($storageConfig['init']);
+            if ($storageConfig) {
+                foreach ($storageConfig as $key => $config) {
+                    if ($key == 'qiniu' || $key == 'oss') {
+                        foreach ($config as $itemKey => $item) {
+                            sysconf($itemKey, $item);
+                        }
+                    } else {
+                        sysconf($key, $config);
                     }
-                } else {
-                    sysconf($key, $config);
                 }
             }
         }

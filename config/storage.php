@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'init' => false,
     'storage_type' => 'local', //local:本地，qiniu：七牛，oss：阿里云oss
     'storage_local_exts' => 'png,jpg,rar,doc,icon,mp4,zip,gif,jpeg,bmp,webp,mp4,m3u8,rmvb,avi,swf,3gp,mkv,flv,txt,docx,pages,epub,pdf,numbers,csv,xls,xlsx,keynote,ppt,pptx,mp3,wav,wma,ogg,aac,flac;', //支持上传的文件格式
     // 可用的第三方资源配置
