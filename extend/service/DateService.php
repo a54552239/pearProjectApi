@@ -242,6 +242,137 @@ class DateService
     }
 
     /**
+     * 返回今日开始和结束的时间戳
+     *
+     * @return array
+     */
+    public static function today()
+    {
+        return array(
+            mktime(0, 0, 0, date('m'), date('d'), date('Y')),
+            mktime(23, 59, 59, date('m'), date('d'), date('Y'))
+        );
+    }
+
+    /**
+     * 返回昨日开始和结束的时间戳
+     *
+     * @return array
+     */
+    public static function yesterday()
+    {
+        $yesterday = date('d') - 1;
+        return array(
+            mktime(0, 0, 0, date('m'), $yesterday, date('Y')),
+            mktime(23, 59, 59, date('m'), $yesterday, date('Y'))
+        );
+    }
+
+    /**
+     * 返回本周开始和结束的时间戳
+     *
+     * @return array
+     */
+    public static function week()
+    {
+        $timestamp = time();
+        return array(
+            strtotime(date('Y-m-d', strtotime("this week Monday", $timestamp))),
+            strtotime(date('Y-m-d', strtotime("this week Sunday", $timestamp))) + 24 * 3600 - 1
+        );
+    }
+
+    /**
+     * 返回上周开始和结束的时间戳
+     *
+     * @return array
+     */
+    public static function lastWeek()
+    {
+        $timestamp = time();
+        return array(
+            strtotime(date('Y-m-d', strtotime("last week Monday", $timestamp))),
+            strtotime(date('Y-m-d', strtotime("last week Sunday", $timestamp))) + 24 * 3600 - 1
+        );
+    }
+
+    /**
+     * 返回本月开始和结束的时间戳
+     *
+     * @return array
+     */
+    public static function month($everyDay = false)
+    {
+        return array(
+            mktime(0, 0, 0, date('m'), 1, date('Y')),
+            mktime(23, 59, 59, date('m'), date('t'), date('Y'))
+        );
+    }
+
+    /**
+     * 返回上个月开始和结束的时间戳
+     *
+     * @return array
+     */
+    public static function lastMonth()
+    {
+        $begin = mktime(0, 0, 0, date('m') - 1, 1, date('Y'));
+        $end = mktime(23, 59, 59, date('m') - 1, date('t', $begin), date('Y'));
+
+        return array($begin, $end);
+    }
+
+    public static function lastCurrentMonth($num = 1)
+    {
+        $months = array();
+        $this_year = date('Y');
+        $this_month = 0;
+        for ($i = 1; $i <= $num; $i++) {
+            if (!$this_month) {
+                $this_month = intval(date('m'));
+            } else {
+                $this_month--;
+            }
+            $format_time = "{$this_year}-{$this_month}-01 00:00:00";
+            $current_date = strtotime(date($format_time));
+            $day_num = date('t', $current_date);
+            $months[] = array('current_date' => $current_date, 'day_num' => $day_num);
+            if ($this_month == 1) {
+                $this_year--;
+                $this_month = 13;
+            }
+        }
+        return $months;
+    }
+
+    /**
+     * 返回今年开始和结束的时间戳
+     *
+     * @return array
+     */
+    public static function year()
+    {
+        return array(
+            mktime(0, 0, 0, 1, 1, date('Y')),
+            mktime(23, 59, 59, 12, 31, date('Y'))
+        );
+    }
+
+    /**
+     * 返回去年开始和结束的时间戳
+     *
+     * @return array
+     */
+    public static function lastYear()
+    {
+        $year = date('Y') - 1;
+        return array(
+            mktime(0, 0, 0, 1, 1, $year),
+            mktime(23, 59, 59, 12, 31, $year)
+        );
+    }
+
+    /**
      * 校验日期格式是否正确
      *
      * @param string $date 日期

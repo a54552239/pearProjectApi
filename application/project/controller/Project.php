@@ -103,6 +103,14 @@ class Project extends BasicApi
         $this->success('', ['list' => $newList, 'total' => count($newList)]);
     }
 
+    public function analysis(Request $request)
+    {
+        $projectList = [];
+        $this->success('', ['list' => $projectList]);
+
+
+    }
+
     /**
      * 获取自己的项目
      * @throws DataNotFoundException
