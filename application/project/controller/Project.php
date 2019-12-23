@@ -13,6 +13,7 @@ use app\common\Model\ProjectReport;
 use app\common\Model\SystemConfig;
 use controller\BasicApi;
 use OSS\Core\OssException;
+use service\DateService;
 use service\FileService;
 use service\NodeService;
 use service\RandomService;
@@ -105,8 +106,69 @@ class Project extends BasicApi
 
     public function analysis(Request $request)
     {
+        $organizationCode = getCurrentOrganizationCode();
         $projectList = [];
-        $this->success('', ['list' => $projectList]);
+        $monthNum = date('m', time());
+        $monthList = DateService::lastCurrentMonth($monthNum);
+        $monthList = array_reverse($monthList);
+        foreach ($monthList as $key => $mounth) {
+            if ($key < $monthNum - 1) {
+                $num = \app\common\Model\Project::where('create_time', 'between', [date('Y-m-d H:i:s', $mounth['current_date']), date('Y-m-d H:i:s', $monthList[$key + 1]['current_date'])])->where(['deleted' => 0])->where(['organization_code' => $organizationCode])->count('id');
+            } else {
+                $num = \app\common\Model\Project::where('create_time', '>=', date('Y-m-d H:i:s', $mounth['current_date']))->where(['deleted' => 0])->where(['organization_code' => $organizationCode])->count('id');
+            }
+            $projectList[] = [
+                '日期' => date('m', $mounth['current_date']) . '月',
+                '数量' => $num,
+            ];
+        }
+        $projectAll = \app\common\Model\Project::where(['deleted' => 0])->where(['organization_code' => $organizationCode])->select();
+        $projectCount = count($projectAll);
+        $projectSchedule = 0;
+        $scheduleAll = 0;
+        if ($projectAll) {
+            foreach ($projectAll as $item) {
+                $scheduleAll += $item['schedule'];
+            }
+        }
+        if ($projectCount) {
+            $projectSchedule = round($scheduleAll / ($projectCount * 100), 2);
+        }
+        $taskList = [];
+        $currentMonth = DateService::lastCurrentMonth();
+        $currentMonthBegin = $currentMonth[0]['current_date'];
+        $today = date('d', time());
+        $month = date('m', time());
+        for ($i = 0; $i < $today; $i++) {
+            $dayBegin = date('Y-m-d H:i:s', $currentMonthBegin + $i * DateService::DAY);
+            $dayEnd = date('Y-m-d H:i:s', $currentMonthBegin + ($i + 1) * DateService::DAY);
+            $taskList[] = [
+                '日期' => $month . '月' . ($i + 1) . '日',
+                '任务' => \app\common\Model\Task::alias('t')->leftJoin('project p', 't.project_code = p.code')->where('t.create_time', 'between', [$dayBegin, $dayEnd])->where(['t.deleted' => 0])->where(['p.organization_code' => $organizationCode])->count('t.id'),
+            ];
+        }
+
+        $taskAll = \app\common\Model\Task::alias('t')->leftJoin('project p', 't.project_code = p.code')->where(['p.organization_code' => $organizationCode])->where(['t.deleted' => 0])->field('t.done,t.end_time,t.code')->select();
+        $taskCount = count($taskAll);
+        $taskOverdueCount = 0;
+        $now = nowTime();
+        foreach ($taskAll as $item) {
+            if ($item['end_time']) {
+                if (!$item['done']) {
+                    $item['end_time'] < $now && $taskOverdueCount++;
+                } else {
+                    $log = ProjectLog::where(['action_type' => 'task', 'source_code' => $item['code'], 'type' => 'done'])->order('id desc')->find();
+                    if ($log && $log['create_time'] > $item['end_time']) {
+                        $taskOverdueCount++;
+                    }
+                }
+            }
+        }
+        $taskOverduePercent = 0;
+        if ($taskCount) {
+            $taskOverduePercent = round($taskOverdueCount / $taskCount, 2) * 100;
+        }
+        $this->success('', compact('projectList', 'projectCount', 'projectSchedule', 'taskList', 'taskCount', 'taskOverdueCount', 'taskOverduePercent'));
 
 
     }
@@ -335,8 +397,8 @@ class Project extends BasicApi
         $taskList = Db::name('task')->where(['project_code' => $projectCode, 'deleted' => 0])->field('id,assign_to,done,end_time,create_time,code')->select();
         $taskStats['total'] = count($taskList);
         if ($taskList) {
-            $today = date('Y-m-d 00:00', time());
-            $tomorrow = date('Y-m-d 00:00', strtotime($today) + 3600 * 24);
+            $today = date('Y-m-d 00:00:00', time());
+            $tomorrow = date('Y-m-d 00:00:00', strtotime($today) + 3600 * 24);
             foreach ($taskList as $item) {
                 !$item['assign_to'] && $taskStats['toBeAssign']++;
                 $item['done'] && $taskStats['done']++;
