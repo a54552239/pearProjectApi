@@ -368,13 +368,24 @@ class Project extends BasicApi
         echo 'success_at ' . nowTime();
     }
 
+    public function _getProjectReport()
+    {
+        $projectCode = Request::param('projectCode');
+        if (!$projectCode) {
+            $this->error('项目已失效');
+        }
+        $data = ProjectReport::getReportByDay($projectCode, 10);
+        $this->success('', $data);
+    }
+
     /**
      * 概览报表
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    public function _projectStats()
+    public
+    function _projectStats()
     {
         $projectCode = Request::param('projectCode');
         if (!$projectCode) {
@@ -425,7 +436,8 @@ class Project extends BasicApi
     /**
      * 上传封面
      */
-    public function uploadCover()
+    public
+    function uploadCover()
     {
         try {
             $file = $this->model->uploadCover(Request::file('cover'));
@@ -438,7 +450,8 @@ class Project extends BasicApi
     /**
      * 放入回收站
      */
-    public function recycle()
+    public
+    function recycle()
     {
         try {
             $this->model->recycle(Request::post('projectCode'));
@@ -451,7 +464,8 @@ class Project extends BasicApi
     /**
      * 恢复
      */
-    public function recovery()
+    public
+    function recovery()
     {
         try {
             $this->model->recovery(Request::post('projectCode'));
@@ -465,7 +479,8 @@ class Project extends BasicApi
     /**
      * 归档
      */
-    public function archive()
+    public
+    function archive()
     {
         try {
             $this->model->archive(Request::post('projectCode'));
@@ -478,7 +493,8 @@ class Project extends BasicApi
     /**
      * 恢复归档
      */
-    public function recoveryArchive()
+    public
+    function recoveryArchive()
     {
         try {
             $this->model->recoveryArchive(Request::post('projectCode'));
@@ -491,7 +507,8 @@ class Project extends BasicApi
     /**
      * 退出项目
      */
-    public function quit()
+    public
+    function quit()
     {
         try {
             $this->model->quit(Request::post('projectCode'));

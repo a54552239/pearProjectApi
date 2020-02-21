@@ -17,6 +17,50 @@ class ProjectReport extends CommonModel
     protected $append = [];
     protected $json = ['content'];
 
+    /**
+     * 计算最近n天的数据
+     * @param string $projectCode 项目code
+     * @param int $day 近n天
+     * @return array
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public static function getReportByDay($projectCode, $day = 10)
+    {
+        $dateList = [];
+        $taskList = [];
+        $undoneTaskList = [];
+        $baseLineList = [];
+        $max = 0;
+        for ($i = $day; $i >= 1; $i--) {
+            $date = date('Y-m-d', mktime(0, 0, 0, date("m"), date("d") - $i, date("Y")));
+            $dateFormat = date('m-d', strtotime($date));
+            $dateList[] = $dateFormat;
+            $report = ProjectReport::where(['project_code' => $projectCode, 'date' => $date])->find();
+            if ($report) {
+                $task = get_object_vars($report['content']);
+                $taskList[] = $task['task'];
+                $undoneTaskList[] = $task['task:undone'];
+                if ($task['task:undone'] > $max) {
+                    $max = $task['task:undone'];
+                }
+            }else{
+                $taskList[] = 0;
+                $undoneTaskList[] = 0;
+            }
+        }
+        if ($max) {
+            $each = ceil($max / ($day - 1));
+            $current = $max;
+            for ($i = 1; $i <= $day; $i++) {
+                $baseLineList[] = $current;
+                $current -= $each;
+                $current < 0 && $current = 0;
+            }
+        }
+        return ['date' => $dateList, 'task' => $taskList, 'undoneTask' => $undoneTaskList, 'baseLineList' => $baseLineList];
+    }
 
     public static function setDayilyProejctReport()
     {
