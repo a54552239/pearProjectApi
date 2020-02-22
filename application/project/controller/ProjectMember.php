@@ -42,6 +42,35 @@ class ProjectMember extends BasicApi
         $this->success('', $list);
     }
 
+    public function _listForInvite()
+    {
+        $code = trim(Request::post('projectCode'));
+        if (!$code) {
+            $this->error('请先选择项目');
+        }
+        $orgCode = getCurrentOrganizationCode();
+        $memberAccountList = MemberAccount::where([['organization_code', '=', $orgCode]])->select()->toArray();
+        $list = [];
+        if ($memberAccountList) {
+            foreach ($memberAccountList as $member) {
+                $has = $this->model->where('member_code', $member['member_code'])->where('project_code', $code)->field('id')->find();
+                $item['memberCode'] = $member['member_code'];
+                $item['status'] = $member['status'];
+                $item['avatar'] = $member['avatar'];
+                $item['name'] = $member['name'];
+                $item['email'] = $member['email'] ?? '未绑定邮箱';
+                $item['joined'] = false;
+                if ($has) {
+                    $item['joined'] = true;
+//                    $item['avatar'] = $has['avatar'];
+//                    $item['name'] = $has['name'];
+                }
+                $list[] = $item; //为了去重
+            }
+        }
+        $this->success('', $list);//数组下标重置
+    }
+
 
     /**
      * 邀请成员查询
@@ -62,6 +91,7 @@ class ProjectMember extends BasicApi
         }
         $project = \app\common\Model\Project::where(['code' => $code])->field('id')->find();
         //先找出项目所有成员
+//        $projectMemberIds = [];
         $projectMemberIds = $this->model->where([['project_code', '=', $code]])->column('member_code');
         $tempList = [];
         //从当前组织的所有成员查询，判断是否已加入该项目，并存储已加入项目的成员的account_id
@@ -83,7 +113,7 @@ class ProjectMember extends BasicApi
             }
         }
         //从平台查询
-        $memberList = Member::where([['email', 'like', "%{$keyword}%"]])->whereNotIn('code', $projectMemberIds)->select()->toArray();
+        $memberList = Member::where([['email', 'like', "%{$keyword}%"]])->select()->toArray();
         if ($memberList) {
             foreach ($memberList as $member) {
                 $item = [];
