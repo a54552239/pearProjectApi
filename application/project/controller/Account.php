@@ -177,6 +177,27 @@ class Account extends BasicApi
     }
 
     /**
+     * 更新本团队内的头像和手机、邮箱
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function _syncDetail()
+    {
+        $code = Request::post('code');
+        $memberAccount = $this->model->where(['code' => $code])->find();
+        $memberInfo = Member::where('code', $memberAccount['member_code'])->find();
+        if (!$memberInfo) {
+            $this->error("更新失败！");
+        }
+        $memberAccount->avatar = $memberInfo['avatar'];
+        !$memberAccount->mobile && $memberAccount->mobile = $memberInfo['mobile'];
+        !$memberAccount->email && $memberAccount->email = $memberInfo['email'];
+        $memberAccount->save();
+        $this->success('更新成功');
+    }
+
+    /**
      * 账户添加
      * @return array|string
      * @throws \think\db\exception\DataNotFoundException

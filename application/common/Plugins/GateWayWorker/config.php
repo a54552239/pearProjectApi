@@ -8,4 +8,4 @@ define('USE_SSL', false);//是否使用ssl
 define('LOCAL_CERT', '/www/wwwroot/EasyProjectApi/server.pem');// 证书路径也可以是crt文件
 define('LOCAL_PK', '/www/wwwroot/EasyProjectApi/server.key');
 define('VERIFY_PEER', false);
-define('ALLOW_SELF_SIGNED', true);//如果是自签名证书需要开启此选项
+define('ALLOW_SELF_SIGNED', false);//如果是自签名证书需要开启此选项
