@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\Client;
 use Workerman\Lib\Timer;
 use Workerman\Worker;
 
@@ -9,6 +10,7 @@ require_once __DIR__ . '/../../../../vendor/autoload.php';
 
 date_default_timezone_set('Asia/Shanghai');
 
+$client = new Client();
 $task = new Worker();
 $task->name = 'crontab';
 $doneTicket = [];
@@ -32,9 +34,14 @@ function checkTime()
 
 function setProjectReport()
 {
-    global $doneTicket;
+    global $client,$doneTicket;
     $doneTicket['setProjectReportDate'] = date('Y-m-d', time());
-    exec("php think projectReport",$out);
-    echo $out[0];
+    //命令行模式
+//    exec("php think projectReport",$out);
+//    echo $out[0];
+
+    //http模式
+    $res = $client->request('GET', SITE_URL . '/index.php/project/project/_setDayilyProejctReport');
+    echo $res->getBody();
 }
 
