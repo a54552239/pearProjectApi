@@ -21,6 +21,7 @@ class NodeService
     {
         cache('member_need_access_node', null);
         $member = getCurrentMember();
+        $member['nodes'] = [];
         if (($authorize = $member['authorize'])) {
             $where = ['status' => '1'];
             $authorizeIds = Db::name('ProjectAuth')->whereIn('id', explode(',', $authorize))->where($where)->column('id');
@@ -32,7 +33,7 @@ class NodeService
             $member['nodes'] = $nodes;
             return setCurrentMember($member);
         }
-        return false;
+        return setCurrentMember($member);
     }
 
     /**
@@ -68,7 +69,7 @@ class NodeService
             if (!in_array($currentNode, self::getProjectAuthNode())) {
                 return true;
             }
-            return in_array($currentNode, (array)$member['nodes']);
+            return in_array($currentNode, !empty($member['nodes']) ? (array)$member['nodes'] : []);
         }
         return false;
     }

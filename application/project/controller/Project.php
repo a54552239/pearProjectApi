@@ -181,8 +181,10 @@ class Project extends BasicApi
      */
     public function selfList()
     {
-        $type = Request::post('type');
+        $type = Request::post('type', 0);
         $archive = Request::param('archive', 0);
+        $delete = Request::param('delete');
+        $organizationCode = Request::param('organizationCode', '');
         $memberCode = Request::post('memberCode', '');
         if (!$memberCode) {
             $member = getCurrentMember();
@@ -192,11 +194,11 @@ class Project extends BasicApi
         if (!$member) {
             $this->error("参数有误");
         }
-        $deleted = 1;
+        $deleted = $delete === null ? 1 : $delete;
         if (!$type) {
             $deleted = 0;
         }
-        $list = $this->model->getMemberProjects($member['code'], getCurrentOrganizationCode(), $deleted, $archive, Request::post('page'), Request::post('pageSize'));
+        $list = $this->model->getMemberProjects($member['code'], $organizationCode ?? getCurrentOrganizationCode(), $deleted, $archive, Request::post('page'), Request::post('pageSize'));
         if ($list['list']) {
             foreach ($list['list'] as $key => &$item) {
                 $item['owner_name'] = '-';
@@ -206,9 +208,8 @@ class Project extends BasicApi
                 }
                 $collected = ProjectCollection::where(['project_code' => $item['code'], 'member_code' => getCurrentMember()['code']])->field('id')->find();
                 $item['collected'] = $collected ? 1 : 0;
-                $owner = ProjectMember::where(['project_code' => $item['code'], 'is_owner' => 1])->field('member_code')->find();
-                $member = Member::where(['code' => $owner['member_code']])->field('name')->find();
-                $item['owner_name'] = $member['name'];
+                $owner = ProjectMember::alias('pm')->leftJoin('member m', 'pm.member_code = m.code')->where(['pm.project_code' => $item['code'], 'is_owner' => 1])->field('member_code,name')->find();
+                $item['owner_name'] = $owner['name'];
             }
             unset($item);
         }

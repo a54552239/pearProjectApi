@@ -27,7 +27,7 @@ class Member extends CommonModel
             'last_login_time' => Db::raw('now()'),
         ]);
         $list = MemberAccount::where(['member_code' => $member['code']])->order('id asc')->select()->toArray();
-        $organizationList = [];
+        $organizationList = self::getOrgList($member['code'], true);
         if ($list) {
             foreach ($list as &$item) {
                 $departments = [];
@@ -40,10 +40,6 @@ class Member extends CommonModel
                     }
                 }
                 $item['department'] = $departments ? implode(' - ', $departments) : '';
-                $organization = Organization::where(['code' => $item['organization_code']])->find();
-                if ($organization) {
-                    $organizationList[] = $organization;
-                }
             }
         }
         $member['account_id'] = $list[0]['id'];
@@ -62,6 +58,41 @@ class Member extends CommonModel
         session('loginInfo', $loginInfo);
         logRecord($loginInfo, 'info', 'member/login');
         return $loginInfo;
+    }
+
+    /**
+     * 获取当前用户所在的组织
+     * @param string $memberCode
+     * @param bool $newest 是否取最新的值
+     * @return array
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public static function getOrgList(string $memberCode, $newest = false)
+    {
+        $organizationList = [];
+        if (!$memberCode) {
+            return $organizationList;
+        }
+        $cacheKey = 'member:orgList:' . $memberCode;
+        if (!$newest) {
+            $organizationList = cache($cacheKey);
+            if ($organizationList) {
+                return $organizationList;
+            }
+        }
+        $list = MemberAccount::where(['member_code' => $memberCode])->order('id asc')->select()->toArray();
+        if ($list) {
+            foreach ($list as $item) {
+                $organization = Organization::where(['code' => $item['organization_code']])->find();
+                if ($organization) {
+                    $organizationList[] = $organization;
+                }
+            }
+        }
+        cache($cacheKey, $organizationList, 3600 * 24);
+        return $organizationList;
     }
 
     /**
@@ -176,7 +207,7 @@ class Member extends CommonModel
                 if (!$currentMember['dingtalk_unionid'] || !$currentMember['dingtalk_userid']) {
                     if ($currentMember['mobile']) {
                         unset($memberData['mobile']);
-                    }else{
+                    } else {
                         $has = self::where(['mobile' => $memberData['mobile']])->find();
                         if ($has) {
                             return error('1', '您想要绑定的手机号码已经被绑定给其他帐号，请先用该手机号码登录后进行重置，再切回当前帐号发起绑定');
@@ -184,7 +215,7 @@ class Member extends CommonModel
                     }
                     if ($currentMember['email']) {
                         unset($memberData['email']);
-                    }else{
+                    } else {
                         $has = self::where(['email' => $memberData['email']])->find();
                         if ($has) {
                             return error('1', '您想要绑定的邮箱已经被绑定给其他帐号，请先用该邮箱登录后进行重置，再切回当前帐号发起绑定');

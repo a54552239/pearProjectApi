@@ -22,12 +22,14 @@ class Notify extends CommonModel
         $formatList = [];
         $total = $this->where($where)->count('id');
         if ($list) {
+            foreach ($types as $type) {
+                !isset($formatList[$type]) and $formatList[$type] = [];
+                !isset($totalSum[$type]) and $totalSum[$type] = 0;
+                $sum = $this->where($where)->where(['type' => $type])->count('id');
+                $totalSum[$type] = $sum;
+            }
             foreach ($list as &$item) {
                 foreach ($types as $type) {
-                    !isset($formatList[$type]) and $formatList[$type] = [];
-                    !isset($totalSum[$type]) and $totalSum[$type] = 0;
-                    $sum = $this->where($where)->where(['type' => $type])->count('id');
-                    $totalSum[$type] = $sum;
                     if ($size and count($formatList[$type]) >= $size) {
                         continue;
                     }
