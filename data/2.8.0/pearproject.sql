@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 22/02/2020 20:22:08
+ Date: 23/02/2020 16:14:45
 */
 
 SET NAMES utf8mb4;
@@ -1974,7 +1974,7 @@ CREATE TABLE `pear_project_menu`  (
 -- ----------------------------
 -- Records of pear_project_menu
 -- ----------------------------
-INSERT INTO `pear_project_menu` VALUES (120, 0, '工作台', 'appstore-o', 'home', 'home', '', '#', 0, 1, 0, '2018-09-30 16:30:01', 0, '', 0);
+INSERT INTO `pear_project_menu` VALUES (120, 0, '工作台', 'appstore-o', 'home', 'home', ':org', '#', 0, 1, 0, '2018-09-30 16:30:01', 0, '', 0);
 INSERT INTO `pear_project_menu` VALUES (121, 0, '项目管理', 'project', '#', '#', '', '#', 0, 1, 0, '0000-00-00 00:00:00', 0, '', 1);
 INSERT INTO `pear_project_menu` VALUES (122, 121, '项目列表', 'branches', '#', '#', '', '#', 0, 1, 0, '0000-00-00 00:00:00', 0, '', 1);
 INSERT INTO `pear_project_menu` VALUES (124, 0, '系统设置', 'setting', '#', '#', '', '#', 100, 1, 0, '0000-00-00 00:00:00', 0, '', 1);
@@ -2077,7 +2077,7 @@ INSERT INTO `pear_project_node` VALUES (508, 'project/department_member/index', 
 INSERT INTO `pear_project_node` VALUES (509, 'project/department_member/searchinvitemember', '搜索部门成员', 0, 0, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (510, 'project/department_member/invitemember', '添加部门成员', 0, 1, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (511, 'project/department_member/removemember', '移除部门成员', 0, 1, 1, NULL);
-INSERT INTO `pear_project_node` VALUES (512, 'project/index/changecurrentorganization', '切换当前组织', 0, 1, 1, NULL);
+INSERT INTO `pear_project_node` VALUES (512, 'project/index/changecurrentorganization', '切换当前组织', 0, 0, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (513, 'project/index/editpassword', '修改密码', 0, 1, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (514, 'project/index/uploadimg', '上传图片', 0, 0, 1, NULL);
 INSERT INTO `pear_project_node` VALUES (515, 'project/menu', '菜单管理', 0, 1, 1, NULL);
