@@ -73,7 +73,10 @@ class MemberAccount extends CommonModel
             'mobile' => $mobile,
             'email' => $memberDate['email'],
         ];
-        return MemberAccount::create($data);
+        $result = MemberAccount::create($data);
+        $cacheKey = 'member:orgList:' . $memberCode;
+        cache($cacheKey, null);
+        return $result;
     }
 
     /**
@@ -126,6 +129,8 @@ class MemberAccount extends CommonModel
                 $orgCode = getCurrentOrganizationCode();
                 DepartmentMember::where(['account_code' => $accountCode, 'organization_code' => $orgCode])->delete();
             }
+            $cacheKey = 'member:orgList:' . $memberAccount['member_code'];
+            cache($cacheKey, null);
             Db::commit();
         } catch (Exception $e) {
             Db::rollback();

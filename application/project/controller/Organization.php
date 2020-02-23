@@ -2,6 +2,7 @@
 
 namespace app\project\controller;
 
+use app\common\Model\Member;
 use controller\BasicApi;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
@@ -16,6 +17,12 @@ class Organization extends BasicApi
         if (!$this->model) {
             $this->model = new \app\common\Model\Organization();
         }
+    }
+
+    public function _getOrgList()
+    {
+        $list = Member::getOrgList(getCurrentMember()['code']);
+        $this->success('', $list);
     }
 
     /**
@@ -103,7 +110,7 @@ class Organization extends BasicApi
     /**
      * 删除指定资源
      *
-     * @param  int $id
+     * @param int $id
      * @return void
      */
     public function delete($id = 0)
