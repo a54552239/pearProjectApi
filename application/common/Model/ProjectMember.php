@@ -55,6 +55,9 @@ class ProjectMember extends CommonModel
 //            throw new \Exception('该成员尚未加入项目', 1);
             return true;
         }
+        if ($hasJoined['is_owner']) {
+            throw new \Exception('不能移除创建者', 1);
+        }
         $result = $hasJoined->delete();
         Project::projectHook(getCurrentMember()['code'], $projectCode, 'removeMember', $memberCode);
         return $result;
