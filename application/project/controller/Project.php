@@ -56,32 +56,24 @@ class Project extends BasicApi
 
         $orgCode = getCurrentOrganizationCode();
         if ($type == 'my' || $type == 'other') {
-            $sql = "select * from {$prefix}project as pp join {$prefix}project_member as pm on pm.project_code = pp.code where pp.organization_code = '{$orgCode}' and (pm.member_code = '{$memberCode}' or pp.private = 0) group by pp.`code` order by pp.id desc";
-            $list = CommonModel::limitByQuery($sql, $page, $pageSize);
+            $sql = "select * from {$prefix}project as pp left join {$prefix}project_member as pm on pm.project_code = pp.code where pp.organization_code = '{$orgCode}' and (pm.member_code = '{$memberCode}' or pp.private = 0)";
         } else {
-            $sql = "select * from {$prefix}project as pp join {$prefix}project_collection as pc on pc.project_code = pp.code where pp.organization_code = '{$orgCode}' and pc.member_code = '{$memberCode}' group by pp.`code` order by pc.id desc";
-            $list = CommonModel::limitByQuery($sql, $page, $pageSize);
+            $sql = "select * from {$prefix}project as pp left  join {$prefix}project_collection as pc on pc.project_code = pp.code where pp.organization_code = '{$orgCode}' and pc.member_code = '{$memberCode}'";
         }
+        if ($type != 'other') {
+            $sql .= " and pp.deleted = 0";
+        }
+        if (isset($data['archive'])) {
+            $sql .= " and pp.archive = 1";
+        }
+        if (isset($data['recycle'])) {
+            $sql .= " and pp.deleted = 1";
+        }
+        $sql .= " group by pp.`code` order by pp.id desc";
+        $list = CommonModel::limitByQuery($sql, $page, $pageSize);
         $newList = [];
         if ($list['list']) {
             foreach ($list['list'] as $key => &$item) {
-                $delete = false;
-                if ($type != 'other') {
-                    if ($item['deleted']) {
-                        $delete = true;
-                    }
-                }
-                if (isset($data['archive']) && !$item['archive']) {
-                    $delete = true;
-                }
-
-                if (isset($data['recycle']) && !$item['deleted']) {
-                    $delete = true;
-                }
-                if ($delete) {
-                    continue;
-                }
-
                 $item['collected'] = 0;
                 $item['owner_name'] = '-';
                 $collected = ProjectCollection::where(['project_code' => $item['code'], 'member_code' => $currentMember['code']])->field('id')->find();
