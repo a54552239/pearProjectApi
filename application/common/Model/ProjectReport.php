@@ -51,12 +51,12 @@ class ProjectReport extends CommonModel
             }
         }
         if ($max) {
-            $each = ceil($max / ($day - 1));
+            $each = round($max / ($day - 1), 1);
             $current = $max;
             for ($i = 1; $i <= $day; $i++) {
+                ($current < 0 || $day == $i) && $current = 0;
                 $baseLineList[] = $current;
                 $current -= $each;
-                $current < 0 && $current = 0;
             }
         }
         return ['date' => $dateList, 'task' => $taskList, 'undoneTask' => $undoneTaskList, 'baseLineList' => $baseLineList];
