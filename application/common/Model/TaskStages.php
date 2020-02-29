@@ -19,25 +19,114 @@ class TaskStages extends CommonModel
      * 任务列表下的任务
      * @param $stageCode
      * @param int $deleted
+     * @param int $done
+     * @param string $title
+     * @param array $pri
+     * @param array $executor
+     * @param array $creator
+     * @param array $joiner
+     * @param array $endTime
+     * @param array $beginTime
+     * @param array $createTime
+     * @param array $doneTime
      * @return array|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function tasks($stageCode, $deleted = 0, $done = -1)
+    public function tasks($stageCode, $deleted = 0, $done = -1, $title = '', $pri = [], $executor = [], $creator = [], $joiner = [], $endTime = [], $beginTime = [], $createTime = [], $doneTime = [])
+    {
+        $where = ['pcode' => '', 'deleted' => $deleted];
+        if ($done != -1) {
+            $where['done'] = $done;
+        }
+        $taskModel = Task::alias('t')->where($where);
+        if (is_array($stageCode)) {
+            $taskModel = $taskModel->whereIn('t.stage_code', $stageCode);
+        }else{
+            $taskModel = $taskModel->where('t.stage_code', $stageCode);
+        }
+        if ($title) {
+            $taskModel = $taskModel->whereLike('t.name', "%$title%");
+        }
+        if ($pri) {
+            $taskModel = $taskModel->whereIn('t.pri', $pri);
+        }
+        if ($endTime) {
+            $taskModel = $taskModel->whereBetween('t.end_time', implode(',', $endTime));
+        }
+        if ($beginTime) {
+            $taskModel = $taskModel->whereBetween('t.begin_time', implode(',', $beginTime));
+        }
+        if ($createTime) {
+            $taskModel = $taskModel->whereBetween('t.create_time', implode(',', $createTime));
+        }
+        if ($doneTime) {
+            $taskModel = $taskModel->leftJoin('project_log pl', 't.code = pl.source_code')->where(['pl.action_type'=> 'task', 'pl.type' => 'done'])->whereBetween('pl.create_time', $doneTime);
+        }
+        //todo 查询范围问题
+        $joinTaskMember = false;
+        if ($executor) {
+            $joinTaskMember = true;
+            $taskModel = $taskModel->leftJoin('task_member tm', 't.code = tm.task_code')->whereIn('tm.member_code', $executor)->where('tm.is_executor', 1);
+        }
+        if ($creator) {
+            !$joinTaskMember && $taskModel->leftJoin('task_member tm', 't.code = tm.task_code');
+            $taskModel = $taskModel->whereIn('tm.member_code', $creator)->where('tm.is_owner', 1);
+        }
+        if ($joiner) {
+            !$joinTaskMember && $taskModel->leftJoin('task_member tm', 't.code = tm.task_code');
+            $taskModel = $taskModel->whereIn('tm.member_code', $joiner);
+        }
+        $list = $taskModel->order('t.sort asc,t.id asc')->field('id', true)->select();
+        if ($list) {
+            $taskMemberList = [];
+            foreach ($list as &$task) {
+                $assign_to = $task['assign_to'];
+                $task['executor'] = null;
+                if ($assign_to) {
+                    if (isset($taskMemberList[$assign_to])) {
+                        $task['executor'] = $taskMemberList[$assign_to];
+                    } else {
+                        $task['executor'] = Member::where(['code' => $task['assign_to']])->field('name,avatar')->find();
+                        $taskMemberList[$assign_to] = $task['executor'];
+                    }
+                }
+            }
+        }
+        return $list;
+    }
+
+    /*public function tasks($stageCode, $deleted = 0, $done = -1)
     {
         $where = ['stage_code' => $stageCode, 'pcode' => '', 'deleted' => $deleted];
         if ($done != -1) {
             $where['done'] = $done;
         }
-        $list = Task::where($where)->order('sort asc,id asc')->field('id', true)->select();
+        $cacheKey = 'taskStages:task:' . $stageCode;
+        $list = cache($cacheKey);
         if ($list) {
+            return $list;
+        }
+        $list = Task::where($where)->order('sort asc,id asc')->field('id', true)->select()->toArray();
+        if ($list) {
+            $taskMemberList = [];
             foreach ($list as &$task) {
-                $task['executor'] = Member::where(['code' => $task['assign_to']])->field('name,avatar')->find();
+                $assign_to = $task['assign_to'];
+                $task['executor'] = null;
+                if ($assign_to) {
+                    if (isset($taskMemberList[$assign_to])) {
+                        $task['executor'] = $taskMemberList[$assign_to];
+                    }else{
+                        $task['executor'] = Member::where(['code' => $task['assign_to']])->field('name,avatar')->find();
+                        $taskMemberList[$assign_to] = $task['executor'];
+                    }
+                }
             }
         }
+        cache($cacheKey, $list, 600);
         return $list;
-    }
+    }*/
 
     /**
      * @param $name

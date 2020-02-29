@@ -1,9 +1,10 @@
 {
-  "type": "pearProject",
-  "name": "pearProject",
-  "description": "pearProject",
-  "homepage": "https://beta.vilson.xyz",
+  "name": "vilson/pearproject",
+  "description": "task collaboration",
+  "homepage": "https://home.vilson.xyz",
   "keywords": [
+    "task",
+    "team",
     "project",
     "plan"
   ],
@@ -15,7 +16,7 @@
     }
   ],
   "require": {
-    "php": ">=7.0",
+    "php": ">=7.2",
     "qiniu/php-sdk": "^7.2",
     "endroid/qr-code": "^1.9",
     "topthink/framework": "5.1.*",
