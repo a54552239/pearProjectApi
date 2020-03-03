@@ -118,4 +118,14 @@ class Organization extends BasicApi
         $this->model->destroy(Request::post('id'));
         $this->success('');
     }
+
+    public function _quitOrganization(Request $request)
+    {
+        $organizationCode = $request::param('organizationCode');
+        $res = $this->model->quitOrganization(getCurrentMember()['code'], $organizationCode);
+        if (isError($res)) {
+            $this->error($res['msg']);
+        }
+        $this->success('');
+    }
 }

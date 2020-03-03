@@ -2,6 +2,8 @@
 
 namespace app\common\Model;
 
+use think\Db;
+
 /**
  * 组织
  * Class Organization
@@ -83,5 +85,47 @@ class Organization extends CommonModel
         }
         $result = self::update($data, ['code' => $code]);
         return $result;
+    }
+
+    public static function quitOrganization($memberCode, $orgCode)
+    {
+        if (!$orgCode) {
+            return error(201, '请选择组织');
+        }
+        $org = self::where(['code' => $orgCode])->field('id', true)->find();
+        if (!$org) {
+            return error(202, '该组织不存在');
+        }
+        $hasJoined = MemberAccount::where(['member_code' => $memberCode, 'organization_code' => $orgCode])->find();
+        if (!$hasJoined) {
+            return error(203, '尚未加入该组织');
+        }
+        Db::startTrans();
+        try {
+            $accountCode = $hasJoined['code'];
+            $hasJoined->delete();
+            //退出部门
+            $list = DepartmentMember::where(['account_code' => $accountCode])->select();
+            if ($list) {
+                $departmentMemberModel = new DepartmentMember();
+                foreach ($list as $item) {
+                    $departmentMemberModel->removeMember($accountCode, $item['department_code']);
+                }
+                unset($item);
+            }
+            //退出项目
+            $projectMemberList = ProjectMember::alias('pm')->leftJoin('project p', 'p.code = pm.project_code')->where(['pm.member_code' => $memberCode, 'p.organization_code' => $orgCode])->select();
+            if ($projectMemberList) {
+                $projectMemberModel = new ProjectMember();
+                foreach ($projectMemberList as $item) {
+                    $projectMemberModel->removeMember($memberCode, $item['project_code']);
+                }
+            }
+        } catch (\Exception $exception) {
+            Db::rollback();
+            return error($exception->getCode(), $exception->getMessage());
+        }
+        Db::commit();
+        return true;
     }
 }
