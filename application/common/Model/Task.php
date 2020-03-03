@@ -498,7 +498,7 @@ class Task extends CommonModel
         if ($page < 1) {
             $page = 1;
         }
-        $offset = ($page - 1) * $page;
+        $offset = ($page - 1) * $pageSize;
         $limit = $pageSize;
         $prefix = config('database.prefix');
         $doneSql = '';
