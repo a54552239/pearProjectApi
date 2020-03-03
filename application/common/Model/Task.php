@@ -481,7 +481,16 @@ class Task extends CommonModel
         return false;
     }
 
-    public function getMemberTasks($memberCode = '', $done = 0, $page = 1, $pageSize = 10)
+    /**
+     * 成员任务
+     * @param string $memberCode
+     * @param int $done
+     * @param int $taskType 搜索类型 1-我执行的 2-我参与的 3-我创建的
+     * @param int $page
+     * @param int $pageSize
+     * @return array
+     */
+    public function getMemberTasks($memberCode = '', $done = 0, $taskType = 1, $page = 1, $pageSize = 10)
     {
         if (!$memberCode) {
             $memberCode = getCurrentMember()['code'];
@@ -496,7 +505,18 @@ class Task extends CommonModel
         if ($done != -1) {
             $doneSql = " and t.done = {$done}";
         }
-        $sql = "select *,t.id as id,t.name as name,t.code as code,t.create_time as create_time,t.end_time,t.begin_time from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code where  t.deleted = 0 {$doneSql} and t.assign_to = '{$memberCode}' and p.deleted = 0 order by t.id desc";
+        //我执行的
+        if ($taskType == 1) {
+            $sql = "select *,t.id as id,t.name as name,t.code as code,t.create_time as create_time,t.end_time,t.begin_time from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code where  t.deleted = 0 {$doneSql} and t.assign_to = '{$memberCode}' and p.deleted = 0 order by t.id desc";
+        }
+        //我参与的
+        if ($taskType == 2) {
+            $sql = "select *,t.id as id,t.name as name,t.code as code,t.create_time as create_time,t.end_time,t.begin_time from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code left join {$prefix}task_member as tm on tm.task_code = t.code where  t.deleted = 0 {$doneSql} and tm.member_code = '{$memberCode}' and p.deleted = 0 order by t.id desc";
+        }
+        //我创建的
+        if ($taskType == 3) {
+            $sql = "select *,t.id as id,t.name as name,t.code as code,t.create_time as create_time,t.end_time,t.begin_time from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code where  t.deleted = 0 {$doneSql} and t.create_by = '{$memberCode}' and p.deleted = 0 order by t.id desc";
+        }
         $total = Db::query($sql);
         $total = count($total);
         $sql .= " limit {$offset},{$limit}";
