@@ -294,7 +294,7 @@ class Task extends BasicApi
      */
     public function edit(Request $request)
     {
-        $data = $request::only('name,sort,end_time,begin_time,pri,description,work_time');
+        $data = $request::only('name,sort,end_time,begin_time,pri,description,work_time,status');
         $code = $request::post('taskCode');
         if (!$code) {
             $this->error("请选择一个任务");

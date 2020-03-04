@@ -19,7 +19,7 @@ use think\facade\Hook;
  */
 class Task extends CommonModel
 {
-    protected $append = ['priText', 'liked', 'stared', 'tags', 'childCount', 'hasUnDone', 'parentDone', 'hasComment', 'hasSource', 'canRead'];
+    protected $append = ['priText','statusText', 'liked', 'stared', 'tags', 'childCount', 'hasUnDone', 'parentDone', 'hasComment', 'hasSource', 'canRead'];
 
     public function read($code)
     {
@@ -111,6 +111,9 @@ class Task extends CommonModel
         }
         if (isset($data['pri'])) {
             $type = 'pri';
+        }
+        if (isset($data['status'])) {
+            $type = 'status';
         }
         if (isset($data['begin_time'])) {
             $type = 'setBeginTime';
@@ -719,6 +722,14 @@ class Task extends CommonModel
         }
         $status = [0 => '普通', 1 => '紧急', 2 => '非常紧急'];
         return $status[$data['pri']];
+    }
+    public function getStatusTextAttr($value, $data)
+    {
+        if (!isset($data['status'])) {
+            $data['status'] = 0;
+        }
+        $status = [0 => '未开始', 1 => '已完成', 2 => '进行中', 3 => '挂起', 4 => '测试中'];
+        return $status[$data['status']];
     }
 
     /**

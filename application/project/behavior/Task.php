@@ -118,6 +118,10 @@ class Task
                 $icon = 'user';
                 $remark = '更新任务优先级为 ' . $task['priText'];
                 break;
+            case 'status':
+                $icon = 'deployment-unit';
+                $remark = '修改执行状态为 ' . $task['statusText'];
+                break;
             case 'removeExecutor':
                 $icon = 'user-delete';
                 $remark = '移除了执行者 ';
