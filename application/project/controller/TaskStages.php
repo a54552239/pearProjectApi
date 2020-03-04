@@ -69,6 +69,7 @@ class TaskStages extends BasicApi
         $done = Request::param('done', -1);
         $title = Request::param('title', '');
         $pri = json_decode(Request::post('pri', ''));
+        $status = json_decode(Request::post('status', ''));
         $stage = json_decode(Request::post('stage', ''));
         $executor = json_decode(Request::post('executor', ''));
         $creator = json_decode(Request::post('creator', ''));
@@ -81,7 +82,7 @@ class TaskStages extends BasicApi
             $this->error("数据解析异常");
         }
         $where[] = ['stage_code', '=', $code];
-        $list = $this->model->tasks($code, 0, $done, $title, $pri, $executor, $creator, $joiner, $endTime, $beginTime, $createTime, $doneTime);
+        $list = $this->model->tasks($code, 0, $done, $title, $pri, $executor, $creator, $joiner, $status, $endTime, $beginTime, $createTime, $doneTime);
 //        $list = \app\common\Model\Task::alias('t')->join('member m','t.assign_to = m.code')->field()->where(['stage_code'=>$code])->select();
 
         $this->success('', $list);

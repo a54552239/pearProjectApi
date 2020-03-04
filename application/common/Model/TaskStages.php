@@ -34,7 +34,7 @@ class TaskStages extends CommonModel
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function tasks($stageCode, $deleted = 0, $done = -1, $title = '', $pri = [], $executor = [], $creator = [], $joiner = [], $endTime = [], $beginTime = [], $createTime = [], $doneTime = [])
+    public function tasks($stageCode, $deleted = 0, $done = -1, $title = '', $pri = [], $executor = [], $creator = [], $joiner = [], $status = [], $endTime = [], $beginTime = [], $createTime = [], $doneTime = [])
     {
         $where = ['pcode' => '', 'deleted' => $deleted];
         if ($done != -1) {
@@ -43,7 +43,7 @@ class TaskStages extends CommonModel
         $taskModel = Task::alias('t')->where($where);
         if (is_array($stageCode)) {
             $taskModel = $taskModel->whereIn('t.stage_code', $stageCode);
-        }else{
+        } else {
             $taskModel = $taskModel->where('t.stage_code', $stageCode);
         }
         if ($title) {
@@ -51,6 +51,9 @@ class TaskStages extends CommonModel
         }
         if ($pri) {
             $taskModel = $taskModel->whereIn('t.pri', $pri);
+        }
+        if ($status) {
+            $taskModel = $taskModel->whereIn('t.status', $status);
         }
         if ($endTime) {
             $taskModel = $taskModel->whereBetween('t.end_time', implode(',', $endTime));
@@ -62,7 +65,7 @@ class TaskStages extends CommonModel
             $taskModel = $taskModel->whereBetween('t.create_time', implode(',', $createTime));
         }
         if ($doneTime) {
-            $taskModel = $taskModel->leftJoin('project_log pl', 't.code = pl.source_code')->where(['pl.action_type'=> 'task', 'pl.type' => 'done'])->whereBetween('pl.create_time', $doneTime);
+            $taskModel = $taskModel->leftJoin('project_log pl', 't.code = pl.source_code')->where(['pl.action_type' => 'task', 'pl.type' => 'done'])->whereBetween('pl.create_time', $doneTime);
         }
         //todo 查询范围问题
         $joinTaskMember = false;
