@@ -77,6 +77,7 @@ class Task extends BasicApi
      */
     public function selfList()
     {
+        $taskType = Request::post('taskType', 1);
         $type = Request::post('type', 0);
         $memberCode = Request::post('memberCode', '');
         if (!$memberCode) {
@@ -89,9 +90,11 @@ class Task extends BasicApi
             $done = 0;
         }
         $type == -1 && $done = $type;
-        $list = $this->model->getMemberTasks($member['code'], $done, Request::post('page'), Request::post('pageSize'));
+        $list = $this->model->getMemberTasks($member['code'], $done, $taskType, Request::post('page'), Request::post('pageSize'));
+        $status = [0 => '普通', 1 => '紧急', 2 => '非常紧急'];
         if ($list['list']) {
             foreach ($list['list'] as &$task) {
+                $task['priText'] = $status[$task['pri']];
                 $task['executor'] = Member::where(['code' => $task['assign_to']])->field('name,avatar')->find();
                 $task['projectInfo'] = \app\common\Model\Project::where(['code' => $task['project_code']])->field('name,code')->find();
             }
@@ -291,7 +294,7 @@ class Task extends BasicApi
      */
     public function edit(Request $request)
     {
-        $data = $request::only('name,sort,end_time,begin_time,pri,description,work_time');
+        $data = $request::only('name,sort,end_time,begin_time,pri,description,work_time,status');
         $code = $request::post('taskCode');
         if (!$code) {
             $this->error("请选择一个任务");

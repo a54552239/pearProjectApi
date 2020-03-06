@@ -146,6 +146,12 @@ class DepartmentMember extends CommonModel
                         }
                     } else {
                         $memberAccount = MemberAccount::where(['member_code' => $member['code'], 'organization_code' => $organizationCode])->find();
+                        if (!$memberAccount) {
+                            $memberAccount = MemberAccount::inviteMember($member['code'], $organizationCode, $position, $mobile, '', $description);
+                            if (!isError($memberAccount)) {
+                                $count++;
+                            }
+                        }
                     }
                     if ($departments) {
                         $departmentList = explode(';', $departments);
@@ -168,6 +174,8 @@ class DepartmentMember extends CommonModel
                                         } catch (Exception $e) {
                                             return error(2, $e->getMessage());
                                         }
+                                    }else{
+
                                     }
                                 }
                             }

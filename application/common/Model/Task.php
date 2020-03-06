@@ -19,7 +19,7 @@ use think\facade\Hook;
  */
 class Task extends CommonModel
 {
-    protected $append = ['priText', 'liked', 'stared', 'tags', 'childCount', 'hasUnDone', 'parentDone', 'hasComment', 'hasSource', 'canRead'];
+    protected $append = ['priText','statusText', 'liked', 'stared', 'tags', 'childCount', 'hasUnDone', 'parentDone', 'hasComment', 'hasSource', 'canRead'];
 
     public function read($code)
     {
@@ -111,6 +111,9 @@ class Task extends CommonModel
         }
         if (isset($data['pri'])) {
             $type = 'pri';
+        }
+        if (isset($data['status'])) {
+            $type = 'status';
         }
         if (isset($data['begin_time'])) {
             $type = 'setBeginTime';
@@ -481,7 +484,16 @@ class Task extends CommonModel
         return false;
     }
 
-    public function getMemberTasks($memberCode = '', $done = 0, $page = 1, $pageSize = 10)
+    /**
+     * 成员任务
+     * @param string $memberCode
+     * @param int $done
+     * @param int $taskType 搜索类型 1-我执行的 2-我参与的 3-我创建的
+     * @param int $page
+     * @param int $pageSize
+     * @return array
+     */
+    public function getMemberTasks($memberCode = '', $done = 0, $taskType = 1, $page = 1, $pageSize = 10)
     {
         if (!$memberCode) {
             $memberCode = getCurrentMember()['code'];
@@ -489,14 +501,25 @@ class Task extends CommonModel
         if ($page < 1) {
             $page = 1;
         }
-        $offset = ($page - 1) * $page;
+        $offset = ($page - 1) * $pageSize;
         $limit = $pageSize;
         $prefix = config('database.prefix');
         $doneSql = '';
         if ($done != -1) {
             $doneSql = " and t.done = {$done}";
         }
-        $sql = "select *,t.id as id,t.name as name,t.code as code,t.create_time as create_time,t.end_time,t.begin_time from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code where  t.deleted = 0 {$doneSql} and t.assign_to = '{$memberCode}' and p.deleted = 0 order by t.id desc";
+        //我执行的
+        if ($taskType == 1) {
+            $sql = "select *,t.id as id,t.name as name,t.code as code,t.create_time as create_time,t.end_time,t.begin_time from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code where  t.deleted = 0 {$doneSql} and t.assign_to = '{$memberCode}' and p.deleted = 0 order by t.id desc";
+        }
+        //我参与的
+        if ($taskType == 2) {
+            $sql = "select *,t.id as id,t.name as name,t.code as code,t.create_time as create_time,t.end_time,t.begin_time from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code left join {$prefix}task_member as tm on tm.task_code = t.code where  t.deleted = 0 {$doneSql} and tm.member_code = '{$memberCode}' and p.deleted = 0 order by t.id desc";
+        }
+        //我创建的
+        if ($taskType == 3) {
+            $sql = "select *,t.id as id,t.name as name,t.code as code,t.create_time as create_time,t.end_time,t.begin_time from {$prefix}task as t join {$prefix}project as p on t.project_code = p.code where  t.deleted = 0 {$doneSql} and t.create_by = '{$memberCode}' and p.deleted = 0 order by t.id desc";
+        }
         $total = Db::query($sql);
         $total = count($total);
         $sql .= " limit {$offset},{$limit}";
@@ -699,6 +722,14 @@ class Task extends CommonModel
         }
         $status = [0 => '普通', 1 => '紧急', 2 => '非常紧急'];
         return $status[$data['pri']];
+    }
+    public function getStatusTextAttr($value, $data)
+    {
+        if (!isset($data['status'])) {
+            $data['status'] = 0;
+        }
+        $status = [0 => '未开始', 1 => '已完成', 2 => '进行中', 3 => '挂起', 4 => '测试中'];
+        return $status[$data['status']];
     }
 
     /**
