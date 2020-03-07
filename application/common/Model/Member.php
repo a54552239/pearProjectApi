@@ -26,7 +26,19 @@ class Member extends CommonModel
         Db::name('Member')->where(['id' => $member['id']])->update([
             'last_login_time' => Db::raw('now()'),
         ]);
-        $list = MemberAccount::where(['member_code' => $member['code']])->order('id asc')->select()->toArray();
+
+        $configModel = new SystemConfig();
+        $config = $configModel->info();
+        if ($config['single_mode'] && $config['single_org_code']) {
+            $list = MemberAccount::where(['member_code' => $member['code'], 'organization_code' => $config['single_org_code']])->order('id asc')->select()->toArray();
+            if (!$list) {
+                MemberAccount::inviteMember($member['code'], $config['single_org_code']);
+                $list = MemberAccount::where(['member_code' => $member['code'], 'organization_code' => $config['single_org_code']])->order('id asc')->select()->toArray();
+            }
+        } else {
+            $list = MemberAccount::where(['member_code' => $member['code']])->order('id asc')->select()->toArray();
+        }
+
         $organizationList = self::getOrgList($member['code'], true);
         if ($list) {
             foreach ($list as &$item) {
@@ -84,11 +96,29 @@ class Member extends CommonModel
         }
         $list = MemberAccount::where(['member_code' => $memberCode])->order('id asc')->select()->toArray();
         if ($list) {
+            $configModel = new SystemConfig();
+            $config = $configModel->info();
+            $single = false;
+            if ($config['single_mode'] && $config['single_org_code']) {
+                $single = true;
+            }
             foreach ($list as $item) {
                 $organization = Organization::where(['code' => $item['organization_code']])->find();
                 if ($organization) {
-                    $organizationList[] = $organization;
+                    if ($single) {
+                        if ($item['organization_code'] == $config['single_org_code']) {
+                            $organizationList[] = $organization;
+                            break;
+                        };
+                    } else {
+                        $organizationList[] = $organization;
+                    }
                 }
+            }
+            if (!$organizationList) {
+                $organization = Organization::where(['code' => $config['single_org_code']])->find();
+                MemberAccount::inviteMember($memberCode, $config['single_org_code']);
+                $organizationList[] = $organization;
             }
         }
         cache($cacheKey, $organizationList, 3600 * 24);
@@ -123,52 +153,13 @@ class Member extends CommonModel
             }
         }
         $result = self::create($memberData);
-
-
         Organization::createOrganization($result);
-//        $organizationData = [
-//            'code' => createUniqueCode('organization'),
-//            'name' => $memberData['name'] . '的个人项目',
-//            'personal' => 1,
-//            'create_time' => nowTime(),
-//            'owner_code' => $memberData['code'],
-//        ];
-//        Organization::create($organizationData);
-//
-//        $defaultAdminAuth = ProjectAuth::get(1)->toArray();
-//        $defaultMemberAuth = ProjectAuth::get(2)->toArray();
-//        unset($defaultAdminAuth['id']);
-//        unset($defaultMemberAuth['id']);
-//        $defaultAdminAuth['organization_code'] = $defaultMemberAuth['organization_code'] = $organizationData['code'];
-//        $defaultAdminAuth = ProjectAuth::create($defaultAdminAuth);
-//        $defaultMemberAuth = ProjectAuth::create($defaultMemberAuth);
-//        $defaultAdminAuthNode = ProjectAuthNode::where(['auth' => 1])->select()->toArray();
-//        $defaultMemberAuthNode = ProjectAuthNode::where(['auth' => 2])->select()->toArray();
-//        foreach ($defaultAdminAuthNode as &$item) {
-//            unset($item['id']);
-//            $item['auth'] = $defaultAdminAuth['id'];
-//            ProjectAuthNode::create($item);
-//        }
-//        foreach ($defaultMemberAuthNode as &$item) {
-//            unset($item['id']);
-//            $item['auth'] = $defaultMemberAuth['id'];
-//            ProjectAuthNode::create($item);
-//        }
-//
-//        $memberAccountData = [
-//            'position' => '资深工程师',
-//            'department' => '某某公司－某某某事业群－某某平台部－某某技术部－BM',
-//            'code' => createUniqueCode('organization'),
-//            'member_code' => $memberData['code'],
-//            'organization_code' => $organizationData['code'],
-//            'is_owner' => 1,
-//            'status' => 1,
-//            'create_time' => nowTime(),
-//            'avatar' => $memberData['avatar'],
-//            'name' => $memberData['name'],
-//            'email' => $memberData['email'],
-//        ];
-//        MemberAccount::create($memberAccountData);
+
+        $configModel = new SystemConfig();
+        $config = $configModel->info();
+        if ($config['single_mode'] && $config['single_org_code']) {
+            $result = MemberAccount::inviteMember($result['code'], $config['single_org_code']);
+        }
         return $result;
     }
 

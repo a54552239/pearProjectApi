@@ -143,7 +143,7 @@ class Oauth extends BasicApi
                 if (!$user['errcode']) {
                     $user['user_info']['avatar'] = $userInfo['avatar'];
                     $user['user_info']['mobile'] = $userInfo['mobile'];
-                    $user['user_info']['email'] = $userInfo['email'];
+                    $user['user_info']['email'] = $userInfo['email'] ?? '';
                     $user['user_info']['userId'] = $userId;
                 }
             }
