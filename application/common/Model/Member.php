@@ -158,7 +158,7 @@ class Member extends CommonModel
         $configModel = new SystemConfig();
         $config = $configModel->info();
         if ($config['single_mode'] && $config['single_org_code']) {
-            $result = MemberAccount::inviteMember($result['code'], $config['single_org_code']);
+            MemberAccount::inviteMember($result['code'], $config['single_org_code']);
         }
         return $result;
     }

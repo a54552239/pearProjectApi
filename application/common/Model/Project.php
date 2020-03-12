@@ -33,7 +33,7 @@ class Project extends CommonModel
         if ($page < 1) {
             $page = 1;
         }
-        $offset = ($page - 1) * $page;
+        $offset = ($page - 1) * $pageSize;
         $limit = $pageSize;
         $prefix = config('database.prefix');
         $sql = "select *,p.id as id,p.name as name,p.code as code,p.create_time as create_time from {$prefix}project as p join {$prefix}project_member as pm on p.code = pm.project_code left join {$prefix}project_collection as pc on p.code = pc.project_code where pm.member_code = '{$memberCode}' and p.organization_code = '$organizationCode'";
