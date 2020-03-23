@@ -70,7 +70,7 @@ class ProjectMenu extends CommonModel
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function listForUser()
+    public function listForUser($isTree = true)
     {
         NodeService::applyProjectAuthNode();
         $list = $this->where(['status' => '1'])->order('sort asc,id asc')->select();
@@ -85,8 +85,9 @@ class ProjectMenu extends CommonModel
         $member = getCurrentMember();
         $menus = $member['is_owner'] ? $list : $this->filterMenu($list, $member['nodes']);
         $new = [];
-        $this->buildFilterMenuData(ToolsService::arr2tree($menus), $new);
-        $menus = ToolsService::arr2tree($new);
+        $isTree && $menus = ToolsService::arr2tree($menus);
+        $this->buildFilterMenuData($menus, $new);
+        $isTree && $menus = ToolsService::arr2tree($new);
         return $menus;
     }
 

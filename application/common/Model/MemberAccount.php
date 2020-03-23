@@ -22,11 +22,11 @@ class MemberAccount extends CommonModel
      * @throws ModelNotFoundException
      * @throws DbException
      */
-    public static function getAuthMenuList()
+    public static function getAuthMenuList($isTree = true)
     {
         NodeService::applyProjectAuthNode();
         $menuModel = new ProjectMenu();
-        $list = $menuModel->listForUser();
+        $list = $menuModel->listForUser($isTree);
         return $list;
     }
 
