@@ -6,7 +6,7 @@ return [
     // 应用名称
     'app_name'               => Env::get('app.app_name', false),
     // 应用版本
-    'app_version'            =>  Env::get('app.app_version', '2.8.14'),
+    'app_version'            =>  Env::get('app.app_version', '1.0.0'),
     // 应用地址
     'app_host'               => Env::get('app.app_host', ''),
     // 应用调试模式
