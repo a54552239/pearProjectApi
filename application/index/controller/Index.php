@@ -43,7 +43,7 @@ class Index extends BasicApi
 
     public function index()
     {
-        $this->success('success');
+        $this->success('后端部署成功');
     }
 
     /**

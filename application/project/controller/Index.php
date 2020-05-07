@@ -42,6 +42,13 @@ class Index extends BasicApi
         $this->success('', $list);
     }
 
+    public function _menus()
+    {
+        $menusFormat = MemberAccount::getAuthMenuList();
+        $menus = MemberAccount::getAuthMenuList(false);
+        $this->success('', ['menus' => $menus, 'menusFormat' => $menusFormat]);
+    }
+
     /**
      * 更换当前组织
      * @throws DataNotFoundException
