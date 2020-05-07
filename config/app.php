@@ -4,15 +4,15 @@ use think\facade\Env;
 
 return [
     // 应用名称
-    'app_name'               => 'pearProject',
+    'app_name'               => Env::get('app.app_name', false),
     // 应用版本
-    'app_version'            => '2.8.14',
+    'app_version'            =>  Env::get('app.app_version', '2.8.14'),
     // 应用地址
-    'app_host'               => '',
+    'app_host'               => Env::get('app.app_host', ''),
     // 应用调试模式
-    'app_debug'              => true,
+    'app_debug'              => Env::get('app.app_debug', false),
     // 应用Trace
-    'app_trace'              => false,
+    'app_trace'              =>Env::get('app.app_trace', false),
     // 是否支持多模块
     'app_multi_module'       => true,
     // 入口自动绑定模块
@@ -63,7 +63,7 @@ return [
     // 操作方法后缀
     'action_suffix'          => '',
     // 自动搜索控制器
-    'controller_auto_search' => false,
+    'controller_auto_search' => true,
 
     // +----------------------------------------------------------------------
     // | URL设置
