@@ -82,17 +82,25 @@ class Index extends BasicApi
         }
 
         $initData = isset($_POST['initData']) ? $_POST['initData'] : false;
-        $mysqlHostname = isset($_POST['mysqlHost']) ? $_POST['mysqlHost'] : '127.0.0.1';
-        $mysqlHostport = isset($_POST['mysqlHostport']) ? $_POST['mysqlHostport'] : 3306;
-        $hostArr = explode(':', $mysqlHostname);
-        if (count($hostArr) > 1) {
-            $mysqlHostname = $hostArr[0];
-            $mysqlHostport = $hostArr[1];
-        }
-        $mysqlUsername = isset($_POST['mysqlUsername']) ? $_POST['mysqlUsername'] : 'root';
-        $mysqlPassword = isset($_POST['mysqlPassword']) ? $_POST['mysqlPassword'] : 'root';
-        $mysqlDatabase = isset($_POST['mysqlDatabase']) ? $_POST['mysqlDatabase'] : 'pearProject';
-        $mysqlPrefix = isset($_POST['mysqlPrefix']) ? $_POST['mysqlPrefix'] : 'pear_';
+//        $mysqlHostname = isset($_POST['mysqlHost']) ? $_POST['mysqlHost'] : '127.0.0.1';
+//        $mysqlHostport = isset($_POST['mysqlHostport']) ? $_POST['mysqlHostport'] : 3306;
+//        $hostArr = explode(':', $mysqlHostname);
+//        if (count($hostArr) > 1) {
+//            $mysqlHostname = $hostArr[0];
+//            $mysqlHostport = $hostArr[1];
+//        }
+//       $mysqlUsername = isset($_POST['mysqlUsername']) ? $_POST['mysqlUsername'] : 'root';
+//        $mysqlPassword = isset($_POST['mysqlPassword']) ? $_POST['mysqlPassword'] : 'root';
+//        $mysqlDatabase = isset($_POST['mysqlDatabase']) ? $_POST['mysqlDatabase'] : 'pearProject';
+//        $mysqlPrefix = isset($_POST['mysqlPrefix']) ? $_POST['mysqlPrefix'] : 'pear_';
+
+        $mysqlHostname = config('database.hostname');
+        $mysqlHostport = config('database.hostport');
+        $mysqlUsername = config('database.username');
+        $mysqlPassword = config('database.password');
+        $mysqlDatabase = config('database.database');
+        $mysqlPrefix = config('database.prefix');
+
         try {
             ignore_user_abort();
             set_time_limit(0);
@@ -104,7 +112,7 @@ class Index extends BasicApi
             $sql = str_replace("`pms_", "`{$mysqlPrefix}", $sql);
             $pdo = new PDO("mysql:host={$mysqlHostname};port={$mysqlHostport}", $mysqlUsername, $mysqlPassword, array(
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb"
             ));
 
             //检测是否支持innodb存储引擎
@@ -120,23 +128,23 @@ class Index extends BasicApi
 
             $pdo->exec($sql);
 
-            $config = @file_get_contents($dbConfigFile);
-            $callback = function ($matches) use ($mysqlHostname, $mysqlHostport, $mysqlUsername, $mysqlPassword, $mysqlDatabase, $mysqlPrefix) {
-                $field = ucfirst($matches[1]);
-                $replace = ${"mysql{$field}"};
-                if ($matches[1] == 'hostport' && $mysqlHostport == 3306) {
-                    $replace = '';
-                }
-                return "'{$matches[1]}'{$matches[2]}=>{$matches[3]}'{$replace}',";
-            };
-
-            $config = preg_replace_callback("/'(hostname|database|username|password|hostport|prefix)'(\s+)=>(\s+)(.*),/", $callback, $config);
-            //检测能否成功写入数据库配置
-            $result = @file_put_contents($dbConfigFile, $config);
-
-            if (!$result) {
-                throw new Exception("无法写入数据库信息到config/database.php文件，请检查是否有写权限");
-            }
+//            $config = @file_get_contents($dbConfigFile);
+//            $callback = function ($matches) use ($mysqlHostname, $mysqlHostport, $mysqlUsername, $mysqlPassword, $mysqlDatabase, $mysqlPrefix) {
+//                $field = ucfirst($matches[1]);
+//                $replace = ${"mysql{$field}"};
+//                if ($matches[1] == 'hostport' && $mysqlHostport == 3306) {
+//                    $replace = '';
+//                }
+//                return "'{$matches[1]}'{$matches[2]}=>{$matches[3]}'{$replace}',";
+//            };
+//
+//            $config = preg_replace_callback("/'(hostname|database|username|password|hostport|prefix)'(\s+)=>(\s+)(.*),/", $callback, $config);
+//            //检测能否成功写入数据库配置
+//            $result = @file_put_contents($dbConfigFile, $config);
+//
+//            if (!$result) {
+//                throw new Exception("无法写入数据库信息到config/database.php文件，请检查是否有写权限");
+//            }
 
             //检测能否成功写入lock文件
             $result = @file_put_contents($lockFile, 1);
