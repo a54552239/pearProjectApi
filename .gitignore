@@ -4,6 +4,7 @@
 *.idea
 *.svn
 *.git
+.env
 /runtime
 /log
 /vendor
