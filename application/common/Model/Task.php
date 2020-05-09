@@ -492,8 +492,8 @@ class Task extends CommonModel
                 $preTask->save();
             } else {
 //                小于安全值
-//                $this->resetSort($preTask['project_code']);
-//                $this->sort($preCode, $nextCode);
+                $this->resetSort($preTask['stage_code']);
+                $this->sort($preCode, $nextCode, $toStageCode);
             }
             return true;
         }
