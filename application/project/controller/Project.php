@@ -93,7 +93,7 @@ class Project extends BasicApi
                 $newList[] = $item;
             }
         }
-        $this->success('', ['list' => $newList, 'total' => count($newList)]);
+        $this->success('', ['list' => $newList, 'total' => $list['total']]);
     }
 
     public function analysis(Request $request)
