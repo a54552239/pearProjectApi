@@ -190,7 +190,7 @@ class TaskStages extends CommonModel
             if ($nextCode) {
                 $nextPreStage = self::where('sort', '<', $nextStage['sort'])->where('code', '<>', $nextCode)->where('project_code', '=', $projectCode)->order('sort desc')->find();
                 $nextPreStageSort = $nextPreStage ? $nextPreStage['sort'] : 0;
-                $newSort = (int)($nextStage['sort'] - $nextPreStageSort) / 2;
+                $newSort = (int)($nextStage['sort'] + $nextPreStageSort) / 2;
             } else {
                 $maxSort = self::where('project_code', $projectCode)->max('sort');
                 $newSort = $maxSort + 500;

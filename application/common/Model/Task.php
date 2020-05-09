@@ -481,7 +481,7 @@ class Task extends CommonModel
                 $nextTask = self::where(['code' => $nextCode])->field('sort')->find();
                 $nextPreTask = self::where('sort', '<', $nextTask['sort'])->where('code', '<>', $nextCode)->where('stage_code', '=', $toStageCode)->where('done', $done)->order('sort desc')->find();
                 $nextPreTaskSort = $nextPreTask ? $nextPreTask['sort'] : 0;
-                $newSort = (int)($nextTask['sort'] - $nextPreTaskSort) / 2;
+                $newSort = (int)($nextTask['sort'] + $nextPreTaskSort) / 2;
             } else {
                 $maxSort = self::where('stage_code', '=', $toStageCode)->where('done', $done)->max('sort');
                 $newSort = $maxSort + 500;
