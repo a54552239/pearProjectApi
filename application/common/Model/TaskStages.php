@@ -154,7 +154,7 @@ class TaskStages extends CommonModel
             'create_time' => nowTime(),
             'code' => createUniqueCode('taskStages'),
             'project_code' => $projectCode,
-            'sort' => $maxSort + 500,
+            'sort' => $maxSort + 65536,
             'name' => trim($name),
         ];
         $result = self::create($data)->toArray();
@@ -193,7 +193,7 @@ class TaskStages extends CommonModel
                 $newSort = (int)($nextStage['sort'] + $nextPreStageSort) / 2;
             } else {
                 $maxSort = self::where('project_code', $projectCode)->max('sort');
-                $newSort = $maxSort + 500;
+                $newSort = $maxSort + 65536;
             }
             if ($newSort and $newSort > 50) {
                 self::update(['sort' => $newSort], ['code' => $preCode]);
@@ -211,11 +211,11 @@ class TaskStages extends CommonModel
     {
         $taskStagesList = self::where('project_code', $projectCode)->order('sort asc, id asc')->select();
         if ($taskStagesList) {
-            $sort = 500;
+            $sort = 65536;
             foreach ($taskStagesList as $taskStage) {
                 $taskStage->sort = $sort;
-                $res = $taskStage->save();
-                $sort += 500;
+                $taskStage->save();
+                $sort += 65536;
             }
         }
     }

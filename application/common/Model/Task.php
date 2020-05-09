@@ -281,7 +281,7 @@ class Task extends CommonModel
                     'create_by' => $memberCode,
                     'assign_to' => $assignTo,
                     'id_num' => $maxNum + 1,
-                    'sort' => $maxSort + 500,
+                    'sort' => $maxSort + 65536,
                     'project_code' => $projectCode,
                     'pcode' => $parentCode,
                     'path' => $path,
@@ -484,7 +484,7 @@ class Task extends CommonModel
                 $newSort = (int)($nextTask['sort'] + $nextPreTaskSort) / 2;
             } else {
                 $maxSort = self::where('stage_code', '=', $toStageCode)->where('done', $done)->max('sort');
-                $newSort = $maxSort + 500;
+                $newSort = $maxSort + 65536;
             }
             if ($newSort and $newSort > 50) {
                 $preTask->stage_code = $toStageCode;
@@ -505,11 +505,11 @@ class Task extends CommonModel
     {
         $taskList = self::where('stage_code', $stageCode)->order('sort asc, id asc')->where('done', $done)->select();
         if ($taskList) {
-            $sort = 500;
+            $sort = 65536;
             foreach ($taskList as $task) {
                 $task->sort = $sort;
                 $task->save();
-                $sort += 500;
+                $sort += 65536;
             }
         }
     }
@@ -534,7 +534,7 @@ class Task extends CommonModel
              foreach ($codes as $key => $code) {
                  $task = self::where(['code' => $code])->find();
                  self::update(['sort' => $sort, 'stage_code' => $stageCode], ['code' => $code]);
-                 $sort += 500;
+                 $sort += 65536;
                  if ($task['stage_code'] != $stageCode) {
                      self::taskHook(getCurrentMember()['code'], $code, 'move', '', '', '', '', '', ['stageName' => $stage['name']]);
                  }
