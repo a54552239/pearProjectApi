@@ -492,7 +492,7 @@ class Task extends CommonModel
                 $preTask->save();
             } else {
 //                小于安全值
-                $this->resetSort($preTask['stage_code']);
+                $this->resetSort($preTask['stage_code'], $done);
                 $this->sort($preCode, $nextCode, $toStageCode);
             }
             return true;
@@ -501,9 +501,9 @@ class Task extends CommonModel
     }
 
 
-    public function resetSort($stageCode)
+    public function resetSort($stageCode, $done)
     {
-        $taskList = self::where('stage_code', $stageCode)->order('sort asc, id asc')->select();
+        $taskList = self::where('stage_code', $stageCode)->order('sort asc, id asc')->where('done', $done)->select();
         if ($taskList) {
             $sort = 500;
             foreach ($taskList as $task) {
