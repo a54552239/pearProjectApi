@@ -19,7 +19,7 @@ use think\facade\Hook;
  */
 class Task extends CommonModel
 {
-    protected $append = ['priText','statusText', 'liked', 'stared', 'tags', 'childCount', 'hasUnDone', 'parentDone', 'hasComment', 'hasSource', 'canRead'];
+    protected $append = ['priText', 'statusText', 'liked', 'stared', 'tags', 'childCount', 'hasUnDone', 'parentDone', 'hasComment', 'hasSource', 'canRead'];
 
     public function read($code)
     {
@@ -174,7 +174,7 @@ class Task extends CommonModel
         if ($like) {
             $result = self::where(['code' => $code])->setInc('like');
         } else {
-            $result = self::where(['code' => $code])->setDec('like');;
+            $result = self::where(['code' => $code])->setDec('like');
         }
         $member = getCurrentMember();
         TaskLike::likeTask($code, $member['code'], $like);
@@ -202,7 +202,7 @@ class Task extends CommonModel
         if ($star) {
             $result = self::where(['code' => $code])->setInc('star');
         } else {
-            $result = self::where(['code' => $code])->setDec('star');;
+            $result = self::where(['code' => $code])->setDec('star');
         }
         $member = getCurrentMember();
         Collection::starTask($code, $member['code'], $star);
@@ -268,6 +268,8 @@ class Task extends CommonModel
                 if (!$maxNum) {
                     $maxNum = 0;
                 }
+                $maxSort = self::where('project_code', $projectCode)->where('stage_code', $stageCode)->max('sort');
+                $maxSort = $maxSort ?? 0;
                 $path = '';
                 if ($parentCode) {
                     $parentTask['path'] && $parentTask['path'] = ",{$parentTask['path']}";
@@ -279,6 +281,7 @@ class Task extends CommonModel
                     'create_by' => $memberCode,
                     'assign_to' => $assignTo,
                     'id_num' => $maxNum + 1,
+                    'sort' => $maxSort + 500,
                     'project_code' => $projectCode,
                     'pcode' => $parentCode,
                     'path' => $path,
@@ -457,6 +460,61 @@ class Task extends CommonModel
     }
 
     /**
+     * 任务排序，事件：把 $preCode 移动到 $nextCode 前面
+     * @param $preCode string 前一个移动的列表
+     * @param $nextCode string 后一个移动的列表
+     * @param $toStageCode string 要移动到到的分组
+     * @return bool
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    public function sort($preCode, $nextCode, $toStageCode)
+    {
+        $preTask = self::where(['code' => $preCode])->field('sort,stage_code,done')->find();
+        if ($preCode == $nextCode) {
+            return false;
+        }
+        if ($preTask) {
+            $done = $preTask['done'];
+            if ($nextCode) {
+                $nextTask = self::where(['code' => $nextCode])->field('sort')->find();
+                $nextPreTask = self::where('sort', '<', $nextTask['sort'])->where('code', '<>', $nextCode)->where('stage_code', '=', $toStageCode)->where('done', $done)->order('sort desc')->find();
+                $nextPreTaskSort = $nextPreTask ? $nextPreTask['sort'] : 0;
+                $newSort = (int)($nextTask['sort'] - $nextPreTaskSort) / 2;
+            } else {
+                $maxSort = self::where('stage_code', '=', $toStageCode)->where('done', $done)->max('sort');
+                $newSort = $maxSort + 500;
+            }
+            if ($newSort and $newSort > 50) {
+                $preTask->stage_code = $toStageCode;
+                $preTask->sort = $newSort;
+                $preTask->save();
+            } else {
+//                小于安全值
+//                $this->resetSort($preTask['project_code']);
+//                $this->sort($preCode, $nextCode);
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    public function resetSort($stageCode)
+    {
+        $taskList = self::where('stage_code', $stageCode)->order('sort asc, id asc')->select();
+        if ($taskList) {
+            $sort = 500;
+            foreach ($taskList as $task) {
+                $task->sort = $sort;
+                $task->save();
+                $sort += 500;
+            }
+        }
+    }
+
+    /**
      * 任务排序
      * @param $stageCode string 移到的任务列表code
      * @param $codes array 经过排序的任务code列表
@@ -465,24 +523,26 @@ class Task extends CommonModel
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    public function sort($stageCode, $codes)
-    {
-        if (!$codes) {
-            return false;
-        }
-        if ($codes) {
-            $stage = TaskStages::where(['code' => $stageCode])->find();
-            foreach ($codes as $key => $code) {
-                $task = self::where(['code' => $code])->find();
-                self::update(['sort' => $key, 'stage_code' => $stageCode], ['code' => $code]);
-                if ($task['stage_code'] != $stageCode) {
-                    self::taskHook(getCurrentMember()['code'], $code, 'move', '', '', '', '', '', ['stageName' => $stage['name']]);
-                }
-            }
-            return true;
-        }
-        return false;
-    }
+    /* public function sort($stageCode, $codes)
+     {
+         if (!$codes) {
+             return false;
+         }
+         if ($codes) {
+             $stage = TaskStages::where(['code' => $stageCode])->find();
+             $sort = 0;
+             foreach ($codes as $key => $code) {
+                 $task = self::where(['code' => $code])->find();
+                 self::update(['sort' => $sort, 'stage_code' => $stageCode], ['code' => $code]);
+                 $sort += 500;
+                 if ($task['stage_code'] != $stageCode) {
+                     self::taskHook(getCurrentMember()['code'], $code, 'move', '', '', '', '', '', ['stageName' => $stage['name']]);
+                 }
+             }
+             return true;
+         }
+         return false;
+     }*/
 
     /**
      * 成员任务
@@ -723,6 +783,7 @@ class Task extends CommonModel
         $status = [0 => '普通', 1 => '紧急', 2 => '非常紧急'];
         return $status[$data['pri']];
     }
+
     public function getStatusTextAttr($value, $data)
     {
         if (!isset($data['status'])) {

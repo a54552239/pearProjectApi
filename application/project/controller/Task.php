@@ -248,12 +248,12 @@ class Task extends BasicApi
      */
     public function sort(Request $request)
     {
-        $data = $request::only('stageCode,codes');
-        if (!$request::post('codes')) {
+        $data = $request::only('preTaskCode,nextTaskCode,toStageCode');
+        if (!$request::post('preTaskCode')) {
             $this->error("参数有误");
         }
         try {
-            $this->model->sort($data['stageCode'], explode(',', $data['codes']));
+            $this->model->sort($data['preTaskCode'], $data['nextTaskCode'], $data['toStageCode']);
         } catch (Exception $e) {
             $this->error($e->getMessage(), $e->getCode());;
         }

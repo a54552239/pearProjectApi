@@ -148,14 +148,16 @@ class TaskStages extends CommonModel
         if (!$project) {
             throw new \Exception('该项目已失效', 3);
         }
+        $maxSort = self::where('project_code', $projectCode)->max('sort');
+        $maxSort = $maxSort ?? 0;
         $data = [
             'create_time' => nowTime(),
             'code' => createUniqueCode('taskStages'),
             'project_code' => $projectCode,
+            'sort' => $maxSort + 500,
             'name' => trim($name),
         ];
         $result = self::create($data)->toArray();
-        self::update(['sort' => $result['id']], ['id' => $result['id']]);
         if ($result) {
             unset($result['id']);
             $result['tasksLoading'] = false; //任务加载状态
@@ -168,7 +170,7 @@ class TaskStages extends CommonModel
     }
 
     /**
-     * 列表排序（交换两个列表的sort）
+     * 列表排序，事件：把 $preCode 移动到 $nextCode 前面
      * @param $preCode string 前一个移动的列表
      * @param $nextCode string 后一个移动的列表
      * @return bool
@@ -178,17 +180,44 @@ class TaskStages extends CommonModel
      */
     public function sort($preCode, $nextCode)
     {
-        $preStage = self::where(['code' => $preCode])->field('sort')->find();
-        $nextStage = self::where(['code' => $nextCode])->field('sort')->find();
+        $preStage = self::where(['code' => $preCode])->field('sort,project_code')->find();
+        $nextStage = self::where(['code' => $nextCode])->field('sort, project_code')->find();
+        $projectCode = $preStage['project_code'];
         if ($preCode == $nextCode) {
             return false;
         }
-        if ($preStage !== false && $preStage !== false) {
-            self::update(['sort' => $nextStage['sort']], ['code' => $preCode]);
-            self::update(['sort' => $preStage['sort']], ['code' => $nextCode]);
+        if ($preStage) {
+            if ($nextCode) {
+                $nextPreStage = self::where('sort', '<', $nextStage['sort'])->where('code', '<>', $nextCode)->where('project_code', '=', $projectCode)->order('sort desc')->find();
+                $nextPreStageSort = $nextPreStage ? $nextPreStage['sort'] : 0;
+                $newSort = (int)($nextStage['sort'] - $nextPreStageSort) / 2;
+            } else {
+                $maxSort = self::where('project_code', $projectCode)->max('sort');
+                $newSort = $maxSort + 500;
+            }
+            if ($newSort and $newSort > 50) {
+                self::update(['sort' => $newSort], ['code' => $preCode]);
+            } else {
+                //小于安全值
+                $this->resetSort($preStage['project_code']);
+                $this->sort($preCode, $nextCode);
+            }
             return true;
         }
         return false;
+    }
+
+    public function resetSort($projectCode)
+    {
+        $taskStagesList = self::where('project_code', $projectCode)->order('sort asc, id asc')->select();
+        if ($taskStagesList) {
+            $sort = 500;
+            foreach ($taskStagesList as $taskStage) {
+                $taskStage->sort = $sort;
+                $res = $taskStage->save();
+                $sort += 500;
+            }
+        }
     }
 
     /**

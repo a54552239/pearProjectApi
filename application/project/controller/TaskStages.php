@@ -91,7 +91,7 @@ class TaskStages extends BasicApi
     public function sort(Request $request)
     {
         $data = $request::only('preCode,nextCode');
-        if (!$request::post('preCode') || !$request::post('nextCode')) {
+        if (!$request::post('preCode')) {
             $this->error("参数有误");
         }
         try {
