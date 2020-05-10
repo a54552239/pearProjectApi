@@ -68,6 +68,8 @@ class Auth
             }
         }
         // 访问权限检查
+//        var_dump(auth($node, 'project'));
+//        die;
         if (!empty($access['is_auth']) && !auth($node, 'project')) {
             $nodeInfo = ProjectNode::where('node', $node)->find();
             return json(['code' => 403, 'msg' => '无权限操作资源['. $nodeInfo['title'] . ']，访问被拒绝']);

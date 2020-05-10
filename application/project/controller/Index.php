@@ -77,6 +77,7 @@ class Index extends BasicApi
             $member['account_id'] = $memberAccount['id'];
             $member['is_owner'] = $memberAccount['is_owner'];
             $member['authorize'] = $memberAccount['authorize'];
+            $member['organization_code'] = $memberAccount['organization_code'];
             setCurrentMember($member);
             !empty($member['authorize']) && NodeService::applyProjectAuthNode();
             setCurrentOrganizationCode($organizationCode);

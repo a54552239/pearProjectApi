@@ -59,6 +59,7 @@ class Member extends CommonModel
         $member['authorize'] = $list[0]['authorize'];
         $member['position'] = $list[0]['position'];
         $member['department'] = $list[0]['department'];
+        $member['organization_code'] = $list[0]['organization_code'];
 
         setCurrentMember($member);
         !empty($member['authorize']) && NodeService::applyProjectAuthNode();

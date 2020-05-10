@@ -3,7 +3,9 @@
 
 namespace service;
 
+use app\common\Model\MemberAccount;
 use think\Db;
+use think\facade\Cache;
 
 /**
  * 系统权限节点读取器
@@ -19,22 +21,53 @@ class NodeService
      */
     public static function applyProjectAuthNode()
     {
-        cache('member_need_access_node', null);
+//        cache('member_need_access_node', null);
         $member = getCurrentMember();
-        $member['nodes'] = [];
-        if (($authorize = $member['authorize'])) {
-            $where = ['status' => '1'];
-            $authorizeIds = Db::name('ProjectAuth')->whereIn('id', explode(',', $authorize))->where($where)->column('id');
-            if (empty($authorizeIds)) {
-                $member['nodes'] = [];
-                return setCurrentMember($member);
-            }
-            $nodes = Db::name('ProjectAuthNode')->whereIn('auth', $authorizeIds)->column('node');
-            $member['nodes'] = $nodes;
-            return setCurrentMember($member);
-        }
-        return setCurrentMember($member);
+//        $member['nodes'] = [];
+//        if (($authorize = $member['authorize'])) {
+//            $where = ['status' => '1'];
+//            $authorizeIds = Db::name('ProjectAuth')->whereIn('id', explode(',', $authorize))->where($where)->column('id');
+//            if (empty($authorizeIds)) {
+//                $member['nodes'] = [];
+//                return setCurrentMember($member);
+//            }
+//            $nodes = Db::name('ProjectAuthNode')->whereIn('auth', $authorizeIds)->column('node');
+//            $member['nodes'] = $nodes;
+//            return setCurrentMember($member);
+//        }
+//        return setCurrentMember($member);
+        $nodes = self::getMemberNodes($member['organization_code'], $member['account_id']);
+        $member['nodes'] = $nodes;
+        setCurrentMember($member);
+        return $nodes;
     }
+
+    public static function getMemberNodes($orgCode, $memberAccountId)
+    {
+        $cacheKey = 'member:nodes:' . $memberAccountId;
+        $tagKey = 'member:codes:' . $orgCode;
+//        self::clearMemberNodes($orgCode);
+        $nodes = Cache::tag($tagKey)->get($cacheKey);
+        if (!$nodes) {
+            $member = MemberAccount::get($memberAccountId);
+            $authorize = $member['authorize'];
+            $authorizeIds = Db::name('ProjectAuth')->whereIn('id', explode(',', $authorize))->where(['status' => '1'])->column('id');
+            if (empty($authorizeIds)) {
+                $nodes = [];
+            } else {
+                $nodes = Db::name('ProjectAuthNode')->whereIn('auth', $authorizeIds)->column('node');
+            }
+            Cache::tag($tagKey)->set($cacheKey, $nodes, 3600 * 24 * 7);
+        }
+        return $nodes;
+    }
+
+    public static function clearMemberNodes($orgCode)
+    {
+        $tagKey = 'member:codes:' . $orgCode;
+        return Cache::clear($tagKey);
+    }
+
 
     /**
      * 获取项目账号授权节点
@@ -49,6 +82,7 @@ class NodeService
         }
         return $nodes;
     }
+
 
     /**
      * 检查账号节点权限
@@ -69,7 +103,8 @@ class NodeService
             if (!in_array($currentNode, self::getProjectAuthNode())) {
                 return true;
             }
-            return in_array($currentNode, !empty($member['nodes']) ? (array)$member['nodes'] : []);
+            $memberNodes = self::getMemberNodes($member['organization_code'], $member['account_id']);
+            return in_array($currentNode, !empty($memberNodes) ? (array)$memberNodes : $memberNodes);
         }
         return false;
     }

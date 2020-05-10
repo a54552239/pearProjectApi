@@ -26,8 +26,7 @@ class MemberAccount extends CommonModel
     {
         NodeService::applyProjectAuthNode();
         $menuModel = new ProjectMenu();
-        $list = $menuModel->listForUser($isTree);
-        return $list;
+        return $menuModel->listForUser($isTree);
     }
 
     /**

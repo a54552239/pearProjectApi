@@ -81,6 +81,7 @@ class Auth extends BasicApi
      */
     protected function _apply_save($auth)
     {
+        //todo 优化
         list($data, $post) = [[], Request::only('action,id,nodes')];
         isset($post['nodes']) && $post['nodes'] = json_decode($post['nodes']);
         foreach (isset($post['nodes']) ? $post['nodes'] : [] as $node) {
@@ -88,6 +89,7 @@ class Auth extends BasicApi
         }
         ProjectAuthNode::where(['auth' => $auth])->delete();
         ProjectAuthNode::insertAll($data);
+        NodeService::clearMemberNodes(getCurrentOrganizationCode());
         $this->success('节点授权更新成功！', '');
     }
 

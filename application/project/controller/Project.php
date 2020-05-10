@@ -44,7 +44,7 @@ class Project extends BasicApi
      * @return void
      * @throws DbException
      */
-    public function index11()
+   /* public function index11()
     {
         $prefix = config('database.prefix');
         $type = Request::post('type');
@@ -94,7 +94,7 @@ class Project extends BasicApi
             }
         }
         $this->success('', ['list' => $newList, 'total' => $list['total']]);
-    }
+    }*/
 
     public function index()
     {

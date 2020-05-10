@@ -49,7 +49,7 @@ function getCurrentMember()
 function setCurrentMember($data)
 {
 
-    $key = 'member:info:' . $data['code'];
+    $key = 'member:info:' . $data['code'];//Member 里的 code
     if (!$data) {
         Cache::rm($key);
     }else{
