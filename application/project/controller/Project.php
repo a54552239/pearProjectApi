@@ -44,7 +44,7 @@ class Project extends BasicApi
      * @return void
      * @throws DbException
      */
-    public function index()
+    public function index11()
     {
         $prefix = config('database.prefix');
         $type = Request::post('type');
@@ -94,6 +94,55 @@ class Project extends BasicApi
             }
         }
         $this->success('', ['list' => $newList, 'total' => $list['total']]);
+    }
+
+    public function index()
+    {
+        $selectBy = Request::post('selectBy', 'all');
+        switch ($selectBy) {
+            case 'my':
+                $deleted = 0;
+                $archive = -1;
+                $collection = -1;
+                break;
+            case 'collect':
+                $deleted = 0;
+                $archive = -1;
+                $collection = 1;
+                break;
+            case 'archive':
+                $deleted = 0;
+                $archive = 1;
+                $collection = -1;
+                break;
+            case 'deleted':
+                $deleted = 1;
+                $archive = -1;
+                $collection = -1;
+                break;
+            default:
+                $deleted = 0;
+                $archive = -1;
+                $collection = -1;
+
+
+        }
+        $list = $this->model->getMemberProjects(getCurrentMember()['code'], getCurrentOrganizationCode(), $deleted, $archive, $collection, Request::post('page'), Request::post('pageSize'));
+        if ($list['list']) {
+            foreach ($list['list'] as $key => &$item) {
+                $item['owner_name'] = '-';
+                if (isset($item['project_code'])) {
+                    $item['code'] = $item['project_code'];
+                    $item = $this->model->where(['code' => $item['code']])->find();
+                }
+                $collected = ProjectCollection::where(['project_code' => $item['code'], 'member_code' => getCurrentMember()['code']])->field('id')->find();
+                $item['collected'] = $collected ? 1 : 0;
+                $owner = ProjectMember::alias('pm')->leftJoin('member m', 'pm.member_code = m.code')->where(['pm.project_code' => $item['code'], 'is_owner' => 1])->field('member_code,name')->find();
+                $item['owner_name'] = $owner['name'];
+            }
+            unset($item);
+        }
+        $this->success('', $list);
     }
 
     public function analysis(Request $request)
@@ -190,7 +239,7 @@ class Project extends BasicApi
         if (!$type) {
             $deleted = 0;
         }
-        $list = $this->model->getMemberProjects($member['code'], $organizationCode ?? getCurrentOrganizationCode(), $deleted, $archive, Request::post('page'), Request::post('pageSize'));
+        $list = $this->model->getMemberProjects($member['code'], $organizationCode ?? getCurrentOrganizationCode(), $deleted, $archive, -1, Request::post('page'), Request::post('pageSize'));
         if ($list['list']) {
             foreach ($list['list'] as $key => &$item) {
                 $item['owner_name'] = '-';

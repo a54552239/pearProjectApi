@@ -22,7 +22,7 @@ class Project extends CommonModel
         return self::where(['id' => $id, 'deleted' => 0, 'archive' => 0])->find();
     }
 
-    public function getMemberProjects($memberCode = '',$organizationCode = '', $deleted = 0, $archive = 0, $page = 1, $pageSize = 10)
+    public function getMemberProjects($memberCode = '',$organizationCode = '', $deleted = 0, $archive = 0, $collection = -1, $page = 1, $pageSize = 10)
     {
         if (!$memberCode) {
             $memberCode = getCurrentMember()['code'];
@@ -36,12 +36,15 @@ class Project extends CommonModel
         $offset = ($page - 1) * $pageSize;
         $limit = $pageSize;
         $prefix = config('database.prefix');
-        $sql = "select *,p.id as id,p.name as name,p.code as code,p.create_time as create_time from {$prefix}project as p join {$prefix}project_member as pm on p.code = pm.project_code left join {$prefix}project_collection as pc on p.code = pc.project_code where pm.member_code = '{$memberCode}' and p.organization_code = '$organizationCode'";
+        $sql = "select *,p.id as id,p.name as name,p.code as code,p.create_time as create_time from {$prefix}project as p join {$prefix}project_member as pm on p.code = pm.project_code left join {$prefix}project_collection as pc on p.code = pc.project_code where pm.member_code = '{$memberCode}'  and p.organization_code = '$organizationCode'";
         if ($deleted != -1) {
             $sql .= " and p.deleted = {$deleted} ";
         }
         if ($archive != -1) {
             $sql .= " and p.archive = {$archive} ";
+        }
+        if ($collection == 1) {
+            $sql .= " and pc.project_code is not null and pc.member_code = '{$memberCode}'";
         }
         $sql .= " order by pc.id desc, p.id desc";
         $total = Db::query($sql);
