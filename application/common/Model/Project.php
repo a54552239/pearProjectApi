@@ -46,7 +46,7 @@ class Project extends CommonModel
         if ($collection == 1) {
             $sql .= " and pc.project_code is not null and pc.member_code = '{$memberCode}'";
         }
-        $sql .= " order by pc.id desc, p.id desc";
+        $sql .= "group by p.id order by pc.id desc, p.id desc";
         $total = Db::query($sql);
         $total = count($total);
         $sql .= " limit {$offset},{$limit}";
