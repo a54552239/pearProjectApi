@@ -94,6 +94,9 @@ class Task extends BasicApi
         $status = [0 => '普通', 1 => '紧急', 2 => '非常紧急'];
         if ($list['list']) {
             foreach ($list['list'] as &$task) {
+                $taskInfo = \app\common\Model\Task::get($task['id']);
+                $task['parentDone'] = $taskInfo['parentDone'];
+                $task['hasUnDone'] = $taskInfo['hasUnDone'];
                 $task['priText'] = $status[$task['pri']];
                 $task['executor'] = Member::where(['code' => $task['assign_to']])->field('name,avatar')->find();
                 $task['projectInfo'] = \app\common\Model\Project::where(['code' => $task['project_code']])->field('name,code')->find();

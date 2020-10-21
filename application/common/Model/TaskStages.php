@@ -4,6 +4,7 @@ namespace app\common\Model;
 
 use service\FileService;
 use service\RandomService;
+use service\ToolsService;
 use think\File;
 
 /**
@@ -97,6 +98,32 @@ class TaskStages extends CommonModel
                 }
             }
         }
+        return $list;
+    }
+
+    public function tasksTree($stageCode)
+    {
+        $taskModel = new Task();
+        $list1 = $taskModel->where('stage_code', $stageCode)->where('done', 0)->where('deleted', 0)->order('sort asc,end_time desc, id asc')->select()->toArray();
+        $list2 = $taskModel->where('stage_code', $stageCode)->where('done', 1)->where('deleted', 0)->order('sort asc,end_time desc, id asc')->select()->toArray();
+        $list = array_merge($list1, $list2);
+        if ($list) {
+            foreach ($list as $key => &$item) {
+                $item = $taskModel->read($item['code']);
+                if ($item) {
+                    $item = $item->toArray();
+                } else {
+                    $item = [];
+                }
+                if (empty($item['canRead'])) {
+                    array_splice($list, $key, 1);
+                }
+                $item['type'] = 'task';
+                $item['tasks'] = [];
+            }
+            unset($item);
+        }
+        $list = ToolsService::arr2tree($list, 'code', 'pcode', 'tasks');
         return $list;
     }
 

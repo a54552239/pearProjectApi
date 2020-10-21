@@ -345,7 +345,7 @@ class Task extends CommonModel
             throw new Exception('父任务已完成，无法重做子任务', 4);
         }
         if ($task['hasUnDone']) {
-            throw new Exception('子任务尚未全部完成，无法完成父任务', 5);
+            throw new Exception('子任务尚未全部完成，无法完成父任务', 55);
         }
 
         Db::startTrans();
