@@ -9,4 +9,7 @@ return [
     'version' => [
         'app\\project\\behavior\\Version'
     ],
+    'events' => [
+        'app\\project\\behavior\\Events'
+    ],
 ];
