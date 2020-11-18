@@ -40,6 +40,7 @@ class Events extends BasicApi
             $where[] = ['project_code', '=', $code];
         }
         $where[] = ['deleted', '=', 0];
+        $where[] = ['organization_code', '=', getCurrentOrganizationCode()];
         $list = $this->model->_list($where);
 //        $eventMember = new EventsMember();
 //        $list = $eventMember->_list($where);
