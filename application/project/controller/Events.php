@@ -71,6 +71,7 @@ class Events extends BasicApi
         $status = Request::post('status', -1);
         $where[] = ['deleted', '=', 0];
         $where[] = ['organization_code', '=', getCurrentOrganizationCode()];
+        $where[] = ['end_time', '>=', nowTime()];
         $memberWhere = [['member_code', '=', getCurrentMember()['code']]];
         if ($status != -1) {
             $memberWhere[] = ['status', '=', $status];
