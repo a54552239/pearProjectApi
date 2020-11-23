@@ -82,6 +82,7 @@ class File extends BasicApi
      */
     public function uploadFiles()
     {
+        set_time_limit(0);
         $data = Request::post();
         $fileName = $data['identifier'];
         $orgFileName = $data['filename'];
@@ -107,19 +108,23 @@ class File extends BasicApi
         ];
         $result = [];
         $type = empty($file_storage) ? sysconf('storage_type') : $file_storage;
+        $path2 = config('upload.base_path') . config('upload.file') . "/{$orgCode}/{$memberCode}/$date/$ticket-$orgFileName";
         if ($chunkNumber == $totalChunks) {
             $fileList = [];
-            $blob = '';
+//            $blob = '';
             for ($i = 1; $i <= $totalChunks; $i++) {
                 $ext = explode('.', $orgFileName);
                 $ext = $ext[count($ext) - 1];
                 $fileUrl = "{$path}/{$fileName}-{$i}.{$ext}";
                 $site_url = FileService::getFileUrl($fileUrl, 'local');
-                $blob .= file_get_contents($site_url);
+                $blob = file_get_contents($site_url);
+//                $blob .= file_get_contents($site_url);
                 $fileList[] = env('root_path') . $fileUrl;
+                $result = FileService::$type($path2, $blob);
+                unset($blob);
+                unset($site_url);
             }
-            $path = config('upload.base_path') . config('upload.file') . "/{$orgCode}/{$memberCode}/$date/$ticket-$orgFileName";
-            $result = FileService::$type($path, $blob);
+            //Allowed memory size of 1073741824 bytes exhausted (tried to allocate 534773792 bytes)
             $fileData['size'] = $data['totalSize'];
             $fileData['path_name'] = $result['key'];
             $fileData['file_url'] = $result['url'];

@@ -310,7 +310,7 @@ class FileService
         try {
             $realfile = env('root_path') . $filename;
             !file_exists(dirname($realfile)) && mkdir(dirname($realfile), 0755, true);
-            if (file_put_contents($realfile, $content)) {
+            if (file_put_contents($realfile, $content, FILE_APPEND)) {
                 $url = pathinfo(request()->baseFile(true), PATHINFO_DIRNAME) . '/' . $filename;
                 return ['file' => $realfile, 'hash' => md5_file($realfile), 'key' => "{$filename}", 'url' => $url];
             }
