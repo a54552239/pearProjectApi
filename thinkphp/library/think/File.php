@@ -352,9 +352,9 @@ class File extends SplFileObject
         }
 
         // 验证上传
-        if (!$this->check()) {
-            return false;
-        }
+//        if (!$this->check()) {
+//            return false;
+//        }
 
         $path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         // 文件保存命名规则
