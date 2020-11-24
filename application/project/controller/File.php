@@ -93,7 +93,7 @@ class File extends BasicApi
         $memberCode = getCurrentMember()['code'];
         $date = date('Ymd', time());
         $ticket = date('YmdHis', time());
-        $path = config('upload.base_path') . config('upload.file_temp') . "/{$orgCode}/{$memberCode}/$date/";
+        $path = config('upload.base_path') . config('upload.file_temp') . "/{$orgCode}/{$memberCode}/$date";
         $saveName = $fileName . "-{$chunkNumber}";
         try {
             $uploadInfo = _uploadFile($file, $path, $saveName);
@@ -111,20 +111,22 @@ class File extends BasicApi
         $path2 = config('upload.base_path') . config('upload.file') . "/{$orgCode}/{$memberCode}/$date/$ticket-$orgFileName";
         if ($chunkNumber == $totalChunks) {
             $fileList = [];
-//            $blob = '';
+            $blob = '';
             for ($i = 1; $i <= $totalChunks; $i++) {
                 $ext = explode('.', $orgFileName);
                 $ext = $ext[count($ext) - 1];
                 $fileUrl = "{$path}/{$fileName}-{$i}.{$ext}";
                 $site_url = FileService::getFileUrl($fileUrl, 'local');
-                $blob = file_get_contents($site_url);
-//                $blob .= file_get_contents($site_url);
+//                $blob = file_get_contents($site_url);
+                $blob .= file_get_contents($site_url);
+
                 $fileList[] = env('root_path') . $fileUrl;
-                $result = FileService::$type($path2, $blob);
-                unset($blob);
-                unset($site_url);
+
+//                $result = FileService::$type($path2, $blob);
+//                unset($blob);
+//                unset($site_url);
             }
-            //Allowed memory size of 1073741824 bytes exhausted (tried to allocate 534773792 bytes)
+            $result = FileService::$type($path2, $blob);
             $fileData['size'] = $data['totalSize'];
             $fileData['path_name'] = $result['key'];
             $fileData['file_url'] = $result['url'];
@@ -132,9 +134,11 @@ class File extends BasicApi
             $fileData['size'] = $data['totalSize'];
             !isset($data['taskCode']) && $data['taskCode'] = '';
             $fileResult = \app\common\Model\File::createFile($data['projectCode'], $fileData);
+
+            unset($info);
             //文件碎片移除
             foreach ($fileList as $file) {
-                @unlink($file);
+                unlink($file);
             }
             $fileInfo = \app\common\Model\File::where(['code' => $fileResult['code']])->find();
             if ($data['taskCode']) {
