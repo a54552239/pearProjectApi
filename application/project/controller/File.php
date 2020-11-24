@@ -6,6 +6,7 @@ use app\common\Model\Member;
 use controller\BasicApi;
 use service\FileService;
 use think\Exception;
+use think\facade\Log;
 use think\facade\Request;
 
 
@@ -116,11 +117,15 @@ class File extends BasicApi
                 $ext = explode('.', $orgFileName);
                 $ext = $ext[count($ext) - 1];
                 $fileUrl = "{$path}/{$fileName}-{$i}.{$ext}";
+
+//                logRecord(['url' => $fileUrl], 'info', 'temp/uploadFiles');
                 $site_url = FileService::getFileUrl($fileUrl, 'local');
-                $blob = file_get_contents($site_url);
+                if ($site_url) {
+                    $blob = file_get_contents($site_url);
 //                $blob .= file_get_contents($site_url);
-                $fileList[] = env('root_path') . $fileUrl;
-                $result = FileService::$type($path2, $blob, true);
+                    $fileList[] = env('root_path') . $fileUrl;
+                    $result = FileService::$type($path2, $blob, true);
+                }
                 unset($blob);
                 unset($site_url);
                 unset($fileUrl);
