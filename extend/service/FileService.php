@@ -328,7 +328,7 @@ class FileService
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-    public static function qiniu($filename, $content)
+    public static function qiniu($filename, $content, $append = false)
     {
         $auth = new Auth(sysconf('storage_qiniu_access_key'), sysconf('storage_qiniu_secret_key'));
         $token = $auth->uploadToken(sysconf('storage_qiniu_bucket'));
@@ -351,7 +351,7 @@ class FileService
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-    public static function oss($filename, $content)
+    public static function oss($filename, $content, $append = false)
     {
         try {
             $endpoint = 'http://' . sysconf('storage_oss_domain');

@@ -101,7 +101,7 @@ class File extends BasicApi
             $this->error($e->getMessage(), 500);
         }
         $info = $uploadInfo['uploadInfo'];
-
+        unset($uploadInfo);
         $fileData = [
             'extension' => $info->getExtension(),
             'file_type' => $info->getInfo()['type'],
@@ -134,11 +134,10 @@ class File extends BasicApi
             !isset($data['taskCode']) && $data['taskCode'] = '';
             $fileResult = \app\common\Model\File::createFile($data['projectCode'], $fileData);
 
-            unset($fileData);
             unset($info);
             //文件碎片移除
             foreach ($fileList as $file) {
-                @unlink($file);
+                unlink($file);
             }
             $fileInfo = \app\common\Model\File::where(['code' => $fileResult['code']])->find();
             if ($data['taskCode']) {
