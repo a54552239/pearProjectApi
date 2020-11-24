@@ -305,12 +305,12 @@ class FileService
      * @param string $content
      * @return array|null
      */
-    public static function local($filename, $content)
+    public static function local($filename, $content, $append = false)
     {
         try {
             $realfile = env('root_path') . $filename;
             !file_exists(dirname($realfile)) && mkdir(dirname($realfile), 0755, true);
-            if (file_put_contents($realfile, $content, FILE_APPEND)) {
+            if (file_put_contents($realfile, $content, $append ? FILE_APPEND : 0)) {
                 $url = pathinfo(request()->baseFile(true), PATHINFO_DIRNAME) . '/' . $filename;
                 return ['file' => $realfile, 'hash' => md5_file($realfile), 'key' => "{$filename}", 'url' => $url];
             }

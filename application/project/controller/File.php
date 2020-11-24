@@ -117,16 +117,15 @@ class File extends BasicApi
                 $ext = $ext[count($ext) - 1];
                 $fileUrl = "{$path}/{$fileName}-{$i}.{$ext}";
                 $site_url = FileService::getFileUrl($fileUrl, 'local');
-//                $blob = file_get_contents($site_url);
-                $blob .= file_get_contents($site_url);
-
+                $blob = file_get_contents($site_url);
+//                $blob .= file_get_contents($site_url);
                 $fileList[] = env('root_path') . $fileUrl;
-
-//                $result = FileService::$type($path2, $blob);
-//                unset($blob);
-//                unset($site_url);
+                $result = FileService::$type($path2, $blob, true);
+                unset($blob);
+                unset($site_url);
+                unset($fileUrl);
             }
-            $result = FileService::$type($path2, $blob);
+//            $result = FileService::$type($path2, $blob);
             $fileData['size'] = $data['totalSize'];
             $fileData['path_name'] = $result['key'];
             $fileData['file_url'] = $result['url'];
@@ -135,10 +134,11 @@ class File extends BasicApi
             !isset($data['taskCode']) && $data['taskCode'] = '';
             $fileResult = \app\common\Model\File::createFile($data['projectCode'], $fileData);
 
+            unset($fileData);
             unset($info);
             //文件碎片移除
             foreach ($fileList as $file) {
-                unlink($file);
+                @unlink($file);
             }
             $fileInfo = \app\common\Model\File::where(['code' => $fileResult['code']])->find();
             if ($data['taskCode']) {
