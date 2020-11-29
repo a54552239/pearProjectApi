@@ -103,6 +103,36 @@ class Account extends BasicApi
         $this->success('', $list);
     }
 
+
+    public function _allList()
+    {
+        $keyword = Request::post('keyword');
+        $orgCode = getCurrentOrganizationCode();
+        $where = [['organization_code', '=', $orgCode]];
+        if ($keyword) {
+            $where[] = ['name', 'like', "%{$keyword}%"];
+        }
+        $memberAccountList = MemberAccount::where($where)->select()->toArray();
+        $list = [];
+        if ($memberAccountList) {
+            foreach ($memberAccountList as $member) {
+                $item['memberCode'] = $member['member_code'];
+                $item['status'] = $member['status'];
+                $item['avatar'] = $member['avatar'];
+                if (!$item['avatar']) {
+                    $memberInfo = Member::where(['code' => $member['member_code']])->field('id', true)->find();
+                    if ($memberInfo) {
+                        $item['avatar'] = $memberInfo['avatar'];
+                    }
+                }
+                $item['name'] = $member['name'];
+                $item['email'] = $member['email'] ?? '未绑定邮箱';
+                $list[] = $item; //为了去重
+            }
+        }
+        $this->success('', $list);//数组下标重置
+    }
+
     public function read()
     {
         $code = Request::param('code');

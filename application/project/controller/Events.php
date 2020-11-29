@@ -6,8 +6,11 @@ use app\common\Model\EventsMember;
 use app\common\Model\Member;
 use app\common\Model\EventsLog;
 use controller\BasicApi;
+use service\DataService;
+use service\DateService;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
+use think\db\Where;
 use think\Exception;
 use think\exception\DbException;
 use think\exception\PDOException;
@@ -40,7 +43,6 @@ class Events extends BasicApi
             $where[] = ['project_code', '=', $code];
         }
         $where[] = ['deleted', '=', 0];
-        $where[] = ['organization_code', '=', getCurrentOrganizationCode()];
         $list = $this->model->_list($where);
 //        $eventMember = new EventsMember();
 //        $list = $eventMember->_list($where);
@@ -70,7 +72,6 @@ class Events extends BasicApi
         }
         $status = Request::post('status', -1);
         $where[] = ['deleted', '=', 0];
-        $where[] = ['organization_code', '=', getCurrentOrganizationCode()];
         $where[] = ['end_time', '>=', nowTime()];
         $memberWhere = [['member_code', '=', getCurrentMember()['code']]];
         if ($status != -1) {
@@ -287,6 +288,87 @@ class Events extends BasicApi
             $this->error($result['msg'], $result['errno']);
         }
         $this->success();
+    }
+
+    public function getEventsListByCalendar()
+    {
+        $date = Request::post('date');
+        $dateTimestamp = strtotime($date);
+        $month = DateService::unixtime('month', -1, 'begin', date('Y', $dateTimestamp), date('m', $dateTimestamp));
+        $month2 = DateService::unixtime('month', 2, 'begin', date('Y', $dateTimestamp), date('m', $dateTimestamp));
+        $begin = date('Y-m-d H:i:s', $month);
+        $end = date('Y-m-d H:i:s', $month2);
+        $memberCodes = Request::post('memberCodes');
+        if ($memberCodes) {
+            $memberCodes = json_decode($memberCodes, JSON_UNESCAPED_UNICODE);
+        }
+
+        $where[] = ['deleted', '=', 0];
+        $memberWhere = [['member_code', 'in', $memberCodes]];
+        $memberWhere[] = ['status', '<>', 2];
+        $eventCodes = EventsMember::where($memberWhere)->column('events_code');
+        $where[] = ['code', 'in', $eventCodes];
+//        $list = $this->model->_list($where);
+
+        $dateRange = DateService::getDateFromRange($begin, $end);
+
+        $rows = intval(Request::param('pageSize', cookie('pageSize')));
+        if (!$rows) {
+            $rows = 10;
+        }
+        cookie('pageSize', $rows);
+        $list = $this->model->where($where)->where(function ($query) use ($begin, $end) {
+            $where1 = [['begin_time', '<=', $begin], ['end_time', '>=', $begin]];
+            $where2 = [['begin_time', '>=', $begin], ['end_time', '<=', $end]];
+            $where3 = [['begin_time', '<=', $end], ['end_time', '>=', $end]];
+            $query->whereOr(function($query) use ($where1){
+                $query->where($where1);
+            })->whereOr(function ($query) use ($where2, $where3) {
+                $query->where($where2);
+            })->whereOr(function ($query) use ($where3) {
+                $query->where($where3);
+            });
+        })->select();
+//        $list = $page->all();
+        $newList = [];
+
+        $memberCode = getCurrentMember()['code'];
+        $dateRangeList = [];
+        if ($dateRange) {
+            foreach ($dateRange as $dateItem) {
+                if (!isset($dateRange[$dateItem])) {
+                    $dateRangeList[$dateItem] = [];
+                }
+                if ($list) {
+                    foreach ($list as &$item) {
+                        $item['visible'] = false;
+                        $item['visibleInner'] = false;
+                        $item['visibleMore'] = false;
+                        $item['waitConfirm'] = 1;
+                        $item['myStatus'] = 0;
+                        $waitConfirm = EventsMember::where(['events_code' => $item['code'], 'member_code' => $memberCode])->find();
+                        if ($waitConfirm) {
+                            if ($waitConfirm['status'] != 0) {
+                                $item['waitConfirm'] = 0;
+                            }
+                            $item['myStatus'] = $waitConfirm['status'];
+                        }else{
+                            $item['waitConfirm'] = 0;
+                        }
+                        $item['memberList'] = [];
+                        $members = EventsMember::where(['events_code' => $item['code']])->order('is_owner desc, status desc, id asc')->all();
+                        if ($members) {
+                            $item['memberList'] = $members;
+                        }
+                        if (($dateItem >= date('Y-m-d', strtotime($item['begin_time']))) && ($dateItem <= date('Y-m-d', strtotime($item['end_time'])))) {
+                            $dateRangeList[$dateItem][] = $item;
+                        }
+                    }
+                }
+            }
+        }
+        $result = ['list' => $dateRangeList, 'dateRange' => $dateRange];
+        $this->success('', $result);
     }
 
     /**
