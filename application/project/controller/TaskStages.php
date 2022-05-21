@@ -88,6 +88,24 @@ class TaskStages extends BasicApi
         $this->success('', $list);
     }
 
+    public function taskTree()
+    {
+        $where = [];
+        $code = Request::post('projectCode');
+        if (!$code) {
+            $this->error("请选择一个项目");
+        }
+        $where[] = ['project_code', '=', $code];
+        $list = $this->model->where($where)->select();
+        if ($list) {
+            foreach ($list as &$item) {
+                $item['type'] = 'stage';
+                $item['tasks'] = $this->model->tasksTree($item['code']);
+            }
+        }
+        $this->success('', $list);
+    }
+
     public function sort(Request $request)
     {
         $data = $request::only('preCode,nextCode');

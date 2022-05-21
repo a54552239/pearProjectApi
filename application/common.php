@@ -53,7 +53,7 @@ function setCurrentMember($data)
     if (!$data) {
         Cache::rm($key);
     }else{
-        Cache::set($key, $data);
+        Cache::set($key, $data, 3600 * 24 * 7);
     }
     return session('member', $data);
 }

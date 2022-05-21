@@ -305,12 +305,12 @@ class FileService
      * @param string $content
      * @return array|null
      */
-    public static function local($filename, $content)
+    public static function local($filename, $content, $append = false)
     {
         try {
             $realfile = env('root_path') . $filename;
             !file_exists(dirname($realfile)) && mkdir(dirname($realfile), 0755, true);
-            if (file_put_contents($realfile, $content)) {
+            if (file_put_contents($realfile, $content, $append ? FILE_APPEND : 0)) {
                 $url = pathinfo(request()->baseFile(true), PATHINFO_DIRNAME) . '/' . $filename;
                 return ['file' => $realfile, 'hash' => md5_file($realfile), 'key' => "{$filename}", 'url' => $url];
             }
@@ -328,7 +328,7 @@ class FileService
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-    public static function qiniu($filename, $content)
+    public static function qiniu($filename, $content, $append = false)
     {
         $auth = new Auth(sysconf('storage_qiniu_access_key'), sysconf('storage_qiniu_secret_key'));
         $token = $auth->uploadToken(sysconf('storage_qiniu_bucket'));
@@ -351,7 +351,7 @@ class FileService
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-    public static function oss($filename, $content)
+    public static function oss($filename, $content, $append = false)
     {
         try {
             $endpoint = 'http://' . sysconf('storage_oss_domain');
