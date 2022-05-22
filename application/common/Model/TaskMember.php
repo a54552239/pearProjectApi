@@ -35,7 +35,7 @@ class TaskMember extends CommonModel
         }
         $currentMember = getCurrentMember();
         $taskExecutor = self::where(['is_executor' => 1, 'task_code' => $taskCode])->find(); //原执行者
-        if ($taskExecutor['member_code'] == $memberCode) {
+        if ($taskExecutor && $taskExecutor['member_code'] == $memberCode) {
             //已经是本人
             return true;
         }
