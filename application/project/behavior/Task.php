@@ -199,6 +199,21 @@ class Task
             $logData['content'] = $content;
         }
         ProjectLog::create($logData);
+
+        $scheduleActions = ['create', 'done', 'redo', 'recycle', 'recovery', 'redoChild', 'doneChild', 'createChild'];
+        if (in_array($data['type'], $scheduleActions)) {
+            $project = \app\common\Model\Project::where(['code' => $task['project_code']])->field('auto_update_schedule,schedule')->find();
+            if ($project['auto_update_schedule']) {
+                $taskCount = \app\common\Model\Task::where(['project_code' => $task['project_code']])->count('code');
+                if ($taskCount) {
+                    $doneTaskCount = \app\common\Model\Task::where(['project_code' => $task['project_code'], 'done' => 1])->count('code');
+                    $schedule = $doneTaskCount / $taskCount * 100;
+                    $project->schedule = $schedule;
+                    $project->save();
+                }
+            }
+        }
+
         //工作流事件
         if (!$isRobot && !$task['pcode']) {//子任务不触发
             $workflowActions = ['create', 'move', 'done', 'redo', 'assign', 'setEndTime', 'pri'];
